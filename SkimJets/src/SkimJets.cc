@@ -85,10 +85,10 @@ SkimJets::~SkimJets()
 bool
 SkimJets::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  using namespace edm;
-
   edm::Handle<reco::PFJetCollection> H_pfjets;
   iEvent.getByLabel(jetCollection_ , H_pfjets);
+
+  
 
   return true;
 }
