@@ -61,7 +61,20 @@ process.out = cms.OutputModule(
         #"keep *_*photon*_*_*",
         #"keep *_*Photon*_*_*",
         #"keep *_*Tau*_*_*",
-        #"keep *_*tau*_*_*"
+        #"keep *_*tau*_*_*",
+        "drop *_*CaloJets*_*_*",
+        "drop *JPTJet*_*_*_*",
+        "drop *_*TrackJet*_*_*", 
+        "drop *_*Tau*_*_*",
+        "drop *_*electron*_*_*",
+        "drop *MET*_*_*_*",
+        "keep recoPFMETs_pfMet__RECO",
+        "drop *_*muon*_*_*",
+        "drop *_*Muon*_*_*",
+        "drop *_*conversion*_*_*", 
+        "drop *_*Conversion*_*_*", 
+        "drop *Extrapolation*_*_*_*",
+        "drop l1extra*_*_*_*"
         ),
     SelectEvents = cms.untracked.PSet(
         SelectEvents = cms.vstring('p')
