@@ -15,6 +15,8 @@
 
 // C++ lib
 #include <memory>
+#include <algorithm> 
+#include <vector>
 
 // CMSSW core
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -25,6 +27,9 @@
 
 // CMSSW specific
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
+// #include "DataFormats/JetReco/interface/PFJet.h"
+
+#include "CommonTools/Utils/interface/PtComparator.h"
 
 //
 // class declaration
@@ -87,10 +92,43 @@ SkimJets::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   edm::Handle<reco::PFJetCollection> H_pfjets;
   iEvent.getByLabel(jetCollection_ , H_pfjets);
-
   
+//   const std::vector<reco::PFJet>* V_pfjets = H_pfjets.product();
+  
+  double jetpt1 = 0;
+  double jetpt2 = 0;
+  double jeteta1 = 0;
+  double jeteta2 = 0;
+  
+  double ptcut = 250;
+  double etacut = 2.5;
+  
+  int index = 0;
+  
+//   std::cout<<"new event"<<std::endl;
+  
+  for (reco::PFJetCollection::const_iterator jet = H_pfjets->begin(); jet != H_pfjets->end(); ++jet){
+//     std::cout<<jet->pt()<<std::endl;
+    if (index == 0){
+      jetpt1 = jet->pt();
+      jeteta1 = fabs(jet->eta());
+    }
+    if (index == 1){
+      jetpt2 = jet->pt();
+      jeteta2 = fabs(jet->eta());
+    }
+    index++;
+  }
+  
+  if (jetpt1 > ptcut && jetpt2 > ptcut && jeteta1 < etacut && jeteta2 < etacut){
+//     std::cout<<jetpt1<<"/"<<jetpt2<<"/"<<jeteta1<<"/"<<jeteta2<<std::endl;
+    return true;
+  }
+  else return false;
 
-  return true;
+//   GreaterByPt<reco::PFJet> comparator;
+//   std::sort(V_pfjets->begin(), V_pfjets->end(), comparator);
+
 }
 
 // ------------ method called once each job just before starting event loop  ------------
