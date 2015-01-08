@@ -43,6 +43,7 @@ process.out = cms.OutputModule(
         'keep edmTriggerResults_*_*_*',
         'keep triggerTriggerEvent_*_*_*',
         "keep *_genParticles_*_*",
+        "keep recoRecoChargedRefCandidates_trackRefsForJets_*_*",
         "keep recoTracks_generalTracks_*_*",
         "keep recoPFMETs_pfMet__RECO",
         "keep *_*ak5*_*_*",
