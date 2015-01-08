@@ -95,8 +95,6 @@ SkimJets::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<reco::PFJetCollection> H_pfjets;
   iEvent.getByLabel(jetCollection_ , H_pfjets);
   
-//   const std::vector<reco::PFJet>* V_pfjets = H_pfjets.product();
-  
   double jetpt1 = 0;
   double jetpt2 = 0;
   double jeteta1 = 0;
@@ -107,10 +105,7 @@ SkimJets::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   
   int index = 0;
   
-//   std::cout<<"new event"<<std::endl;
-  
   for (reco::PFJetCollection::const_iterator jet = H_pfjets->begin(); jet != H_pfjets->end(); ++jet){
-//     std::cout<<jet->pt()<<std::endl;
     if (index == 0){
       jetpt1 = jet->pt();
       jeteta1 = fabs(jet->eta());
@@ -122,15 +117,8 @@ SkimJets::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     index++;
   }
   
-  if (jetpt1 > ptcut && jetpt2 > ptcut && jeteta1 < etacut && jeteta2 < etacut){
-//     std::cout<<jetpt1<<"/"<<jetpt2<<"/"<<jeteta1<<"/"<<jeteta2<<std::endl;
-    return true;
-  }
+  if (jetpt1 > ptcut && jetpt2 > ptcut && jeteta1 < etacut && jeteta2 < etacut) return true;
   else return false;
-
-//   GreaterByPt<reco::PFJet> comparator;
-//   std::sort(V_pfjets->begin(), V_pfjets->end(), comparator);
-
   
 }
 
