@@ -1,83 +1,23 @@
-// -*- C++ -*-
-//
-// Package:    TreeProducer
-// Class:      TreeProducer
-// 
-/**\class TreeProducer TreeProducer.cc SimpAnalysis/TreeProducer/src/TreeProducer.cc
-
- Description: [one line class summary]
-
- Implementation:
-     [Notes on implementation]
-*/
-//
-// Original Author:  local user
-//         Created:  Fri Jan  9 09:54:43 CET 2015
-// $Id$
-//
-//
-
-
-// system include files
-#include <memory>
-
-// user include files
-#include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDAnalyzer.h"
-
-#include "FWCore/Framework/interface/Event.h"
-#include "FWCore/Framework/interface/MakerMacros.h"
-
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
-//
-// class declaration
-//
-
-class TreeProducer : public edm::EDAnalyzer {
-   public:
-      explicit TreeProducer(const edm::ParameterSet&);
-      ~TreeProducer();
-
-      static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
-
-
-   private:
-      virtual void beginJob() ;
-      virtual void analyze(const edm::Event&, const edm::EventSetup&);
-      virtual void endJob() ;
-
-      virtual void beginRun(edm::Run const&, edm::EventSetup const&);
-      virtual void endRun(edm::Run const&, edm::EventSetup const&);
-      virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
-      virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
-
-      // ----------member data ---------------------------
-};
-
-//
-// constants, enums and typedefs
-//
-
-//
-// static data member definitions
-//
+#include "SimpAnalysis/TreeProducer/interface/TreeProducer.h"
 
 //
 // constructors and destructor
 //
-TreeProducer::TreeProducer(const edm::ParameterSet& iConfig)
-
+TreeProducer::TreeProducer(const edm::ParameterSet& pset):
+  _hltProcessName(pset.getParameter<string>("hltProcessName")),
+  _trigResultsLabel("TriggerResults", "", _hltProcessName),
+  _pfjetCollection(pset.getParameter<edm::InputTag>("pfjetCollection"))
 {
-   //now do what ever initialization is needed
 
+  // Initialize when class is created
+  edm::Service<TFileService> fs ;
+  _tree = fs->make <TTree>("SimpAnalysis","tree");
+  
 }
 
 
 TreeProducer::~TreeProducer()
 {
- 
-   // do anything here that needs to be done at desctruction time
-   // (e.g. close files, deallocate resources etc.)
 
 }
 
@@ -90,19 +30,58 @@ TreeProducer::~TreeProducer()
 void
 TreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-   using namespace edm;
 
+  // HANDLES
+  // Get collections
+  edm::Handle<edm::TriggerResults> H_trig;
+  iEvent.getByLabel(_trigResultsLabel, H_trig);
 
+  edm::Handle<reco::PFJetCollection> H_pfjets;
+  iEvent.getByLabel(_pfjetCollection , H_pfjets);
 
-#ifdef THIS_IS_AN_EVENT_EXAMPLE
-   Handle<ExampleData> pIn;
-   iEvent.getByLabel("example",pIn);
-#endif
-   
-#ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
-   ESHandle<SetupData> pSetup;
-   iSetup.get<SetupRecord>().get(pSetup);
-#endif
+  // Check validity
+  if(!H_trig.isValid()) {
+    if(verbose>0) cout << "Missing collection : " << _trigResultsLabel << " ... skip entry !" << endl;
+    return;
+  }
+
+  if(!H_pfjets.isValid()) {
+    if(verbose>0) cout << "Missing collection : " << _pfjetCollection << " ... skip entry !" << endl;
+    return;
+  }
+
+  // STORE JET INFORMATION //
+  //double jpt,jeta,jphi,je;
+  //jpt=jeta=jphi=je=0;
+  //UInt_t iJ=0;
+
+  // Loop over PFJets where theJet is a pointer to a PFJet
+  // loop only over 3 highest-pt jets
+
+  /*
+  // Kinematics
+  jpt  = theJet->Pt();
+  jeta = theJet->Eta();
+  jphi = theJet->Phi();
+  je   = theJet->E();
+  jet_TLV[iJ].SetPtEtaPhiE(jpt,jeta,jphi,je);
+
+  // Energy fractions
+  jet_efrac_ne_Had[iJ] = theJet->neutralHadronEnergyFraction();
+  jet_efrac_ne_EM[ iJ] = theJet->neutralEmEnergyFraction();
+  jet_efrac_ch_Had[iJ] = theJet->chargedHadronEnergyFraction();
+  jet_efrac_ch_EM[ iJ] = theJet->chargedEmEnergyFraction();
+  jet_efrac_ch_Mu[ iJ] = theJet->chargedMuEnergyFraction();
+
+  // Multiplicities
+  jet_mult_ch[iJ] = theJet->chargedMultiplicity();
+  jet_mult_mu[iJ] = theJet->muonMultiplicity();
+  jet_mult_ne[iJ] = theJet->neutralMultiplicity();
+
+  iJ++ ;
+  if(iJ>=3) break;
+  */
+
 }
 
 
