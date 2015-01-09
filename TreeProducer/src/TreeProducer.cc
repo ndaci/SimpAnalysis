@@ -114,6 +114,7 @@ TreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   _nJet = nJ;
 
+  _tree->Fill();
 }
 
 
