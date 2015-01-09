@@ -78,8 +78,8 @@ class TreeProducer : public edm::EDAnalyzer {
   TLorentzVector jet_TLV[3];
 
   int jet_mult_ch[3], jet_mult_mu[3], jet_mult_ne[3]; // multiplicities
-  //double jet_efrac_ne_Had[3], double jet_efrac_ne_EM[3]; // neutral energy fractions
-  //double jet_efrac_ch_Had[3], double jet_efrac_ch_EM[3], double jet_efrac_ch_Mu[3]; // charged energy fractions
+  double jet_efrac_ne_Had[3], jet_efrac_ne_EM[3]; // neutral energy fractions
+  double jet_efrac_ch_Had[3], jet_efrac_ch_EM[3], jet_efrac_ch_Mu[3]; // charged energy fractions
 
   // Vertices
 
