@@ -30,6 +30,8 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 // CMSSW specific lib
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/JetReco/interface/PFJet.h"
@@ -71,6 +73,7 @@ class TreeProducer : public edm::EDAnalyzer {
   string   _hltProcessName;
   edm::InputTag _trigResultsLabel;
   edm::InputTag _pfjetCollection;
+  edm::InputTag _vertexCollection;
 
   TTree* _tree;
 

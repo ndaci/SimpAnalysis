@@ -6,7 +6,8 @@
 TreeProducer::TreeProducer(const edm::ParameterSet& pset):
   _hltProcessName(pset.getParameter<string>("hltProcessName")),
   _trigResultsLabel("TriggerResults", "", _hltProcessName),
-  _pfjetCollection(pset.getParameter<edm::InputTag>("pfjetCollection"))
+  _pfjetCollection(pset.getParameter<edm::InputTag>("pfjetCollection")),
+  _vertexCollection(pset.getParameter<edm::InputTag>("vertexCollection"))
 {
 
   // Initialize when class is created
@@ -66,6 +67,9 @@ TreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   // Get collections
   edm::Handle<edm::TriggerResults> H_trig;
   iEvent.getByLabel(_trigResultsLabel, H_trig);
+
+  edm::Handle<reco::VertexCollection> H_vert;
+  iEvent.getByLabel(_vertexCollection, H_vert);
 
   edm::Handle<reco::PFJetCollection> H_pfjets;
   iEvent.getByLabel(_pfjetCollection , H_pfjets);
