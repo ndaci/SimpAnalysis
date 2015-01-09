@@ -1,7 +1,7 @@
 from WMCore.Configuration import Configuration
 config = Configuration()
 
-name = 'Simps_JetHT_2012D_08Jan2015_v1'
+name = 'Simps_JetHT_2012D_09Jan2015_v2'
 
 # GENERAL
 config.section_("General")
@@ -23,7 +23,7 @@ config.section_("Data")
 config.Data.inputDataset = '/JetHT/Run2012D-22Jan2013-v1/AOD'
 config.Data.inputDBS  = 'https://cmsweb.cern.ch/dbs/prod/global/DBSReader/'
 config.Data.splitting = 'LumiBased'
-config.Data.unitsPerJob = 500
+config.Data.unitsPerJob = 250
 config.Data.publication = True
 config.Data.publishDBS = 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter/'
 config.Data.publishDataName = name
