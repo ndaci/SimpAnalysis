@@ -13,6 +13,34 @@ TreeProducer::TreeProducer(const edm::ParameterSet& pset):
   edm::Service<TFileService> fs ;
   _tree = fs->make <TTree>("SimpAnalysis","tree");
   
+  // Declare tree's branches
+  //_tree->Branch("",&,"");
+  //
+  // Event
+  _tree->Branch("nEvent",&_nEvent,"nEvent/I");
+  _tree->Branch("nRun",&_nRun,"nRun/I");
+  _tree->Branch("nLumi",&_nLumi,"nLumi/I");
+  //
+  // Jets
+  _tree->Branch("nJet",&_nJet,"nJet/I");
+  //
+  _tree->Branch("jet_eta",&_jet_eta,"jet_eta/D");
+  _tree->Branch("jet_phi",&_jet_phi,"jet_phi/D");
+  _tree->Branch("jet_pt",&_jet_pt,"jet_pt/D");
+  _tree->Branch("jet_e",&_jet_e,"jet_e/D");
+  _tree->Branch("jet_m",&_jet_m,"jet_m/D");
+  //
+  _tree->Branch("jet_mult_ch",&_jet_mult_ch,"jet_mult_ch[nJet]/I");
+  _tree->Branch("jet_mult_mu",&_jet_mult_mu,"jet_mult_mu[nJet]/I");
+  _tree->Branch("jet_mult_ne",&_jet_mult_ne,"jet_mult_ne[nJet]/I");
+  //
+  _tree->Branch("jet_efrac_ne_Had", &_jet_efrac_ne_Had, "jet_efrac_ne_Had[nJet]/D");
+  _tree->Branch("jet_efrac_ne_EM",  &_jet_efrac_ne_EM,  "jet_efrac_ne_EM[nJet]/D" );
+  _tree->Branch("jet_efrac_ch_Had", &_jet_efrac_ch_Had, "jet_efrac_ch_Had[nJet]/D");
+  _tree->Branch("jet_efrac_ch_EM",  &_jet_efrac_ch_EM,  "jet_efrac_ch_EM[nJet]/D" );
+  _tree->Branch("jet_efrac_ch_Mu",  &_jet_efrac_ch_Mu,  "jet_efrac_ch_Mu[nJet]/D" );
+  //
+
 }
 
 
@@ -31,7 +59,10 @@ void
 TreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
-  // HANDLES
+  // Initialize branches
+  Init();
+
+  // HANDLES //
   // Get collections
   edm::Handle<edm::TriggerResults> H_trig;
   iEvent.getByLabel(_trigResultsLabel, H_trig);
@@ -51,36 +82,37 @@ TreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   }
 
   // STORE JET INFORMATION //
-  //double jpt,jeta,jphi,je;
-  //jpt=jeta=jphi=je=0;
-  //UInt_t iJ=0;
-
   // Loop over PFJets where theJet is a pointer to a PFJet
   // loop only over 3 highest-pt jets
+  //
+  UInt_t iJ=0;
+  //
+  for (reco::PFJetCollection::const_iterator theJet = H_pfjets->begin(); theJet != H_pfjets->end(); ++theJet){
 
-  /*
-  // Kinematics
-  jpt  = theJet->Pt();
-  jeta = theJet->Eta();
-  jphi = theJet->Phi();
-  je   = theJet->E();
-  jet_TLV[iJ].SetPtEtaPhiE(jpt,jeta,jphi,je);
+    // Kinematics
+    _jet_pt[iJ]  = theJet->pt();
+    _jet_eta[iJ] = theJet->eta();
+    _jet_phi[iJ] = theJet->phi();
+    _jet_e[iJ]   = theJet->energy();
+    _jet_m[iJ]   = theJet->mass();
 
-  // Energy fractions
-  jet_efrac_ne_Had[iJ] = theJet->neutralHadronEnergyFraction();
-  jet_efrac_ne_EM[ iJ] = theJet->neutralEmEnergyFraction();
-  jet_efrac_ch_Had[iJ] = theJet->chargedHadronEnergyFraction();
-  jet_efrac_ch_EM[ iJ] = theJet->chargedEmEnergyFraction();
-  jet_efrac_ch_Mu[ iJ] = theJet->chargedMuEnergyFraction();
+    // Energy fractions
+    _jet_efrac_ne_Had[iJ] = theJet->neutralHadronEnergyFraction();
+    _jet_efrac_ne_EM[ iJ] = theJet->neutralEmEnergyFraction();
+    _jet_efrac_ch_Had[iJ] = theJet->chargedHadronEnergyFraction();
+    _jet_efrac_ch_EM[ iJ] = theJet->chargedEmEnergyFraction();
+    _jet_efrac_ch_Mu[ iJ] = theJet->chargedMuEnergyFraction();
 
-  // Multiplicities
-  jet_mult_ch[iJ] = theJet->chargedMultiplicity();
-  jet_mult_mu[iJ] = theJet->muonMultiplicity();
-  jet_mult_ne[iJ] = theJet->neutralMultiplicity();
+    // Multiplicities
+    _jet_mult_ch[iJ] = theJet->chargedMultiplicity();
+    _jet_mult_mu[iJ] = theJet->muonMultiplicity();
+    _jet_mult_ne[iJ] = theJet->neutralMultiplicity();
 
-  iJ++ ;
-  if(iJ>=3) break;
-  */
+    iJ++ ;
+    if(iJ>=nJ) break;
+  }
+
+  _nJet = nJ;
 
 }
 
@@ -129,6 +161,30 @@ TreeProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
   desc.setUnknown();
   descriptions.addDefault(desc);
+}
+
+void
+TreeProducer::Init()
+{
+
+  _nEvent = _nRun = _nLumi = 0;
+
+  for(UInt_t i=0 ; i<nJ ; i++) {
+    _jet_eta[i] = 0;
+    _jet_phi[i] = 0;
+    _jet_pt[i]  = 0;
+    _jet_e[i]   = 0;
+    _jet_m[i]   = 0;
+    _jet_mult_ch[i] = 0;
+    _jet_mult_mu[i] = 0;
+    _jet_mult_ne[i] = 0;
+    _jet_efrac_ne_Had[i] = 0;
+    _jet_efrac_ne_EM[i] = 0;
+    _jet_efrac_ch_Had[i] = 0; 
+    _jet_efrac_ch_EM[i] = 0; 
+    _jet_efrac_ch_Mu[i] = 0;
+  }
+
 }
 
 //define this as a plug-in

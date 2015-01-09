@@ -41,6 +41,7 @@
 // others
 using namespace std;
 int verbose=1;
+const UInt_t nJ=3;
 
 //
 // class declaration
@@ -64,6 +65,8 @@ class TreeProducer : public edm::EDAnalyzer {
   virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
   virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
+  void Init();
+
   // ----------member data ---------------------------
   string   _hltProcessName;
   edm::InputTag _trigResultsLabel;
@@ -72,14 +75,13 @@ class TreeProducer : public edm::EDAnalyzer {
   TTree* _tree;
 
   // For branches
-  int nEvent, nRun, nLumi;
+  int _nEvent, _nRun, _nLumi, _nJet;
 
   // Jets
-  TLorentzVector jet_TLV[3];
-
-  int jet_mult_ch[3], jet_mult_mu[3], jet_mult_ne[3]; // multiplicities
-  double jet_efrac_ne_Had[3], jet_efrac_ne_EM[3]; // neutral energy fractions
-  double jet_efrac_ch_Had[3], jet_efrac_ch_EM[3], jet_efrac_ch_Mu[3]; // charged energy fractions
+  int _jet_mult_ch[nJ], _jet_mult_mu[nJ], _jet_mult_ne[nJ]; // multiplicities
+  double _jet_eta[nJ], _jet_phi[nJ], _jet_pt[nJ], _jet_e[nJ], _jet_m[nJ];
+  double _jet_efrac_ne_Had[nJ], _jet_efrac_ne_EM[nJ]; // neutral energy fractions
+  double _jet_efrac_ch_Had[nJ], _jet_efrac_ch_EM[nJ], _jet_efrac_ch_Mu[nJ]; // charged energy fractions
 
   // Vertices
 
