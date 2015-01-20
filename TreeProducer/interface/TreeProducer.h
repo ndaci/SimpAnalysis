@@ -30,8 +30,10 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 // CMSSW specific lib
+#include "RecoVertex/PrimaryVertexProducer/interface/PrimaryVertexSorter.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
+#include "DataFormats/GeometryVector/interface/GlobalPoint.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/JetReco/interface/PFJet.h"
@@ -44,6 +46,7 @@
 using namespace std;
 int verbose=1;
 const UInt_t nJ=3;
+const UInt_t nV=20;
 
 //
 // class declaration
@@ -74,11 +77,18 @@ class TreeProducer : public edm::EDAnalyzer {
   edm::InputTag _trigResultsLabel;
   edm::InputTag _pfjetCollection;
   edm::InputTag _vertexCollection;
+  GlobalPoint vertexPosition;
 
+  // Tree and its branches
   TTree* _tree;
 
-  // For branches
+  // Global quantities
   int _nEvent, _nRun, _nLumi, _nJet;
+
+  // Vertices
+  int _vtx_N, _vtx_N_stored;
+  double _vtx_x[nV], _vtx_y[nV], _vtx_z[nV];
+  double _vtx_normalizedChi2[nV], _vtx_ndof[nV], _vtx_nTracks[nV], _vtx_d0[nV];
 
   // Jets
   int _jet_mult_ch[nJ], _jet_mult_mu[nJ], _jet_mult_ne[nJ]; // multiplicities
