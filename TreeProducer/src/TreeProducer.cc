@@ -22,6 +22,16 @@ TreeProducer::TreeProducer(const edm::ParameterSet& pset):
   _tree->Branch("nRun",&_nRun,"nRun/I");
   _tree->Branch("nLumi",&_nLumi,"nLumi/I");
   //
+  // Vertices
+  _tree->Branch("vtx_N",&_vtx_N,"vtx_N/I");
+  _tree->Branch("vtx_normalizedChi2",&_vtx_normalizedChi2,"vtx_normalizedChi2[15]/D");
+  _tree->Branch("vtx_ndof",&_vtx_ndof,"vtx_ndof[15]/D");
+  _tree->Branch("vtx_nTracks",&_vtx_nTracks,"vtx_nTracks[15]/D");
+  _tree->Branch("vtx_d0",&_vtx_d0,"vtx_d0[15]/D");
+  _tree->Branch("vtx_x",&_vtx_x,"vtx_x[15]/D");
+  _tree->Branch("vtx_y",&_vtx_y,"vtx_y[15]/D");
+  _tree->Branch("vtx_z",&_vtx_z,"vtx_z[15]/D");
+  //
   // Jets
   _tree->Branch("nJet",&_nJet,"nJet/I");
   //
@@ -71,6 +81,10 @@ TreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::Handle<reco::VertexCollection> H_vert;
   iEvent.getByLabel(_vertexCollection, H_vert);
 
+  edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
+  iEvent.getByType(recoBeamSpotHandle);
+  const reco::BeamSpot bs = *recoBeamSpotHandle;
+
   edm::Handle<reco::PFJetCollection> H_pfjets;
   iEvent.getByLabel(_pfjetCollection , H_pfjets);
 
@@ -84,6 +98,48 @@ TreeProducer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     if(verbose>0) cout << "Missing collection : " << _pfjetCollection << " ... skip entry !" << endl;
     return;
   }
+
+  // GLOBAL EVENT INFORMATIONS //
+  _nRun   = iEvent.id().run();
+  _nLumi  = iEvent.luminosityBlock();
+  _nEvent = iEvent.id().event();
+
+  // VERTICES //
+  int vtx_counter=0;
+  _vtx_N = H_vert->size();
+  _vtx_N_stored = nV;
+	
+  // select the primary vertex as the one with higest sum of (pt)^2 of tracks                                                                               
+  PrimaryVertexSorter PVSorter;
+  std::vector<reco::Vertex> sortedVertices = PVSorter.sortedList( *(H_vert.product()) );
+
+  if(_vtx_N > 0) {
+    GlobalPoint local_vertexPosition(sortedVertices.front().position().x(),
+				     sortedVertices.front().position().y(),
+				     sortedVertices.front().position().z());
+    vertexPosition = local_vertexPosition;
+  }
+  else {
+    GlobalPoint local_vertexPosition(bs.position().x(),
+				     bs.position().y(),
+				     bs.position().z());
+    vertexPosition = local_vertexPosition;
+  }
+
+  for( std::vector<reco::Vertex>::const_iterator PV = sortedVertices.begin(); PV != sortedVertices.end(); ++PV){
+    if(vtx_counter > int(nV)) break;
+		
+    _vtx_normalizedChi2[vtx_counter] = PV->normalizedChi2();
+    _vtx_ndof[vtx_counter] = PV->ndof();
+    _vtx_nTracks[vtx_counter] = PV->tracksSize();
+    _vtx_d0[vtx_counter] = PV->position().Rho();
+    _vtx_x[vtx_counter] = PV->x();
+    _vtx_y[vtx_counter] = PV->y();
+    _vtx_z[vtx_counter] = PV->z();
+		
+    vtx_counter++;
+  } // for loop on primary vertices
+
 
   // STORE JET INFORMATION //
   // Loop over PFJets where theJet is a pointer to a PFJet
@@ -173,6 +229,18 @@ TreeProducer::Init()
 {
 
   _nEvent = _nRun = _nLumi = 0;
+
+  // Vertices
+  _vtx_N = 0; 
+  for(UInt_t iv=0;iv<nV;iv++) {
+    _vtx_normalizedChi2[iv] = 0.;
+    _vtx_ndof[iv] = 0.;
+    _vtx_nTracks[iv] = 0.;
+    _vtx_d0[iv] = 0.;
+    _vtx_x[iv] = 0.;
+    _vtx_y[iv] = 0.;
+    _vtx_z[iv] = 0.;
+  }
 
   for(UInt_t i=0 ; i<nJ ; i++) {
     _jet_eta[i] = 0;
