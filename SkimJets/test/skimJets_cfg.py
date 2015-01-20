@@ -37,6 +37,8 @@ process.out = cms.OutputModule(
     fileName = cms.untracked.string('skimjets.root'),
     outputCommands = cms.untracked.vstring(
         'drop *',
+        "keep *_offlineBeamSpot_*_*",
+        "keep *_offlinePrimaryVertices*_*_*",
         "keep *_TriggerResults_*_*",
         "keep *_hltTriggerSummaryAOD_*_*",
         'keep *_hltL1GtObjectMap_*_*',
