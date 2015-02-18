@@ -1,7 +1,7 @@
 from WMCore.Configuration import Configuration
 config = Configuration()
 
-name = 'Simps_Jet_2011B_v1_15Jan2015'
+name = 'Simps_Jet_2011B_v2_12Feb2015'
 
 # GENERAL
 config.section_("General")
