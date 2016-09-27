@@ -78,14 +78,14 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   edm::Handle<edm::TriggerResults> H_trig;
   iEvent.getByLabel(_trigResultsLabel, H_trig);
 
-  edm::Handle<reco::VertexCollection> H_vert;
+  edm::Handle<vector<reco::Vertex> > H_vert;
   iEvent.getByLabel(_vertexCollection, H_vert);
 
   edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
-  iEvent.getByType(recoBeamSpotHandle);
+  iEvent.getByLabel("offlineBeamSpot", recoBeamSpotHandle);
   const reco::BeamSpot bs = *recoBeamSpotHandle;
 
-  edm::Handle<reco::PFJetCollection> H_pfjets;
+  edm::Handle<vector<pat::Jet> > H_pfjets;
   iEvent.getByLabel(_pfjetCollection , H_pfjets);
 
   // Check validity
@@ -147,7 +147,7 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   //
   UInt_t iJ=0;
   //
-  for (reco::PFJetCollection::const_iterator theJet = H_pfjets->begin(); theJet != H_pfjets->end(); ++theJet){
+  for (vector<pat::Jet>::const_iterator theJet = H_pfjets->begin(); theJet != H_pfjets->end(); ++theJet){
 
     // Kinematics
     _jet_pt[iJ]  = theJet->pt();
