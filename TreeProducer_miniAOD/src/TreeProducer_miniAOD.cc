@@ -4,10 +4,13 @@
 // constructors and destructor
 //
 TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
-  _hltProcessName(pset.getParameter<string>("hltProcessName")),
-  _trigResultsLabel("TriggerResults", "", _hltProcessName),
-  _pfjetCollection(pset.getParameter<edm::InputTag>("pfjetCollection")),
-  _vertexCollection(pset.getParameter<edm::InputTag>("vertexCollection"))
+//   _hltProcessName(pset.getParameter<string>("hltProcessName")),
+  _trigResultsTag(pset.getParameter<edm::InputTag>("triggerResults")),
+  _pfjetCollectionTag(pset.getParameter<edm::InputTag>("pfjetCollection")),
+  _vertexCollectionTag(pset.getParameter<edm::InputTag>("vertexCollection")),
+  _trigResultsToken(consumes<edm::TriggerResults>(_trigResultsTag)),
+  _pfjetCollectionToken(consumes<vector<pat::Jet> >(_pfjetCollectionTag)),
+  _vertexCollectionToken(consumes<vector<reco::Vertex> >(_vertexCollectionTag))
 {
 
   // Initialize when class is created
@@ -76,26 +79,26 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   // HANDLES //
   // Get collections
   edm::Handle<edm::TriggerResults> H_trig;
-  iEvent.getByLabel(_trigResultsLabel, H_trig);
+  iEvent.getByToken(_trigResultsToken, H_trig);
 
   edm::Handle<vector<reco::Vertex> > H_vert;
-  iEvent.getByLabel(_vertexCollection, H_vert);
+  iEvent.getByToken(_vertexCollectionToken, H_vert);
 
-  edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
-  iEvent.getByLabel("offlineBeamSpot", recoBeamSpotHandle);
-  const reco::BeamSpot bs = *recoBeamSpotHandle;
+//   edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
+//   iEvent.getByType("offlineBeamSpot", recoBeamSpotHandle);
+//   const reco::BeamSpot bs = *recoBeamSpotHandle;
 
   edm::Handle<vector<pat::Jet> > H_pfjets;
-  iEvent.getByLabel(_pfjetCollection , H_pfjets);
+  iEvent.getByToken(_pfjetCollectionToken , H_pfjets);
 
   // Check validity
   if(!H_trig.isValid()) {
-    if(verbose>0) cout << "Missing collection : " << _trigResultsLabel << " ... skip entry !" << endl;
+    if(verbose>0) cout << "Missing collection : " << _trigResultsTag << " ... skip entry !" << endl;
     return;
   }
 
   if(!H_pfjets.isValid()) {
-    if(verbose>0) cout << "Missing collection : " << _pfjetCollection << " ... skip entry !" << endl;
+    if(verbose>0) cout << "Missing collection : " << _pfjetCollectionTag << " ... skip entry !" << endl;
     return;
   }
 
@@ -113,18 +116,18 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   PrimaryVertexSorter PVSorter;
   std::vector<reco::Vertex> sortedVertices = PVSorter.sortedList( *(H_vert.product()) );
 
-  if(_vtx_N > 0) {
-    GlobalPoint local_vertexPosition(sortedVertices.front().position().x(),
-				     sortedVertices.front().position().y(),
-				     sortedVertices.front().position().z());
-    vertexPosition = local_vertexPosition;
-  }
-  else {
-    GlobalPoint local_vertexPosition(bs.position().x(),
-				     bs.position().y(),
-				     bs.position().z());
-    vertexPosition = local_vertexPosition;
-  }
+//   if(_vtx_N > 0) {
+//     GlobalPoint local_vertexPosition(sortedVertices.front().position().x(),
+// 				     sortedVertices.front().position().y(),
+// 				     sortedVertices.front().position().z());
+//     vertexPosition = local_vertexPosition;
+//   }
+//   else {
+//     GlobalPoint local_vertexPosition(bs.position().x(),
+// 				     bs.position().y(),
+// 				     bs.position().z());
+//     vertexPosition = local_vertexPosition;
+//   }
 
   for( std::vector<reco::Vertex>::const_iterator PV = sortedVertices.begin(); PV != sortedVertices.end(); ++PV){
     if(vtx_counter > int(nV)) break;

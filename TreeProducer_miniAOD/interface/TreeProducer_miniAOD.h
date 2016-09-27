@@ -70,11 +70,14 @@ class TreeProducer_miniAOD : public edm::EDAnalyzer {
   void Init();
 
   // ----------member data ---------------------------
-  string   _hltProcessName;
-  edm::InputTag _trigResultsLabel;
-  edm::InputTag _pfjetCollection;
-  edm::InputTag _vertexCollection;
-  GlobalPoint vertexPosition;
+  string   _hltProcessName;  
+  edm::InputTag _trigResultsTag;
+  edm::InputTag _pfjetCollectionTag;
+  edm::InputTag _vertexCollectionTag;
+  edm::EDGetTokenT<edm::TriggerResults> _trigResultsToken;
+  edm::EDGetTokenT<vector<pat::Jet> > _pfjetCollectionToken;
+  edm::EDGetTokenT<vector<reco::Vertex> > _vertexCollectionToken;
+//   GlobalPoint vertexPosition;
 
   // Tree and its branches
   TTree* _tree;
