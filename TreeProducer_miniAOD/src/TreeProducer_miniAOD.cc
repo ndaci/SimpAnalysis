@@ -101,6 +101,11 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     if(verbose>0) cout << "Missing collection : " << _pfjetCollectionTag << " ... skip entry !" << endl;
     return;
   }
+  
+  if(!H_vert.isValid()) {
+    if(verbose>0) cout << "Missing collection : " << _vertexCollectionTag << " ... skip entry !" << endl;
+    return;
+  }
 
   // GLOBAL EVENT INFORMATIONS //
   _nRun   = iEvent.id().run();
