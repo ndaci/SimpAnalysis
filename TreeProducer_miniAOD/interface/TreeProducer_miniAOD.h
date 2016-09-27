@@ -70,11 +70,12 @@ class TreeProducer_miniAOD : public edm::EDAnalyzer {
   void Init();
 
   // ----------member data ---------------------------
-  string   _hltProcessName;  
   edm::InputTag _trigResultsTag;
+  edm::InputTag _METfilterTag;
   edm::InputTag _pfjetCollectionTag;
   edm::InputTag _vertexCollectionTag;
   edm::EDGetTokenT<edm::TriggerResults> _trigResultsToken;
+  edm::EDGetTokenT<edm::TriggerResults> _METfilterToken;
   edm::EDGetTokenT<vector<pat::Jet> > _pfjetCollectionToken;
   edm::EDGetTokenT<vector<reco::Vertex> > _vertexCollectionToken;
 //   GlobalPoint vertexPosition;
@@ -96,7 +97,8 @@ class TreeProducer_miniAOD : public edm::EDAnalyzer {
   double _jet_efrac_ne_Had[nJ], _jet_efrac_ne_EM[nJ]; // neutral energy fractions
   double _jet_efrac_ch_Had[nJ], _jet_efrac_ch_EM[nJ], _jet_efrac_ch_Mu[nJ]; // charged energy fractions
 
-  // Vertices
+  // MET
+  double MET, MET_phi;
 
 };
 

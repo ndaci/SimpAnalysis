@@ -4,11 +4,12 @@
 // constructors and destructor
 //
 TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
-//   _hltProcessName(pset.getParameter<string>("hltProcessName")),
   _trigResultsTag(pset.getParameter<edm::InputTag>("triggerResults")),
+  _METfilterTag(pset.getParameter<edm::InputTag>("METfilter")),
   _pfjetCollectionTag(pset.getParameter<edm::InputTag>("pfjetCollection")),
   _vertexCollectionTag(pset.getParameter<edm::InputTag>("vertexCollection")),
   _trigResultsToken(consumes<edm::TriggerResults>(_trigResultsTag)),
+  _METfilterToken(consumes<edm::TriggerResults>(_METfilterTag)),
   _pfjetCollectionToken(consumes<vector<pat::Jet> >(_pfjetCollectionTag)),
   _vertexCollectionToken(consumes<vector<reco::Vertex> >(_vertexCollectionTag))
 {
@@ -53,6 +54,7 @@ TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
   _tree->Branch("jet_efrac_ch_Had", &_jet_efrac_ch_Had, "jet_efrac_ch_Had[nJet]/D");
   _tree->Branch("jet_efrac_ch_EM",  &_jet_efrac_ch_EM,  "jet_efrac_ch_EM[nJet]/D" );
   _tree->Branch("jet_efrac_ch_Mu",  &_jet_efrac_ch_Mu,  "jet_efrac_ch_Mu[nJet]/D" );
+
   //
 
 }
@@ -78,6 +80,9 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   // HANDLES //
   // Get collections
+  edm::Handle<edm::TriggerResults> H_METfilter;
+  iEvent.getByToken(_METfilterToken, H_METfilter);
+  
   edm::Handle<edm::TriggerResults> H_trig;
   iEvent.getByToken(_trigResultsToken, H_trig);
 
@@ -181,6 +186,9 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   }
 
   _nJet = nJ;
+  
+  //MET//
+  
 
   _tree->Fill();
 }
