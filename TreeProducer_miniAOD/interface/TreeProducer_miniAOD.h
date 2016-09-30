@@ -74,10 +74,12 @@ class TreeProducer_miniAOD : public edm::EDAnalyzer {
   edm::InputTag _METfilterTag;
   edm::InputTag _pfjetCollectionTag;
   edm::InputTag _vertexCollectionTag;
+  edm::InputTag _METCollectionTag;
   edm::EDGetTokenT<edm::TriggerResults> _trigResultsToken;
   edm::EDGetTokenT<edm::TriggerResults> _METfilterToken;
   edm::EDGetTokenT<vector<pat::Jet> > _pfjetCollectionToken;
   edm::EDGetTokenT<vector<reco::Vertex> > _vertexCollectionToken;
+  edm::EDGetTokenT<vector<reco::Vertex> > _METCollectionToken;
 //   GlobalPoint vertexPosition;
 
   // Tree and its branches
@@ -98,7 +100,7 @@ class TreeProducer_miniAOD : public edm::EDAnalyzer {
   double _jet_efrac_ch_Had[nJ], _jet_efrac_ch_EM[nJ], _jet_efrac_ch_Mu[nJ]; // charged energy fractions
 
   // MET
-  double MET, MET_phi;
+  double _MET, _MET_phi;
 
 };
 

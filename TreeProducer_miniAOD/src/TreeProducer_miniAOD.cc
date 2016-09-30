@@ -8,10 +8,13 @@ TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
   _METfilterTag(pset.getParameter<edm::InputTag>("METfilter")),
   _pfjetCollectionTag(pset.getParameter<edm::InputTag>("pfjetCollection")),
   _vertexCollectionTag(pset.getParameter<edm::InputTag>("vertexCollection")),
+  _METCollectionTag(pset.getParameter<edm::InputTag>("METCollection")),
+  
   _trigResultsToken(consumes<edm::TriggerResults>(_trigResultsTag)),
   _METfilterToken(consumes<edm::TriggerResults>(_METfilterTag)),
   _pfjetCollectionToken(consumes<vector<pat::Jet> >(_pfjetCollectionTag)),
-  _vertexCollectionToken(consumes<vector<reco::Vertex> >(_vertexCollectionTag))
+  _vertexCollectionToken(consumes<vector<reco::Vertex> >(_vertexCollectionTag)),
+  _METCollectionToken(consumes<vector<pet::MET> >(_METCollectionTag))
 {
 
   // Initialize when class is created
@@ -54,7 +57,9 @@ TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
   _tree->Branch("jet_efrac_ch_Had", &_jet_efrac_ch_Had, "jet_efrac_ch_Had[nJet]/D");
   _tree->Branch("jet_efrac_ch_EM",  &_jet_efrac_ch_EM,  "jet_efrac_ch_EM[nJet]/D" );
   _tree->Branch("jet_efrac_ch_Mu",  &_jet_efrac_ch_Mu,  "jet_efrac_ch_Mu[nJet]/D" );
-
+  
+  _tree->Branch("MET", &_MET, "MET/D");
+  _tree->Branch("MET_phi", &_MET_phi, "MET_phi/D");
   //
 
 }
@@ -95,6 +100,9 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   edm::Handle<vector<pat::Jet> > H_pfjets;
   iEvent.getByToken(_pfjetCollectionToken , H_pfjets);
+  
+  edm::Handle<vector<pat::MET> > H_MET;
+  iEvent.getByToken(_METCollectionToken , H_MET);
 
   // Check validity
   if(!H_trig.isValid()) {
@@ -188,7 +196,9 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   _nJet = nJ;
   
   //MET//
-  
+  const pat::MET &met = H_MET->front();
+  _MET = met.pt();
+  _MET_phi = met.phi();
 
   _tree->Fill();
 }
@@ -246,6 +256,9 @@ TreeProducer_miniAOD::Init()
 
   _nEvent = _nRun = _nLumi = 0;
 
+  _MET = 0;
+  _MET_phi = 0;
+  
   // Vertices
   _vtx_N = 0; 
   for(UInt_t iv=0;iv<nV;iv++) {

@@ -5,5 +5,6 @@ tree = cms.EDAnalyzer(
     triggerResults   = cms.InputTag("TriggerResults", "", "HLT"),
     METfilter        = cms.InputTag("TriggerResults", "", "RECO"),
     pfjetCollection  = cms.InputTag("slimmedJets"),
-    vertexCollection = cms.InputTag("offlineSlimmedPrimaryVertices")
+    vertexCollection = cms.InputTag("offlineSlimmedPrimaryVertices"),
+    METCollection    = cms.InputTag("slimmedMETs")
 )
