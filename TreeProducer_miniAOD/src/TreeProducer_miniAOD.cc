@@ -14,7 +14,7 @@ TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
   _METfilterToken(consumes<edm::TriggerResults>(_METfilterTag)),
   _pfjetCollectionToken(consumes<vector<pat::Jet> >(_pfjetCollectionTag)),
   _vertexCollectionToken(consumes<vector<reco::Vertex> >(_vertexCollectionTag)),
-  _METCollectionToken(consumes<vector<pet::MET> >(_METCollectionTag))
+  _METCollectionToken(consumes<vector<pat::MET> >(_METCollectionTag))
 {
 
   // Initialize when class is created

@@ -35,6 +35,7 @@
 #include "DataFormats/JetReco/interface/PFJet.h"
 // #include "DataFormats/JetReco/interface/PFJetCollection.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/L1Trigger/interface/L1EtMissParticle.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
@@ -79,7 +80,7 @@ class TreeProducer_miniAOD : public edm::EDAnalyzer {
   edm::EDGetTokenT<edm::TriggerResults> _METfilterToken;
   edm::EDGetTokenT<vector<pat::Jet> > _pfjetCollectionToken;
   edm::EDGetTokenT<vector<reco::Vertex> > _vertexCollectionToken;
-  edm::EDGetTokenT<vector<reco::Vertex> > _METCollectionToken;
+  edm::EDGetTokenT<vector<pat::MET> > _METCollectionToken;
 //   GlobalPoint vertexPosition;
 
   // Tree and its branches
