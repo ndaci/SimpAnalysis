@@ -58,6 +58,7 @@ TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
   _tree->Branch("jet_efrac_ch_EM",  &_jet_efrac_ch_EM,  "jet_efrac_ch_EM[nJet]/D" );
   _tree->Branch("jet_efrac_ch_Mu",  &_jet_efrac_ch_Mu,  "jet_efrac_ch_Mu[nJet]/D" );
   
+  //MET
   _tree->Branch("MET", &_MET, "MET/D");
   _tree->Branch("MET_phi", &_MET_phi, "MET_phi/D");
   //
