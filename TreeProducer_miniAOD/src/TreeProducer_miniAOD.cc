@@ -69,7 +69,14 @@ TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
   _tree->Branch("HLT_DiCentralPFJet430", &_dijet_430);
   _tree->Branch("HLT_DiCentralPFJet170", &_dijet_170);
   _tree->Branch("HLT_SingleCentralPFJet170_CFMax0p1", &_singlejet_170_0p1);
-
+  
+  //MET filters
+  _tree->Branch("Flag_HBHENoiseFilter", &_HBHENoiseFlag);
+  _tree->Branch("Flag_HBHENoiseIsoFilter", &_HBHENoiseIsoFlag);
+  _tree->Branch("Flag_EcalDeadCellTriggerPrimitiveFilter", &_ECALFlag);
+  _tree->Branch("Flag_goodVertices", &_vertexFlag);
+  _tree->Branch("Flag_eeBadScFilter", &_eeFlag);
+  _tree->Branch("Flag_globalTightHalo2016Filter", &_beamhaloFlag);
 }
 
 
@@ -209,14 +216,20 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   _MET_phi = met.phi();
   
   //Trigger//
-   
-  
   if (triggerPathsMap[triggerPathsVector[0]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[0]])) _dijet_170_0p1 = 1;
   if (triggerPathsMap[triggerPathsVector[1]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[1]])) _dijet_220_0p3 = 1;
   if (triggerPathsMap[triggerPathsVector[2]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[2]])) _dijet_330_0p5 = 1;
   if (triggerPathsMap[triggerPathsVector[3]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[3]])) _dijet_430 = 1;
   if (triggerPathsMap[triggerPathsVector[4]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[4]])) _dijet_170 = 1;
   if (triggerPathsMap[triggerPathsVector[5]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[5]])) _singlejet_170_0p1 = 1;
+  
+  //MET filters
+  if (filterPathsMap[filterPathsVector[0]] != -1 && H_METfilter->accept(filterPathsMap[filterPathsVector[0]])) _HBHENoiseFlag = 1;
+  if (filterPathsMap[filterPathsVector[1]] != -1 && H_METfilter->accept(filterPathsMap[filterPathsVector[1]])) _HBHENoiseIsoFlag = 1;
+  if (filterPathsMap[filterPathsVector[2]] != -1 && H_METfilter->accept(filterPathsMap[filterPathsVector[2]])) _ECALFlag = 1;
+  if (filterPathsMap[filterPathsVector[3]] != -1 && H_METfilter->accept(filterPathsMap[filterPathsVector[3]])) _vertexFlag = 1;
+  if (filterPathsMap[filterPathsVector[4]] != -1 && H_METfilter->accept(filterPathsMap[filterPathsVector[4]])) _eeFlag = 1;
+  if (filterPathsMap[filterPathsVector[5]] != -1 && H_METfilter->accept(filterPathsMap[filterPathsVector[5]])) _beamhaloFlag = 1;
 
   _tree->Fill();
 }
@@ -262,6 +275,30 @@ TreeProducer_miniAOD::beginRun(edm::Run const& iRun, edm::EventSetup const& iSet
       }
     }
   } 
+  
+  filterPathsVector.push_back("Flag_HBHENoiseFilter");
+  filterPathsVector.push_back("Flag_eeBadScFilter");
+  filterPathsVector.push_back("Flag_HBHENoiseIsoFilter");
+  filterPathsVector.push_back("Flag_EcalDeadCellTriggerPrimitiveFilter");
+  filterPathsVector.push_back("Flag_goodVertices");
+  filterPathsVector.push_back("Flag_globalTightHalo2016Filter");
+  
+  HLTConfigProvider fltrConfig;
+  fltrConfig.init(iRun, iSetup, _METfilterTag.process(), changedConfig);
+  
+  for (size_t i = 0; i < filterPathsVector.size(); i++) {
+    filterPathsMap[filterPathsVector[i]] = -1;
+  }
+
+  for(size_t i = 0; i < filterPathsVector.size(); i++){
+    TPRegexp pattern(filterPathsVector[i]);
+    for(size_t j = 0; j < fltrConfig.triggerNames().size(); j++){
+      std::string pathName = fltrConfig.triggerNames()[j];
+      if(TString(pathName).Contains(pattern)){
+	filterPathsMap[filterPathsVector[i]] = j;
+      }
+    }
+  }
 }
 
 // ------------ method called when ending the processing of a run  ------------

@@ -108,6 +108,11 @@ class TreeProducer_miniAOD : public edm::EDAnalyzer {
   std::vector<std::string> triggerPathsVector;
   std::map<std::string, int> triggerPathsMap;
   int _dijet_170_0p1, _dijet_220_0p3, _dijet_330_0p5, _dijet_430, _dijet_170, _singlejet_170_0p1;
+  
+  //MET filters
+  std::vector<std::string>   filterPathsVector;
+  std::map<std::string, int> filterPathsMap;
+  int _HBHENoiseFlag, _HBHENoiseIsoFlag, _ECALFlag, _vertexFlag, _eeFlag, _beamhaloFlag;
 
 };
 
