@@ -15,6 +15,7 @@
 // ROOT
 #include "TTree.h"
 #include "TLorentzVector.h"
+#include "TPRegexp.h"
 
 // CMSSW standard lib
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -102,6 +103,11 @@ class TreeProducer_miniAOD : public edm::EDAnalyzer {
 
   // MET
   double _MET, _MET_phi;
+  
+  //Trigger
+  std::vector<std::string> triggerPathsVector;
+  std::map<std::string, int> triggerPathsMap;
+  int _dijet_170_0p1, _dijet_220_0p3, _dijet_330_0p5, _dijet_430, _dijet_170, _singlejet_170_0p1;
 
 };
 

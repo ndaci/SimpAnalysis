@@ -61,7 +61,14 @@ TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
   //MET
   _tree->Branch("MET", &_MET, "MET/D");
   _tree->Branch("MET_phi", &_MET_phi, "MET_phi/D");
-  //
+  
+  //Trigger
+  _tree->Branch("HLT_DiCentralPFJet170_CFMax0p1", &_dijet_170_0p1);
+  _tree->Branch("HLT_DiCentralPFJet220_CFMax0p3", &_dijet_220_0p3);
+  _tree->Branch("HLT_DiCentralPFJet330_CFMax0p5", &_dijet_330_0p5);
+  _tree->Branch("HLT_DiCentralPFJet430", &_dijet_430);
+  _tree->Branch("HLT_DiCentralPFJet170", &_dijet_170);
+  _tree->Branch("HLT_SingleCentralPFJet170_CFMax0p1", &_singlejet_170_0p1);
 
 }
 
@@ -200,6 +207,16 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   const pat::MET &met = H_MET->front();
   _MET = met.pt();
   _MET_phi = met.phi();
+  
+  //Trigger//
+   
+  
+  if (triggerPathsMap[triggerPathsVector[0]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[0]])) _dijet_170_0p1 = 1;
+  if (triggerPathsMap[triggerPathsVector[1]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[1]])) _dijet_220_0p3 = 1;
+  if (triggerPathsMap[triggerPathsVector[2]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[2]])) _dijet_330_0p5 = 1;
+  if (triggerPathsMap[triggerPathsVector[3]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[3]])) _dijet_430 = 1;
+  if (triggerPathsMap[triggerPathsVector[4]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[4]])) _dijet_170 = 1;
+  if (triggerPathsMap[triggerPathsVector[5]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[5]])) _singlejet_170_0p1 = 1;
 
   _tree->Fill();
 }
@@ -219,8 +236,32 @@ TreeProducer_miniAOD::endJob()
 
 // ------------ method called when starting to processes a run  ------------
 void 
-TreeProducer_miniAOD::beginRun(edm::Run const&, edm::EventSetup const&)
+TreeProducer_miniAOD::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
+  triggerPathsVector.push_back("HLT_DiCentralPFJet170_CFMax0p1");
+  triggerPathsVector.push_back("HLT_DiCentralPFJet220_CFMax0p3");
+  triggerPathsVector.push_back("HLT_DiCentralPFJet330_CFMax0p5");
+  triggerPathsVector.push_back("HLT_DiCentralPFJet430");
+  triggerPathsVector.push_back("HLT_DiCentralPFJet170");
+  triggerPathsVector.push_back("HLT_SingleCentralPFJet170_CFMax0p1");
+  
+  HLTConfigProvider hltConfig;
+  bool changedConfig = false;
+  hltConfig.init(iRun, iSetup, _trigResultsTag.process(), changedConfig);
+
+  for (size_t i = 0; i < triggerPathsVector.size(); i++) {
+    triggerPathsMap[triggerPathsVector[i]] = -1;
+  }
+  
+  for(size_t i = 0; i < triggerPathsVector.size(); i++){
+    TPRegexp pattern(triggerPathsVector[i]);
+    for(size_t j = 0; j < hltConfig.triggerNames().size(); j++){
+      std::string pathName = hltConfig.triggerNames()[j];
+      if(TString(pathName).Contains(pattern)){
+        triggerPathsMap[triggerPathsVector[i]] = j;
+      }
+    }
+  } 
 }
 
 // ------------ method called when ending the processing of a run  ------------
@@ -257,6 +298,15 @@ TreeProducer_miniAOD::Init()
 
   _nEvent = _nRun = _nLumi = 0;
 
+  //Trigger
+  _dijet_170_0p1 = 0;      
+  _dijet_220_0p3 = 0;      
+  _dijet_330_0p5 = 0;       
+  _dijet_430 = 0;          
+  _dijet_170 = 0;           
+  _singlejet_170_0p1 = 0;   
+  
+  //MET
   _MET = 0;
   _MET_phi = 0;
   
@@ -272,6 +322,7 @@ TreeProducer_miniAOD::Init()
     _vtx_z[iv] = 0.;
   }
 
+  //Jets
   for(UInt_t i=0 ; i<nJ ; i++) {
     _jet_eta[i] = 0;
     _jet_phi[i] = 0;
