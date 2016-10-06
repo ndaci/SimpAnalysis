@@ -5,12 +5,14 @@
 //
 TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
   _trigResultsTag(pset.getParameter<edm::InputTag>("triggerResults")),
+  _prescalesTag(pset.getParameter<edm::InputTag>("prescales")),
   _METfilterTag(pset.getParameter<edm::InputTag>("METfilter")),
   _pfjetCollectionTag(pset.getParameter<edm::InputTag>("pfjetCollection")),
   _vertexCollectionTag(pset.getParameter<edm::InputTag>("vertexCollection")),
   _METCollectionTag(pset.getParameter<edm::InputTag>("METCollection")),
   
   _trigResultsToken(consumes<edm::TriggerResults>(_trigResultsTag)),
+  _triggerPrescalesToken(consumes<pat::PackedTriggerPrescales>(_prescalesTag)),
   _METfilterToken(consumes<edm::TriggerResults>(_METfilterTag)),
   _pfjetCollectionToken(consumes<vector<pat::Jet> >(_pfjetCollectionTag)),
   _vertexCollectionToken(consumes<vector<reco::Vertex> >(_vertexCollectionTag)),
@@ -69,6 +71,10 @@ TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
   _tree->Branch("HLT_DiCentralPFJet430", &_dijet_430);
   _tree->Branch("HLT_DiCentralPFJet170", &_dijet_170);
   _tree->Branch("HLT_SingleCentralPFJet170_CFMax0p1", &_singlejet_170_0p1);
+  //prescales
+  _tree->Branch("pswgt_dijet_170", &_pswgt_dijet_170, "pswgt_dijet_170/D");
+  _tree->Branch("pswgt_singlejet_170_0p1", &_pswgt_singlejet_170_0p1, "pswgt_singlejet_170_0p1/D");
+  
   
   //MET filters
   _tree->Branch("Flag_HBHENoiseFilter", &_HBHENoiseFlag);
@@ -105,6 +111,9 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   
   edm::Handle<edm::TriggerResults> H_trig;
   iEvent.getByToken(_trigResultsToken, H_trig);
+  
+  edm::Handle<pat::PackedTriggerPrescales> H_prescale;
+  iEvent.getByToken(_triggerPrescalesToken, H_prescale);
 
   edm::Handle<vector<reco::Vertex> > H_vert;
   iEvent.getByToken(_vertexCollectionToken, H_vert);
@@ -222,6 +231,12 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   if (triggerPathsMap[triggerPathsVector[3]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[3]])) _dijet_430 = 1;
   if (triggerPathsMap[triggerPathsVector[4]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[4]])) _dijet_170 = 1;
   if (triggerPathsMap[triggerPathsVector[5]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[5]])) _singlejet_170_0p1 = 1;
+  //prescales
+  const edm::TriggerNames &trignames = iEvent.triggerNames(*H_trig);
+    for (size_t i = 0; i < H_trig->size(); i++) {
+        if (trignames.triggerName(i).find("HLT_DiCentralPFJet170_v") != string::npos) _pswgt_dijet_170 = H_prescale->getPrescaleForIndex(i);
+        if (trignames.triggerName(i).find("HLT_SingleCentralPFJet170_CFMax0p1_v") != string::npos) _pswgt_singlejet_170_0p1 = H_prescale->getPrescaleForIndex(i);
+}
   
   //MET filters
   if (filterPathsMap[filterPathsVector[0]] != -1 && H_METfilter->accept(filterPathsMap[filterPathsVector[0]])) _HBHENoiseFlag = 1;

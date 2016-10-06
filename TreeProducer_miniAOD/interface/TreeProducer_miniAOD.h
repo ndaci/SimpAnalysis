@@ -24,6 +24,7 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Common/interface/TriggerNames.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 // CMSSW specific lib
@@ -38,6 +39,7 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/MET.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
 #include "DataFormats/L1Trigger/interface/L1EtMissParticle.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
@@ -73,11 +75,13 @@ class TreeProducer_miniAOD : public edm::EDAnalyzer {
 
   // ----------member data ---------------------------
   edm::InputTag _trigResultsTag;
+  edm::InputTag _prescalesTag;
   edm::InputTag _METfilterTag;
   edm::InputTag _pfjetCollectionTag;
   edm::InputTag _vertexCollectionTag;
   edm::InputTag _METCollectionTag;
   edm::EDGetTokenT<edm::TriggerResults> _trigResultsToken;
+  edm::EDGetTokenT<pat::PackedTriggerPrescales> _triggerPrescalesToken;
   edm::EDGetTokenT<edm::TriggerResults> _METfilterToken;
   edm::EDGetTokenT<vector<pat::Jet> > _pfjetCollectionToken;
   edm::EDGetTokenT<vector<reco::Vertex> > _vertexCollectionToken;
@@ -108,6 +112,8 @@ class TreeProducer_miniAOD : public edm::EDAnalyzer {
   std::vector<std::string> triggerPathsVector;
   std::map<std::string, int> triggerPathsMap;
   int _dijet_170_0p1, _dijet_220_0p3, _dijet_330_0p5, _dijet_430, _dijet_170, _singlejet_170_0p1;
+  //prescales
+  double  _pswgt_dijet_170,  _pswgt_singlejet_170_0p1;
   
   //MET filters
   std::vector<std::string>   filterPathsVector;
