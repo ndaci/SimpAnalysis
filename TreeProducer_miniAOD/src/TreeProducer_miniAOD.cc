@@ -266,12 +266,12 @@ TreeProducer_miniAOD::endJob()
 void 
 TreeProducer_miniAOD::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
-  triggerPathsVector.push_back("HLT_DiCentralPFJet170_CFMax0p1");
-  triggerPathsVector.push_back("HLT_DiCentralPFJet220_CFMax0p3");
-  triggerPathsVector.push_back("HLT_DiCentralPFJet330_CFMax0p5");
-  triggerPathsVector.push_back("HLT_DiCentralPFJet430");
-  triggerPathsVector.push_back("HLT_DiCentralPFJet170");
-  triggerPathsVector.push_back("HLT_SingleCentralPFJet170_CFMax0p1");
+  triggerPathsVector.push_back("HLT_DiCentralPFJet170_CFMax0p1_v");
+  triggerPathsVector.push_back("HLT_DiCentralPFJet220_CFMax0p3_v");
+  triggerPathsVector.push_back("HLT_DiCentralPFJet330_CFMax0p5_v");
+  triggerPathsVector.push_back("HLT_DiCentralPFJet430_v");
+  triggerPathsVector.push_back("HLT_DiCentralPFJet170_v");
+  triggerPathsVector.push_back("HLT_SingleCentralPFJet170_CFMax0p1_v");
   
   HLTConfigProvider hltConfig;
   bool changedConfig = false;
@@ -356,7 +356,19 @@ TreeProducer_miniAOD::Init()
   _dijet_330_0p5 = 0;       
   _dijet_430 = 0;          
   _dijet_170 = 0;           
-  _singlejet_170_0p1 = 0;   
+  _singlejet_170_0p1 = 0;
+  
+  //prescales
+  _pswgt_dijet_170 = 1;
+  _pswgt_singlejet_170_0p1 = 1;
+
+  //MET filters
+  _HBHENoiseFlag = 0;
+  _HBHENoiseIsoFlag = 0;
+  _ECALFlag = 0; 
+  _vertexFlag = 0;
+  _eeFlag = 0;
+  _beamhaloFlag = 0;
   
   //MET
   _MET = 0;
