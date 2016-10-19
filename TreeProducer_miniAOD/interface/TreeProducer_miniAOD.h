@@ -101,6 +101,8 @@ class TreeProducer_miniAOD : public edm::EDAnalyzer {
 
   // Jets
   int _jet_mult_ch[nJ], _jet_mult_mu[nJ], _jet_mult_ne[nJ]; // multiplicities
+  double _jet_vx[nJ], _jet_vy[nJ], _jet_vz[nJ];//vertex position
+  double _jet_area[nJ];
   double _jet_eta[nJ], _jet_phi[nJ], _jet_pt[nJ], _jet_e[nJ], _jet_m[nJ];
   double _jet_efrac_ne_Had[nJ], _jet_efrac_ne_EM[nJ]; // neutral energy fractions
   double _jet_efrac_ch_Had[nJ], _jet_efrac_ch_EM[nJ], _jet_efrac_ch_Mu[nJ]; // charged energy fractions

@@ -45,6 +45,12 @@ TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
   // Jets
   _tree->Branch("nJet",&_nJet,"nJet/I");
   //
+  _tree->Branch("jetArea",&_jet_area,"jetArea[nJet]/D");
+  //
+  _tree->Branch("jet_vx",&_jet_vx,"jet_vx[nJet]/D");
+  _tree->Branch("jet_vy",&_jet_vy,"jet_vy[nJet]/D");
+  _tree->Branch("jet_vz",&_jet_vz,"jet_vz[nJet]/D");
+  //
   _tree->Branch("jet_eta",&_jet_eta,"jet_eta[nJet]/D");
   _tree->Branch("jet_phi",&_jet_phi,"jet_phi[nJet]/D");
   _tree->Branch("jet_pt",&_jet_pt,"jet_pt[nJet]/D");
@@ -194,6 +200,13 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   UInt_t iJ=0;
   //
   for (vector<pat::Jet>::const_iterator theJet = H_pfjets->begin(); theJet != H_pfjets->end(); ++theJet){
+    //Area
+    _jet_area[iJ] = theJet->jetArea();  
+      
+    // Vertex
+    _jet_vx[iJ] = theJet->vx();
+    _jet_vy[iJ] = theJet->vy();
+    _jet_vz[iJ] = theJet->vz();
 
     // Kinematics
     _jet_pt[iJ]  = theJet->pt();
@@ -390,6 +403,10 @@ TreeProducer_miniAOD::Init()
 
   //Jets
   for(UInt_t i=0 ; i<nJ ; i++) {
+    _jet_vx[i]  = 0;
+    _jet_vy[i]  = 0;
+    _jet_vz[i]  = 0;
+    _jet_area[i]= 0;
     _jet_eta[i] = 0;
     _jet_phi[i] = 0;
     _jet_pt[i]  = 0;
