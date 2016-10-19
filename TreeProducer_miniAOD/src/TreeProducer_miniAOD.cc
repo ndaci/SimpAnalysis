@@ -33,13 +33,14 @@ TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
   //
   // Vertices
   _tree->Branch("vtx_N",&_vtx_N,"vtx_N/I");
-  _tree->Branch("vtx_normalizedChi2",&_vtx_normalizedChi2,"vtx_normalizedChi2[3]/D");
-  _tree->Branch("vtx_ndof",&_vtx_ndof,"vtx_ndof[3]/D");
-  _tree->Branch("vtx_nTracks",&_vtx_nTracks,"vtx_nTracks[3]/D");
-  _tree->Branch("vtx_d0",&_vtx_d0,"vtx_d0[3]/D");
-  _tree->Branch("vtx_x",&_vtx_x,"vtx_x[3]/D");
-  _tree->Branch("vtx_y",&_vtx_y,"vtx_y[3]/D");
-  _tree->Branch("vtx_z",&_vtx_z,"vtx_z[3]/D");
+  _tree->Branch("vtx_N_stored",&_vtx_N_stored,"vtx_N_stored/I");
+  _tree->Branch("vtx_normalizedChi2",&_vtx_normalizedChi2,"vtx_normalizedChi2[vtx_N_stored]/D");
+  _tree->Branch("vtx_ndof",&_vtx_ndof,"vtx_ndof[vtx_N_stored]/D");
+  _tree->Branch("vtx_nTracks",&_vtx_nTracks,"vtx_nTracks[vtx_N_stored]/D");
+  _tree->Branch("vtx_d0",&_vtx_d0,"vtx_d0[vtx_N_stored]/D");
+  _tree->Branch("vtx_x",&_vtx_x,"vtx_x[vtx_N_stored]/D");
+  _tree->Branch("vtx_y",&_vtx_y,"vtx_y[vtx_N_stored]/D");
+  _tree->Branch("vtx_z",&_vtx_z,"vtx_z[vtx_N_stored]/D");
   //
   // Jets
   _tree->Branch("nJet",&_nJet,"nJet/I");
@@ -150,7 +151,7 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   _nEvent = iEvent.id().event();
 
   // VERTICES //
-  int vtx_counter=0;
+  UInt_t vtx_counter=0;
   _vtx_N = H_vert->size();
   _vtx_N_stored = nV;
 	
@@ -172,7 +173,6 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 //   }
 
   for( std::vector<reco::Vertex>::const_iterator PV = sortedVertices.begin(); PV != sortedVertices.end(); ++PV){
-    if(vtx_counter > int(nV)) break;
 		
     _vtx_normalizedChi2[vtx_counter] = PV->normalizedChi2();
     _vtx_ndof[vtx_counter] = PV->ndof();
@@ -183,6 +183,7 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
     _vtx_z[vtx_counter] = PV->z();
 		
     vtx_counter++;
+    if(vtx_counter >= nV) break;
   } // for loop on primary vertices
 
 
@@ -237,7 +238,7 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
         if (trignames.triggerName(i).find("HLT_DiCentralPFJet170_v") != string::npos) _pswgt_dijet_170 = H_prescale->getPrescaleForIndex(i);
         if (trignames.triggerName(i).find("HLT_SingleCentralPFJet170_CFMax0p1_v") != string::npos) _pswgt_singlejet_170_0p1 = H_prescale->getPrescaleForIndex(i);
 }
-  
+
   //MET filters
   if (filterPathsMap[filterPathsVector[0]] != -1 && H_METfilter->accept(filterPathsMap[filterPathsVector[0]])) _HBHENoiseFlag = 1;
   if (filterPathsMap[filterPathsVector[1]] != -1 && H_METfilter->accept(filterPathsMap[filterPathsVector[1]])) _HBHENoiseIsoFlag = 1;
@@ -376,6 +377,7 @@ TreeProducer_miniAOD::Init()
   
   // Vertices
   _vtx_N = 0; 
+  _vtx_N_stored = 0;
   for(UInt_t iv=0;iv<nV;iv++) {
     _vtx_normalizedChi2[iv] = 0.;
     _vtx_ndof[iv] = 0.;
