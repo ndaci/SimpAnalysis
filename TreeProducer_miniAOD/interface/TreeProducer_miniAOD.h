@@ -46,8 +46,8 @@
 // others
 using namespace std;
 int verbose=1;
-const UInt_t nJ=3;
-const UInt_t nV=20;
+const UInt_t nJ=4;
+const UInt_t nV=3;
 
 //
 // class declaration
