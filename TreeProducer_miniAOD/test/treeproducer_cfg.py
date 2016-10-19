@@ -4,7 +4,7 @@ process = cms.Process("SIMPTREE")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
 
 process.source = cms.Source("PoolSource",
     #fileNames = cms.untracked.vstring(
@@ -12,7 +12,7 @@ process.source = cms.Source("PoolSource",
         ##'/store/user/ndaci/JetHT/Simps_JetHT_2012D_08Jan2015_v1/150108_171434/0000/skimjets_122.root'
         ##'file:skimjets.root'
     #)
-    fileNames = cms.untracked.vstring('root://cms-xrd-global.cern.ch//store/data/Run2016D/JetHT/MINIAOD/PromptReco-v2/000/276/315/00000/283C90B1-0445-E611-B0AF-02163E014393.root')
+    fileNames = cms.untracked.vstring('/store/data/Run2016D/JetHT/MINIAOD/PromptReco-v2/000/276/315/00000/283C90B1-0445-E611-B0AF-02163E014393.root')
 )
 
 # Tree producer
