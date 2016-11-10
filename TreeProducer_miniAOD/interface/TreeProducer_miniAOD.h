@@ -75,13 +75,17 @@ class TreeProducer_miniAOD : public edm::EDAnalyzer {
 
   // ----------member data ---------------------------
   edm::InputTag _trigResultsTag;
+  edm::InputTag _trigResultsTag2;
   edm::InputTag _prescalesTag;
+  edm::InputTag _prescalesTag2;
   edm::InputTag _METfilterTag;
   edm::InputTag _pfjetCollectionTag;
   edm::InputTag _vertexCollectionTag;
   edm::InputTag _METCollectionTag;
   edm::EDGetTokenT<edm::TriggerResults> _trigResultsToken;
+  edm::EDGetTokenT<edm::TriggerResults> _trigResultsToken2;
   edm::EDGetTokenT<pat::PackedTriggerPrescales> _triggerPrescalesToken;
+  edm::EDGetTokenT<pat::PackedTriggerPrescales> _triggerPrescalesToken2;
   edm::EDGetTokenT<edm::TriggerResults> _METfilterToken;
   edm::EDGetTokenT<vector<pat::Jet> > _pfjetCollectionToken;
   edm::EDGetTokenT<vector<reco::Vertex> > _vertexCollectionToken;

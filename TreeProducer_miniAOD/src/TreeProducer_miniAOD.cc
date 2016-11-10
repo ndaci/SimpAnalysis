@@ -5,14 +5,18 @@
 //
 TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
   _trigResultsTag(pset.getParameter<edm::InputTag>("triggerResults")),
+  _trigResultsTag2(pset.getParameter<edm::InputTag>("triggerResults2")),
   _prescalesTag(pset.getParameter<edm::InputTag>("prescales")),
+  _prescalesTag2(pset.getParameter<edm::InputTag>("prescales2")),
   _METfilterTag(pset.getParameter<edm::InputTag>("METfilter")),
   _pfjetCollectionTag(pset.getParameter<edm::InputTag>("pfjetCollection")),
   _vertexCollectionTag(pset.getParameter<edm::InputTag>("vertexCollection")),
   _METCollectionTag(pset.getParameter<edm::InputTag>("METCollection")),
   
   _trigResultsToken(consumes<edm::TriggerResults>(_trigResultsTag)),
+  _trigResultsToken2(consumes<edm::TriggerResults>(_trigResultsTag2)),
   _triggerPrescalesToken(consumes<pat::PackedTriggerPrescales>(_prescalesTag)),
+  _triggerPrescalesToken2(consumes<pat::PackedTriggerPrescales>(_prescalesTag2)),
   _METfilterToken(consumes<edm::TriggerResults>(_METfilterTag)),
   _pfjetCollectionToken(consumes<vector<pat::Jet> >(_pfjetCollectionTag)),
   _vertexCollectionToken(consumes<vector<reco::Vertex> >(_vertexCollectionTag)),
@@ -116,11 +120,17 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   edm::Handle<edm::TriggerResults> H_METfilter;
   iEvent.getByToken(_METfilterToken, H_METfilter);
   
-  edm::Handle<edm::TriggerResults> H_trig;
-  iEvent.getByToken(_trigResultsToken, H_trig);
+  edm::Handle<edm::TriggerResults> H_trig, H_trig1, H_trig2;
+	try {iEvent.getByToken(_trigResultsToken, H_trig1);} catch (...) {;}
+	try {iEvent.getByToken(_trigResultsToken2, H_trig2);} catch (...) {;}
+	if(H_trig1.isValid()) H_trig = H_trig1;
+	else if (H_trig2.isValid()) H_trig = H_trig2;
   
-  edm::Handle<pat::PackedTriggerPrescales> H_prescale;
-  iEvent.getByToken(_triggerPrescalesToken, H_prescale);
+  edm::Handle<pat::PackedTriggerPrescales> H_prescale, H_prescale1, H_prescale2;
+  try {iEvent.getByToken(_triggerPrescalesToken, H_prescale1);} catch (...) {;}
+  try {iEvent.getByToken(_triggerPrescalesToken2, H_prescale2);} catch (...) {;}
+  if(H_prescale1.isValid()) H_prescale = H_prescale1;
+  else if(H_prescale2.isValid()) H_prescale = H_prescale2;
 
   edm::Handle<vector<reco::Vertex> > H_vert;
   iEvent.getByToken(_vertexCollectionToken, H_vert);
@@ -137,7 +147,7 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 
   // Check validity
   if(!H_trig.isValid()) {
-    if(verbose>0) cout << "Missing collection : " << _trigResultsTag << " ... skip entry !" << endl;
+    if(verbose>0) cout << "Missing collection : " << _trigResultsTag << " and " << _trigResultsTag2 << " ... skip entry !" << endl;
     return;
   }
 
