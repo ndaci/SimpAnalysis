@@ -4,57 +4,61 @@
 bool DEBUG=false;
 
 Int_t quick(TString dir="v0_test", TString UsrCut="Loose",
-	    TString era="2016B", UInt_t run1=274748, UInt_t run2=999999,
+	    TString era="2016B"  , TString sample="SingleMuon", 
+	    Int_t run1=274748    , Int_t run2=999999,
 	    Int_t nRequest=-1)
 {
 
   // Define input tree //////////////////////////////////////////////
   // Input dir
-  TString dirIn="/user/ndaci/Data/XMET/TriggerTrees_07Oct2016/";
+  TString dirIn="/user/ndaci/Data/SIMP/HLT/";
+  TString subdir="";
+  if(     sample=="JetHT")      subdir = "JetHT_ReReco";
+  else if(sample=="SingleMuon") subdir = "Muon_ReReco";
 
   // Define TChain
   cout << "- Define TChain for era " << era << " ";
   TChain* chain;
-  chain = new TChain("tree/tree");
-  //
-  if(era.Contains("All")) chain->Add(dirIn+"/ntuple_SingleMuon_*.root");
-  else                    chain->Add(dirIn+"/ntuple_SingleMuon_"+era+".root");
+  chain = new TChain("tree/SimpAnalysis");
+  chain->Add(dirIn+"/"+subdir+"/trees_"+era+"/*.root");
   cout << " Done!" << endl;
 
   // Branch variables
-  uint32_t event, run, lumi;  
-  uint32_t nvtx;
-  uint8_t hltJet170CF, hltDiJet170, hltDiJet170CF, hltDiJet220CF, hltDiJet330CF, hltDiJet430;
+  int event, run, lumi;  
+  int nvtx;
+  int hltJet170CF, hltDiJet170, hltDiJet170CF, hltDiJet220CF, hltDiJet330CF, hltDiJet430;
   double  ps_DiJet170, ps_Jet170Chf0p1;
 
-  std::vector<double> *combinejetpt      = new vector<double> ();
-  std::vector<double> *combinejeteta     = new vector<double> ();
-  std::vector<double> *combinejetphi     = new vector<double> ();
-  std::vector<double> *combinejetCHfrac  = new vector<double> ();
-  std::vector<double> *combinejetNHfrac  = new vector<double> ();
-  std::vector<double> *combinejetEMfrac  = new vector<double> ();
-  std::vector<double> *combinejetCEMfrac = new vector<double> ();
+  const UInt_t nJ=4;
+  int nJet;
+  double jet_eta[nJ], jet_phi[nJ], jet_pt[nJ];
+  double jet_efrac_ne_Had[nJ], jet_efrac_ne_EM[nJ]; // neutral energy fractions
+  double jet_efrac_ch_Had[nJ], jet_efrac_ch_EM[nJ], jet_efrac_ch_Mu[nJ]; // charged energy fractions
 
   // Branches
-  chain->SetBranchAddress("event"                , &event                ); // , "event/i");
-  chain->SetBranchAddress("run"                  , &run                  ); // , "run/i");
-  chain->SetBranchAddress("lumi"                 , &lumi                 ); // , "lumi/i");
-  chain->SetBranchAddress("nvtx"                 , &nvtx                 ); // , "nvtx/i");
-  chain->SetBranchAddress("hltJet170CF"  , &hltJet170CF); // , "hltJet170CF/b");
-  chain->SetBranchAddress("hltDiJet170"  , &hltDiJet170); // , "hltDiJet170/b");
-  chain->SetBranchAddress("hltDiJet170CF", &hltDiJet170CF); // , "hltDiJet170CF/b");
-  chain->SetBranchAddress("hltDiJet220CF", &hltDiJet220CF); // , "hltDiJet220CF/b");
-  chain->SetBranchAddress("hltDiJet330CF", &hltDiJet330CF); // , "hltDiJet330CF/b");
-  chain->SetBranchAddress("hltDiJet430"  , &hltDiJet430); // , "hltDiJet430/b");
-  chain->SetBranchAddress("pswgt_DiJet170"          , &ps_DiJet170);
-  chain->SetBranchAddress("pswgt_Jet170Chf0p1"      , &ps_Jet170Chf0p1);
-  chain->SetBranchAddress("combinejetpt" ,     &combinejetpt);
-  chain->SetBranchAddress("combinejeteta",     &combinejeteta);
-  chain->SetBranchAddress("combinejetphi",     &combinejetphi);
-  chain->SetBranchAddress("combinejetCHfrac",  &combinejetCHfrac);
-  chain->SetBranchAddress("combinejetNHfrac",  &combinejetNHfrac);
-  chain->SetBranchAddress("combinejetEMfrac",  &combinejetEMfrac);
-  chain->SetBranchAddress("combinejetCEMfrac", &combinejetCEMfrac);
+  chain->SetBranchAddress("nEvent"                , &event                ); // , "event/i");
+  chain->SetBranchAddress("nRun"                  , &run                  ); // , "run/i");
+  chain->SetBranchAddress("nLumi"                 , &lumi                 ); // , "lumi/i");
+  chain->SetBranchAddress("vtx_N"                 , &nvtx                 ); // , "nvtx/i");
+  chain->SetBranchAddress("HLT_SingleCentralPFJet170_CFMax0p1", &hltJet170CF); // , "hltJet170CF/b");
+  chain->SetBranchAddress("HLT_DiCentralPFJet170"         , &hltDiJet170); // , "hltDiJet170/b");
+  chain->SetBranchAddress("HLT_DiCentralPFJet170_CFMax0p1", &hltDiJet170CF); // , "hltDiJet170CF/b");
+  chain->SetBranchAddress("HLT_DiCentralPFJet220_CFMax0p3", &hltDiJet220CF); // , "hltDiJet220CF/b");
+  chain->SetBranchAddress("HLT_DiCentralPFJet330_CFMax0p5", &hltDiJet330CF); // , "hltDiJet330CF/b");
+  chain->SetBranchAddress("HLT_DiCentralPFJet430"         , &hltDiJet430); // , "hltDiJet430/b");
+  chain->SetBranchAddress("pswgt_dijet_170"               , &ps_DiJet170);
+  chain->SetBranchAddress("pswgt_singlejet_170_0p1"       , &ps_Jet170Chf0p1);
+
+  // jet branches
+  chain->SetBranchAddress("nJet",&nJet);
+  chain->SetBranchAddress("jet_eta",&jet_eta); // ,"jet_eta[nJet]/D");
+  chain->SetBranchAddress("jet_phi",&jet_phi); // ,"jet_phi[nJet]/D");
+  chain->SetBranchAddress("jet_pt",&jet_pt); // ,"jet_pt[nJet]/D");
+  chain->SetBranchAddress("jet_efrac_ne_Had", &jet_efrac_ne_Had); // , "jet_efrac_ne_Had[nJet]/D");
+  chain->SetBranchAddress("jet_efrac_ne_EM",  &jet_efrac_ne_EM); // ,  "jet_efrac_ne_EM[nJet]/D" );
+  chain->SetBranchAddress("jet_efrac_ch_Had", &jet_efrac_ch_Had); // , "jet_efrac_ch_Had[nJet]/D");
+  chain->SetBranchAddress("jet_efrac_ch_EM",  &jet_efrac_ch_EM); // ,  "jet_efrac_ch_EM[nJet]/D" );
+  chain->SetBranchAddress("jet_efrac_ch_Mu",  &jet_efrac_ch_Mu); // ,  "jet_efrac_ch_Mu[nJet]/D" );
 
   ////////////////////////////////////////////////////////////////////
 
@@ -97,7 +101,7 @@ Int_t quick(TString dir="v0_test", TString UsrCut="Loose",
   */
 
   // Output dir
-  TString dirOut="/user/ndaci/Results/TracklessJets/Trigger/Efficiency/CMSSW_808/";
+  TString dirOut="/user/ndaci/Results/TracklessJets/Trigger/Efficiency/CMSSW_8020_SIMP/";
   
   // Declare output histograms
   cout << "- Declare output histograms" << endl;
@@ -216,6 +220,15 @@ Int_t quick(TString dir="v0_test", TString UsrCut="Loose",
   double chf_max, chf_min;
   double pswgt;
 
+  // Counters
+  int nTest=0;
+  int nDen[nP], nNum[nP];
+  double totEff[nP];
+  for(UInt_t iP=0; iP<nP; iP++) {
+    nDen[iP] = nNum[iP] = 0;
+    totEff[iP]=0;
+  }
+
   // Loop over chain entries //
   UInt_t nEntries = chain->GetEntries();
   UInt_t nProcess = nEntries;
@@ -233,6 +246,7 @@ Int_t quick(TString dir="v0_test", TString UsrCut="Loose",
     if(print) cout << "- Start processing entry # " << iE << " / " << nProcess << endl;
 
     // Initialize
+    nJet=0;
     jetpt1 = jetphi1 = jetchf1 = 0;
     jetpt2 = jetphi2 = jetchf2 = 0;
     chf_max = chf_min = 0;
@@ -240,36 +254,36 @@ Int_t quick(TString dir="v0_test", TString UsrCut="Loose",
     hltJet170CF = hltDiJet170 = hltDiJet170CF = hltDiJet220CF = hltDiJet330CF = hltDiJet430 = 0;
     ps_DiJet170 = ps_Jet170Chf0p1 = pswgt = 1;
     //
-    combinejetpt      ->clear();
-    combinejeteta     ->clear();
-    combinejetphi     ->clear();
-    combinejetCHfrac  ->clear();
-    combinejetNHfrac  ->clear();
-    combinejetEMfrac  ->clear();
-    combinejetCEMfrac ->clear();
+    // initialization of jets
+    for(UInt_t iJ=0 ; iJ<nJ ; iJ++) {
+      jet_eta[iJ] = jet_phi[iJ] = jet_pt[iJ] = 0;
+      jet_efrac_ne_Had[iJ] = jet_efrac_ne_EM[iJ] = 0;
+      jet_efrac_ch_Had[iJ] = jet_efrac_ch_EM[iJ] = jet_efrac_ch_Mu[iJ] = 0;
+    }
 
     // Get entry iE    
     chain->GetEntry(iE);
+
+    // test
+    if(hltDiJet170>0) nTest++ ;
     
     // Use utility variables
-    if(combinejetpt->size()>0) {
-      jetpt1  = (*combinejetpt )[0];
-      jetphi1 = (*combinejetphi)[0];
-      jetchf1 = (*combinejetCHfrac)[0]+(*combinejetCEMfrac)[0];
-      chf_min = chf_max = jetchf1;
-    }
+    jetpt1  = jet_pt[0];
+    jetphi1 = jet_phi[0];
+    jetchf1 = jet_efrac_ch_Had[0] + jet_efrac_ch_EM[0];
+    chf_min = chf_max = jetchf1;
+    //    
+    jetpt2  = jet_pt[1];
+    jetphi2 = jet_phi[1];
+    jetchf2 = jet_efrac_ch_Had[1] + jet_efrac_ch_EM[1];
     //
-    if(combinejetpt->size()>1) {
-      jetpt2  = (*combinejetpt )[1];
-      jetphi2 = (*combinejetphi)[1];
-      jetchf2 = (*combinejetCHfrac)[1]+(*combinejetCEMfrac)[1];
-      chf_min = TMath::Min( jetchf1 , jetchf2 );
-      chf_max = TMath::Max( jetchf1 , jetchf2 );
-    }
-
+    chf_min = TMath::Min( jetchf1 , jetchf2 );
+    chf_max = TMath::Max( jetchf1 , jetchf2 );
+    /////
+    
     if(print) cout << "-- Check ChF: chf_min=" << chf_min 
 		   << " chf_max=" << chf_max
-		   << " (" << combinejetpt->size() << " jets)" << endl;
+		   << " (" << nJet << " jets)" << endl;
   
     // Denominator selection //
     // DeltaPhi >= 2 (back-to-back dijet)
@@ -335,8 +349,16 @@ Int_t quick(TString dir="v0_test", TString UsrCut="Loose",
     //
     for(UInt_t iP=0; iP<nP; iP++) {
       for(UInt_t iV=0; iV<nV; iV++) {
+
 	if(UsrCut=="Tight") cut_DenPath[iV][iP] = cut_Tight[iV][iP];
 	else                cut_DenPath[iV][iP] = cut_Loose[iV][iP];
+
+	// Add reference path at the denominator 
+	// for all signal paths if processing JetHT dataset
+	if(iP>0 && sample=="JetHT") {
+	  cut_DenPath[iV][iP] = cut_DenPath[iV][iP] && hltDiJet170>0;
+	}
+
       }
     }
 
@@ -352,13 +374,17 @@ Int_t quick(TString dir="v0_test", TString UsrCut="Loose",
 
       for(UInt_t iP=0 ; iP<nP ; iP++) {
 
-	if(iP==0) pswgt = ps_DiJet170;
-	else pswgt = 1;
+	// fixme
+	//if(iP==0) pswgt = ps_DiJet170;
+	//else pswgt = 1;
+	pswgt = 1;
 
 	if( cut_DenPath[iV][iP] ) {
 	  hDen[iP][iV]->Fill( var1D[iV] , 1/pswgt );
+	  if(iV==0) nDen[iP]++ ; // increment den counter
 	  if( cut_DenPath[iV][iP] && cut_NumPath[iP] ) {
 	    hNum[iP][iV]->Fill( var1D[iV] );
+	    if(iV==0) nNum[iP]++ ; // increment num counter
 	  }
 	}
 
@@ -369,12 +395,13 @@ Int_t quick(TString dir="v0_test", TString UsrCut="Loose",
     // Fill 2D histograms
     for(UInt_t iP=0 ; iP<nP ; iP++) {
 
+      /* // fixme
       if(iP==0) {
-	// if(ps_DiJet170==0) pswgt=0;
-	// else               pswgt = 1/ps_DiJet170;
 	pswgt = ps_DiJet170;
       }
       else pswgt = 1;
+      */
+      pswgt = 1;
 
       // x/y axes variables: Jet pT
       if( cut_DenPath[0][iP] && cut_DenPath[2][iP] ) {
@@ -406,6 +433,19 @@ Int_t quick(TString dir="v0_test", TString UsrCut="Loose",
 
   } // end loop: iE (chain entries)
   ////////// END LOOP //////////////////////
+
+  // Calculate numerical efficiencies
+  cout << "REPORT: nTest=" << nTest << endl;
+  for(UInt_t iP=0 ; iP<nP ; iP++) {
+
+    totEff[iP] = nDen[iP]!=0 ? nNum[iP]/double(nDen[iP]) : -1;
+
+    cout << "REPORT: Path '" << nameP[iP] 
+	 << " Total=" << nDen[iP] 
+	 << " Pass=" << nNum[iP] 
+	 << " Eff=" << totEff[iP] 
+	 << endl;
+  }
 
   // Create TCanvas
   TCanvas c("c","c",0,0,600,600); 
