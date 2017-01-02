@@ -1,29 +1,31 @@
 from CRABClient.UserUtilities import config
 config = config()
 
-name = 'SIMPs_XXTo4J_ctau1000_M3000'
+name = 'SIMPs_QCD_HT2000ToInf_PUMoriond17'
+#name = 'SIMPs_QCD_HT2000ToInf_PUSpring16'
 
 # GENERAL
 config.section_("General")
 config.General.requestName = name 
-config.General.workArea    = '/user/isdebruy/SIMPs/SignalMC/'
+config.General.workArea    = '/user/isdebruy/SIMPs/QCDMC/'
 config.General.transferLogs = True
 #config.General.transferOutput = True
 
 # JOB TYPE
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'treeproducer_MC_cfg.py'
+config.JobType.psetName = '../treeproducer_MC_cfg.py'
 #config.JobType.pyCfgParams = []
 #config.JobType.inputFiles = ''
 #config.JobType.allowNonProductionCMSSW = True
 
 # INPUT DATA
 config.section_("Data")
-config.Data.inputDataset = '/XXTo4J_M-3000_CTau-1000mm_TuneCUETP8M1_13TeV_pythia8/RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM'
+config.Data.inputDataset = '/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM'
+#config.Data.inputDataset = '/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
 config.Data.inputDBS  = 'global'
 config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 1
+config.Data.unitsPerJob = 3
 config.Data.publication = False
 config.Data.publishDBS = 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter/'
 config.Data.outputDatasetTag = name

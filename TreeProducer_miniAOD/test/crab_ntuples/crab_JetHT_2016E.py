@@ -1,7 +1,7 @@
 from CRABClient.UserUtilities import config
 config = config()
 
-name = 'SIMPs_JetHT_2016D'
+name = 'SIMPs_JetHT_2016E_rereco'
 
 # GENERAL
 config.section_("General")
@@ -20,10 +20,10 @@ config.JobType.psetName = 'treeproducer_cfg.py'
 
 # INPUT DATA
 config.section_("Data")
-config.Data.inputDataset = '/JetHT/Run2016D-PromptReco-v2/MINIAOD'
+config.Data.inputDataset = '/JetHT/Run2016E-23Sep2016-v1/MINIAOD'
 config.Data.inputDBS  = 'global'
 config.Data.splitting = 'EventAwareLumiBased'
-config.Data.unitsPerJob = 747000
+config.Data.unitsPerJob = 700000
 config.Data.publication = False
 config.Data.publishDBS = 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter/'
 config.Data.outputDatasetTag = name

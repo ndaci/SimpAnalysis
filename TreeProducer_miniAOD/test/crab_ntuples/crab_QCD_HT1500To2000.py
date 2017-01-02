@@ -1,34 +1,36 @@
 from CRABClient.UserUtilities import config
 config = config()
 
-name = 'SIMPs_JetHT_2016Bv2'
+name = 'SIMPs_QCD_HT1500To2000_PUMoriond17'
+#name = 'SIMPs_QCD_HT1500To2000_PUSpring16'
 
 # GENERAL
 config.section_("General")
 config.General.requestName = name 
-config.General.workArea    = '/user/isdebruy/SIMPs/Data2016/'
+config.General.workArea    = '/user/isdebruy/SIMPs/QCDMC/'
 config.General.transferLogs = True
 #config.General.transferOutput = True
 
 # JOB TYPE
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'treeproducer_cfg.py'
+config.JobType.psetName = '../treeproducer_MC_cfg.py'
 #config.JobType.pyCfgParams = []
 #config.JobType.inputFiles = ''
 #config.JobType.allowNonProductionCMSSW = True
 
 # INPUT DATA
 config.section_("Data")
-config.Data.inputDataset = '/JetHT/Run2016B-PromptReco-v2/MINIAOD'
+config.Data.inputDataset = '/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM'
+#config.Data.inputDataset = '/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3/MINIAODSIM'
 config.Data.inputDBS  = 'global'
-config.Data.splitting = 'EventAwareLumiBased'
-config.Data.unitsPerJob = 900000
+config.Data.splitting = 'FileBased'
+config.Data.unitsPerJob = 3
 config.Data.publication = False
 config.Data.publishDBS = 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter/'
 config.Data.outputDatasetTag = name
 config.Data.ignoreLocality = False # allows to process inputs on CE != site hosting inputs
-config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/Cert_271036-282037_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt'
+#config.Data.lumiMask = 'https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/Cert_271036-282037_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt'
 #config.Data.runRange = 
 
 #A custom string to insert in the output file name inside the CRAB-created directory path to allow organizing groups of tasks.

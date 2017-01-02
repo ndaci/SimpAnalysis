@@ -1,7 +1,8 @@
 from CRABClient.UserUtilities import config
 config = config()
 
-name = 'SIMPs_QCD_HT1500To2000'
+#name = 'SIMPs_QCD_HT300To500_PUMoriond17'
+name = 'SIMPs_QCD_HT300To500_PUSpring16'
 
 # GENERAL
 config.section_("General")
@@ -13,14 +14,15 @@ config.General.transferLogs = True
 # JOB TYPE
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'treeproducer_MC_cfg.py'
+config.JobType.psetName = '../treeproducer_MC_cfg.py'
 #config.JobType.pyCfgParams = []
 #config.JobType.inputFiles = ''
 #config.JobType.allowNonProductionCMSSW = True
 
 # INPUT DATA
 config.section_("Data")
-config.Data.inputDataset = '/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v3/MINIAODSIM'
+#config.Data.inputDataset = '/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/MINIAODSIM'
+config.Data.inputDataset= '/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM'
 config.Data.inputDBS  = 'global'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 3
