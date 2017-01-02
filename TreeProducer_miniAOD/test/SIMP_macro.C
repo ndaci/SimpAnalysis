@@ -6,6 +6,10 @@
 #include <sstream> 
 #include <stdio.h>
 #include <TMath.h>
+#include <TRandom3.h>
+#include <TChain.h>
+#include <TH1.h>
+#include <TH2.h>
 
 #include "list_JetHT_2016B.h"
 #include "list_JetHT_2016C.h"
@@ -13,6 +17,13 @@
 #include "list_JetHT_2016E.h"
 #include "list_JetHT_2016F.h"
 #include "list_JetHT_2016G.h"
+
+// #include "list_JetHT_rereco_2016B.h"
+// #include "list_JetHT_rereco_2016C.h"
+// #include "list_JetHT_rereco_2016D.h"
+// #include "list_JetHT_rereco_2016E.h"
+// #include "list_JetHT_rereco_2016F.h"
+// #include "list_JetHT_rereco_2016G.h"
 
 void SIMP_macro(){
   
@@ -23,12 +34,21 @@ void SIMP_macro(){
 	list_JetHT_2016E(chain);
 	list_JetHT_2016F(chain);
 	list_JetHT_2016G(chain);
+// 	list_JetHT_rereco_2016B(chain);
+// 	list_JetHT_rereco_2016C(chain);
+// 	list_JetHT_rereco_2016D(chain);
+// 	list_JetHT_rereco_2016E(chain);
+// 	list_JetHT_rereco_2016F(chain);
+// 	list_JetHT_rereco_2016G(chain);
 	std::cout<<"TChain ready"<<std::endl;
   
+	TRandom3 *r = new TRandom3();
 	int dijet_170, vtx_N;
 	double pswgt_dijet_170;
   double jet_pt[4], jet_eta[4], jet_phi[4], jet_efrac_ch_Had[4], jet_efrac_ch_EM[4], jet_efrac_ch_Mu[4];
 	double CHEF_jet[4];
+	int selection = 0;
+	int CR_region = 0;
   
   chain->SetBranchAddress("vtx_N", &vtx_N);
   chain->SetBranchAddress("jet_pt", &jet_pt);
@@ -40,7 +60,7 @@ void SIMP_macro(){
   chain->SetBranchAddress("HLT_DiCentralPFJet170", &dijet_170);
   chain->SetBranchAddress("pswgt_dijet_170", &pswgt_dijet_170);
   
-  TFile *output = new TFile("control_region.root", "RECREATE");
+  TFile *output = new TFile("control_region_check.root", "RECREATE");
 	
 	TH1F *HT = new TH1F("HT", "HT (4 jets)", 100, 0, 2000);
 	TH1F *nvtx = new TH1F("nvtx", "Number of vertices", 51, -0.5, 50.5);
@@ -73,11 +93,16 @@ void SIMP_macro(){
 	CHFvsCHF->GetXaxis()->SetTitle("jet2 ChF");
 	CHFvsCHF->GetYaxis()->SetTitle("jet1 ChF");
 	TH1D *CHF = new TH1D("CHF", "Jet ChF (both jets)", 100, 0, 1);
+	TH1D *ChFOtherJet = new TH1D("ChFOtherJet", "Jet ChF (other jet ChF > 0.5)", 100, 0, 1);
   
+	std::cout<<"Getting entries....";
   Int_t Nentries = chain->GetEntries(); 
-	std::cout<<"Processing "<<Nentries<<"entries"<<std::endl;
+	std::cout<<"processing "<<Nentries<<"entries"<<std::endl;
   for(Int_t entry = 0; entry < Nentries; ++entry){
+		if(entry%1000000==0) std::cout<<"processed "<<entry/1000000<<"M events"<<std::endl;
     chain->GetEntry(entry);
+			
+		Double_t random1 = r->Uniform();
     
     double deltajet_phi = jet_phi[0] - jet_phi[1];
     if(deltajet_phi > TMath::Pi()) deltajet_phi -= 2*TMath::Pi();
@@ -90,7 +115,9 @@ void SIMP_macro(){
 		output->cd();
 	
 		if (dijet_170 == 1 && jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2){
+			selection ++;
 			if (CHEF_jet[0] > 0.5||CHEF_jet[1] > 0.5){
+				CR_region++;
 				HT->Fill(jet_pt[0]+jet_pt[1]+jet_pt[2]+jet_pt[3]);
 				nvtx->Fill(vtx_N);
 				nvtx_withps->Fill(vtx_N, pswgt_dijet_170);
@@ -131,9 +158,13 @@ void SIMP_macro(){
 					jetB_eta->Fill(jet_eta[0]);
 					if (CHEF_jet[1] > 0.5) chf->Fill(CHEF_jet[0]);
 				}
+				if(random1 <= 0.5 && CHEF_jet[0] > 0.5) ChFOtherJet->Fill(CHEF_jet[1]);
+				else if (random1 > 0.5 && CHEF_jet[1] > 0.5) ChFOtherJet->Fill(CHEF_jet[0]);
 			}
-		}    
+		}
 	}
+	std::cout<<"selected: "<<selection<<std::endl;
+	std::cout<<"CR region: "<<CR_region<<std::endl;
   output->Write();
   output->Close();
 }
