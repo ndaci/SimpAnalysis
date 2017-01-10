@@ -162,6 +162,7 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 		_track_ndof[iT] = trackRef[i]->pseudoTrack().ndof();
 		_track_ptError[iT] = trackRef[i]->pseudoTrack().ptError();
 		_track_dzError[iT] = trackRef[i]->pseudoTrack().dzError();
+		_track_dz[iT] = trackRef[i]->pseudoTrack().dz();
 		iT++ ;
     if(iT>=nT) break;
 	}
@@ -331,6 +332,7 @@ TreeProducer_miniAOD::beginJob()
 	_tree->Branch("track_purity",&_track_purity,"track_purity[nTrack_stored]/I");
 	_tree->Branch("track_nhits",&_track_Nhits,"track_nhits[nTrack_stored]/I");
 	_tree->Branch("track_nPixHits",&_track_NpixHits,"track_nPixHits[nTrack_stored]/I");
+	_tree->Branch("track_dz",&_track_dz,"track_dz[nTrack_stored]/D");
 	//
   // Jets
   _tree->Branch("nJet_stored",&_nJet_stored,"nJet_stored/I");

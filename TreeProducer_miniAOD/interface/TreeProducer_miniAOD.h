@@ -119,7 +119,7 @@ class TreeProducer_miniAOD : public edm::one::EDAnalyzer<edm::one::SharedResourc
 	
 	//Tracks
 	int _track_fromPV[nT], _track_Nhits[nT], _track_NpixHits[nT], _track_purity[nT], _track_ndof[nT];
-	double _track_eta[nT], _track_pt[nT], _track_phi[nT], _track_ptError[nT], _track_dzError[nT], _track_normalizedChi2[nT];	
+	double _track_eta[nT], _track_pt[nT], _track_phi[nT], _track_ptError[nT], _track_dz[nT], _track_dzError[nT], _track_normalizedChi2[nT];	
 
   // Jets
   int _jet_mult_ch[nJ], _jet_mult_mu[nJ], _jet_mult_ne[nJ]; // multiplicities
