@@ -6,15 +6,24 @@
 #include <sstream> 
 #include <stdio.h>
 #include <TMath.h>
+#include <TChain.h>
+#include <TH2.h>
 
-#include "list_QCD_300To500.h"
-#include "list_QCD_500To700.h"
-#include "list_QCD_700To1000.h"
-#include "list_QCD_1000To1500.h"
-#include "list_QCD_1500To2000.h"
-#include "list_QCD_2000ToInf.h"
+// #include "lists/list_QCD_300To500.h"
+// #include "lists/list_QCD_500To700.h"
+// #include "lists/list_QCD_700To1000.h"
+// #include "lists/list_QCD_1000To1500.h"
+// #include "lists/list_QCD_1500To2000.h"
+// #include "lists/list_QCD_2000ToInf.h"
 
-void SIMP_QCD_eff2D(){
+#include "lists/list_QCD_300To500_PUMoriond17.h"
+#include "lists/list_QCD_500To700_PUMoriond17.h"
+#include "lists/list_QCD_700To1000_PUMoriond17.h"
+#include "lists/list_QCD_1000To1500_PUMoriond17.h"
+#include "lists/list_QCD_1500To2000_PUMoriond17.h"
+#include "lists/list_QCD_2000ToInf_PUMoriond17.h"
+
+void SIMP_QCD_eff2D_random(){
   
   TChain* chain0 = new TChain("tree/SimpAnalysis");
 	list_QCD_300To500(chain0);
@@ -31,15 +40,14 @@ void SIMP_QCD_eff2D(){
 	TChain* chains[6] = {chain0, chain1, chain2, chain3, chain4, chain5};
 	std::cout<<"TChains ready"<<std::endl;
   
-  double jet_pt[4], jet_eta[4], jet_phi[4], jet_efrac_ch_Had[4], jet_efrac_ch_EM[4], jet_efrac_ch_Mu[4];
-	double CHEF_jet[4];
-// 	E[4], M[4];
+  double jet_pt[8], jet_eta[8], jet_phi[8], jet_efrac_ch_Had[8], jet_efrac_ch_EM[8], jet_efrac_ch_Mu[8], CHEF_jet[8];
+	double track_pt[10], track_ptError[10];
 	
 	double chf_cuts[11] = {0.5, 0.4, 0.3, 0.2, 0.15, 0.1, 0.05, 0.04, 0.03, 0.02, 0.01};
 	double pt_bins[10] = {250, 275, 300, 350, 400, 450, 550, 700, 900, 10000};
 	double eta_bins[5] = {0, 0.5, 1.0, 1.5, 2.0};
   
-  TFile *output = new TFile("eff2D_QCD_0p1.root", "RECREATE");
+  TFile *output = new TFile("eff2D_QCD_nPixHitsCut_PUMoriond17.root", "RECREATE");
 	TH2D* total = new TH2D("total", "total", 4, eta_bins, 9, pt_bins);
 	total->GetYaxis()->SetTitle("p_{T}");
 	total->GetXaxis()->SetTitle("#eta");
@@ -47,7 +55,8 @@ void SIMP_QCD_eff2D(){
 	TH2D* passed[11] = {0,0,0,0,0,0,0,0,0,0,0};
 	TH2D* eff[11]    = {0,0,0,0,0,0,0,0,0,0,0};
 	
-	double QCD_xsec[6] = {343500, 32050, 6791, 1214, 118.7, 24.91};
+// 	double QCD_xsec[6] = {343500, 32050, 6791, 1214, 118.7, 24.91}; //Spring16
+	double QCD_xsec[6] = {346400, 32010, 6842, 1203, 120.1, 25.40}; //PUMoriond17
 // 	double QCD_events[5] = {16830696, 19199088, 15621634, 4980387, 3846616};
 	double lumi = 20;
 	
@@ -75,60 +84,51 @@ void SIMP_QCD_eff2D(){
 		chain->SetBranchAddress("jet_pt", &jet_pt);
 		chain->SetBranchAddress("jet_eta", &jet_eta);
 		chain->SetBranchAddress("jet_phi", &jet_phi);
-	//   chain->SetBranchAddress("jet_e", &E);
-	//   chain->SetBranchAddress("jet_m", &M);
 		chain->SetBranchAddress("jet_efrac_ch_Had", &jet_efrac_ch_Had);
 		chain->SetBranchAddress("jet_efrac_ch_EM", &jet_efrac_ch_EM);
 		chain->SetBranchAddress("jet_efrac_ch_Mu", &jet_efrac_ch_Mu);
+		chain->SetBranchAddress("track_pt", &track_pt);
+		chain->SetBranchAddress("track_ptError", &track_ptError);
+		chain->SetBranchAddress("track_nPixHits", &nPixHits);
 		
 		Int_t Nentries = chain->GetEntries(); 
 		double weight = QCD_xsec[l]*lumi/Nentries;
 		std::cout<<"QCD bin "<<l<<": Processing "<<Nentries<<" entries with weight "<<weight<<std::endl;
 		
 		for(Int_t entry = 0; entry < Nentries; ++entry){
+			if(entry%1000000==0) std::cout<<"processed "<<entry/1000000<<"M events"<<std::endl;
 			chain->GetEntry(entry);
 			
 			double deltajet_phi = jet_phi[0] - jet_phi[1];
 			if(deltajet_phi > TMath::Pi()) deltajet_phi -= 2*TMath::Pi();
 			if(deltajet_phi < -TMath::Pi()) deltajet_phi += 2*TMath::Pi();
 			
-			for (int i = 0; i < 4; i++){
+			for (int i = 0; i < 8; i++){
 				CHEF_jet[i] = jet_efrac_ch_Had[i]+jet_efrac_ch_EM[i]+jet_efrac_ch_Mu[i];
 			} 
 			
 			output->cd();
 			
-			if (jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2){
-				if(CHEF_jet[0] > CHEF_jet[1] && CHEF_jet[0] > 0.1){
-					for (int i = 0; i < 9; i++){
-						for (int k = 0; k < 4; k++){
-							if (jet_pt[1]>pt_bins[i] && jet_pt[1]<pt_bins[i+1] && jet_eta[1]>eta_bins[k] && jet_eta[1]<eta_bins[k+1]){
-								total->Fill(jet_eta[1], jet_pt[1], weight);
-								for(int j = 0; j < 11; j++){
-									if (CHEF_jet[1]<chf_cuts[j]) passed[j]->Fill(jet_eta[1], jet_pt[1], weight);
-								}
-							}
+			if (jet_pt[0] > 250.0 && jet_pt[1] > 250.0 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2.0 && nPixHits > 0){
+// 				if (track_ptError[0]/track_pt[0] < 0.5){
+					if(CHEF_jet[0] > 0.5){
+						total->Fill(fabs(jet_eta[1]), jet_pt[1], weight);
+						for(int j = 0; j < 11; j++){
+							if (CHEF_jet[1]<chf_cuts[j]) passed[j]->Fill(fabs(jet_eta[1]), jet_pt[1], weight);
 						}
 					}
-				}
-				else if(CHEF_jet[0] < CHEF_jet[1] && CHEF_jet[1] > 0.1){
-					for (int i = 0; i < 9; i++){
-						for (int k = 0; k < 4; k++){
-							if (jet_pt[0]>pt_bins[i] && jet_pt[0]<pt_bins[i+1] && jet_eta[0]>eta_bins[k] && jet_eta[0]<eta_bins[k+1]){
-								total->Fill(jet_eta[0], jet_pt[0], weight);
-								for(int j = 0; j < 11; j++){
-									if (CHEF_jet[0]<chf_cuts[j]) passed[j]->Fill(jet_eta[0], jet_pt[0], weight);
-								}
-							}
+					if(CHEF_jet[1] > 0.5){
+						total->Fill(fabs(jet_eta[0]), jet_pt[0], weight);
+						for(int j = 0; j < 11; j++){
+							if (CHEF_jet[0]<chf_cuts[j]) passed[j]->Fill(fabs(jet_eta[0]), jet_pt[0], weight);
 						}
 					}
-				}
+// 				} else std::cout<<track_pt[0]<<" "<<track_ptError[0]<<" "<<CHEF_jet[0]<<" "<<CHEF_jet[1]<<std::endl;
 			}    
 		}
 	}
 	for(int j = 0; j < 11; j++){
 		eff[j]->Divide(passed[j], total, 1, 1, "b");
-// 			eff[j]->Divide(total);
 	}
   output->Write();
   output->Close();

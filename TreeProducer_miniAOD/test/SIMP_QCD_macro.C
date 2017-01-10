@@ -11,12 +11,12 @@
 #include <TH1.h>
 #include <TH2.h>
 
-#include "list_QCD_300To500_PUMoriond17.h"
-#include "list_QCD_500To700_PUMoriond17.h"
-#include "list_QCD_700To1000_PUMoriond17.h"
-#include "list_QCD_1000To1500_PUMoriond17.h"
-#include "list_QCD_1500To2000_PUMoriond17.h"
-#include "list_QCD_2000ToInf_PUMoriond17.h"
+#include "lists/list_QCD_300To500_PUMoriond17.h"
+#include "lists/list_QCD_500To700_PUMoriond17.h"
+#include "lists/list_QCD_700To1000_PUMoriond17.h"
+#include "lists/list_QCD_1000To1500_PUMoriond17.h"
+#include "lists/list_QCD_1500To2000_PUMoriond17.h"
+#include "lists/list_QCD_2000ToInf_PUMoriond17.h"
 
 void SIMP_QCD_macro(){
   
@@ -35,14 +35,14 @@ void SIMP_QCD_macro(){
 	TChain* chains[6] = {chain0, chain1, chain2, chain3, chain4, chain5};
 	std::cout<<"TChains ready"<<std::endl;
   
-  TFile *output = new TFile("plots_QCD_prescaledlumi0p062_eta1_PUMoriond17.root", "RECREATE");
+  TFile *output = new TFile("plots_QCD_prescaledlumi0p062_nPixHitsCut_PUMoriond17_miniAOD.root", "RECREATE");
   
 	TRandom3 r;
 	int nJet, vtx_N;
 	double pswgt_dijet_170;
   double jet_pt[8], jet_eta[8], jet_phi[8], jet_efrac_ch_Had[8], jet_efrac_ch_EM[8], jet_efrac_ch_Mu[8], chi2[3], vtx_x[3], vtx_y[3], vtx_z[3], vtx_d0[3];
-	double CHEF_jet[8];
-	double track_pt[10], track_ptError[10];
+	double CHEF_jet[8], genjet_efrac_ch[4];
+	double track_pt[10], track_ptError[10], track_dzError[10], track_dz[10];
 	int track_fromPV[10], nhits[10], nPixHits[10], ndof[3];
 // 	E[4], M[4];
   
@@ -88,11 +88,23 @@ void SIMP_QCD_macro(){
 	TH2D *ndofvsCHF1 = new TH2D("ndofvsCHF1", "ndof vs. ChF (leading jet)", 100, 0, 1, 501, -0.5, 500.5);
 	TH2D *ndofvsCHF2 = new TH2D("ndofvsCHF2", "ndof vs. ChF (subleading jet)", 100, 0, 1, 501, -0.5, 500.5);
 	TH2D *Chi2vsNdof = new TH2D("Chi2vsNdof", "#chi^{2} vs. ndof", 501, -0.5, 500.5, 100, 0, 100);
+	TH2D *track1_reldzErrorvsdz = new TH2D("track1_reldzErrorvsdz", "dzError/dz vs. dz (hardest track)", 100, 0, 100, 100, 0, 100);
 	TH1F *track1_nhits = new TH1F("track1_nhits", "Number of hits for hardest track", 11, -0.5, 10.5);
-	TH1F *track1_npixhits = new TH1F("track1_npixhits", "Number of pixel hits for hardest track", 33, -0.5, 32.5);
+	TH1F *track1_npixhits = new TH1F("track1_npixhits", "Number of pixel hits for hardest track", 11, -0.5, 10.5);
 	TH1F *track1_pt = new TH1F("track1_pt", "pt of hardest track", 100, 0, 500);
 	TH1F *track1_ptError = new TH1F("track1_ptError", "ptError of hardest track", 100, 0, 1500);
 	TH1F *track1_fromPV = new TH1F("track1_fromPV", "Hardest track from PV?", 2, -0.5, 1.5);
+  TH1F *track1_dzError = new TH1F("track1_dzError", "dzError of hardest track", 100, 0, 100);
+  TH1F *track1_dz = new TH1F("track1_dz", "dz of hardest track", 100, 0, 100);
+  TH1F *track1_dzRelError = new TH1F("track1_dzRelError", "dzError/dz of hardest track", 100, 0, 100);;
+  TH2D *CHFvsGenCHF1 = new TH2D("CHFvsGenCHF1", "ChF vs. ChF GenJet (leading jet)", 100, 0, 1, 100, 0, 1);
+  TH2D *CHFvsGenCHF2 = new TH2D("CHFvsGenCHF2", "ChF vs. ChF GenJet (subleading jet)", 100, 0, 1, 100, 0, 1);
+  TH1F *relChF1 = new TH1F("relChF1", "(ChF - ChF GenJet)/ChF GenJet (leading jet)", 1000, -10, 10);
+  TH1F *relChF2 = new TH1F("relChF2", "(ChF - ChF GenJet)/ChF GenJet (subleading jet)", 1000, -10, 10);
+  TH1F *genjet1_chf = new TH1F("genjet1_chf", "Charged energy fraction (leading genjet)", 100, 0, 1);
+  TH1F *genjet2_chf = new TH1F("genjet2_chf", "Charged energy fraction (subleading genjet)", 100, 0, 1);
+  TH2D *eta1vsnpixhits = new TH2D("eta1vsnpixhits", "eta vs. # pixel hits (leading jet)", 11, -0.5, 10.5, 100, -3.14, 3.14);
+  TH2D *eta2vsnpixhits = new TH2D("eta2vsnpixhits", "eta vs. # pixel hits (subleading jet)", 11, -0.5, 10.5, 100, -3.14, 3.14);
 	
 // 	double QCD_xsec[6] = {343500, 32050, 6791, 1214, 118.7, 24.91}; //in pb//Spring16
 	double QCD_xsec[6] = {346400, 32010, 6842, 1203, 120.1, 25.40}; //PUMoriond17
@@ -120,6 +132,9 @@ void SIMP_QCD_macro(){
 		chain->SetBranchAddress("track_nPixHits", &nPixHits);
 		chain->SetBranchAddress("track_pt", &track_pt);
 		chain->SetBranchAddress("track_fromPV", &track_fromPV);
+//     chain->SetBranchAddress("track_dzError", &track_dzError);
+//     chain->SetBranchAddress("track_dz", &track_dz);
+
 		
 		Int_t Nentries = chain->GetEntries(); 
 		std::cout<<"Processing "<<Nentries<<"entries"<<std::endl;
@@ -145,7 +160,7 @@ void SIMP_QCD_macro(){
 			
 			//std::cout<<jet_pt[0]<<" "<<jet_pt[1]<<" "<<jet_eta[0]<<" "<<jet_eta[1]<<" "<<deltajet_phi<<" "<<CHEF_jet[0]<<" "<<CHEF_jet[1]<<std::endl;
 			
-			if (jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2){
+			if (jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2 && nPixHits > 0){
 				njets->Fill(nJet, weight);
 				nvtx->Fill(vtx_N, weight);
 				HT->Fill(jet_pt[0]+jet_pt[1]+jet_pt[2]+jet_pt[3], weight);
@@ -173,6 +188,17 @@ void SIMP_QCD_macro(){
 				CHFvsPT->Fill(jet_pt[0], CHEF_jet[0], weight);
 				CHFvsPT->Fill(jet_pt[1], CHEF_jet[1], weight);
 				
+				genjet1_chf->Fill(genjet_efrac_ch[0], weight);
+        genjet2_chf->Fill(genjet_efrac_ch[1], weight);
+        CHFvsGenCHF1->Fill(genjet_efrac_ch[0], CHEF_jet[0], weight);
+        CHFvsGenCHF2->Fill(genjet_efrac_ch[1], CHEF_jet[1], weight);
+        relChF1->Fill((CHEF_jet[0]-genjet_efrac_ch[0])/genjet_efrac_ch[0], weight);
+        relChF2->Fill((CHEF_jet[1]-genjet_efrac_ch[1])/genjet_efrac_ch[1], weight);
+
+				eta1vsnpixhits->Fill(nPixHits[0], jet_eta[0], weight);
+        eta2vsnpixhits->Fill(nPixHits[0], jet_eta[1], weight);
+
+				
 				NVTXvsCHF->Fill(CHEF_jet[0], vtx_N, weight);
 				NVTXvsCHF->Fill(CHEF_jet[1], vtx_N, weight);
 				NVTXvsCHF1->Fill(CHEF_jet[0], vtx_N, weight);
@@ -193,6 +219,10 @@ void SIMP_QCD_macro(){
 				track1_pt->Fill(track_pt[0], weight);
 				track1_ptError->Fill(track_ptError[0], weight);
 				track1_fromPV->Fill(track_fromPV[0], weight);
+				track1_dzError->Fill(track_dzError[0], weight);
+				track1_dz->Fill(track_dz[0], weight);
+				track1_dzRelError->Fill(track_dzError[0]/track_dz[0], weight);
+				track1_reldzErrorvsdz->Fill(track_dz[0], track_dzError[0]/track_dz[0], weight);
 				
 // 				if (ndof[0] == 0) std::cout<<vtx_x[0]<<"\t"<<vtx_y[0]<<"\t"<<vtx_z[0]<<"\t"<<vtx_d0[0]<<std::endl;
 				

@@ -11,19 +11,19 @@
 #include <TGraphErrors.h>
 #include <TCanvas.h>
 
-// #include "list_QCD_300To500.h"
-// #include "list_QCD_500To700.h"
-// #include "list_QCD_700To1000.h"
-// #include "list_QCD_1000To1500.h"
-// #include "list_QCD_1500To2000.h"
-// #include "list_QCD_2000ToInf.h"
+// #include "lists/list_QCD_300To500.h"
+// #include "lists/list_QCD_500To700.h"
+// #include "lists/list_QCD_700To1000.h"
+// #include "lists/list_QCD_1000To1500.h"
+// #include "lists/list_QCD_1500To2000.h"
+// #include "lists/list_QCD_2000ToInf.h"
 
-#include "list_QCD_300To500_PUMoriond17.h"
-#include "list_QCD_500To700_PUMoriond17.h"
-#include "list_QCD_700To1000_PUMoriond17.h"
-#include "list_QCD_1000To1500_PUMoriond17.h"
-#include "list_QCD_1500To2000_PUMoriond17.h"
-#include "list_QCD_2000ToInf_PUMoriond17.h"
+#include "lists/list_QCD_300To500_PUMoriond17.h"
+#include "lists/list_QCD_500To700_PUMoriond17.h"
+#include "lists/list_QCD_700To1000_PUMoriond17.h"
+#include "lists/list_QCD_1000To1500_PUMoriond17.h"
+#include "lists/list_QCD_1500To2000_PUMoriond17.h"
+#include "lists/list_QCD_2000ToInf_PUMoriond17.h"
 
 void SIMP_QCD_closure(){
   
