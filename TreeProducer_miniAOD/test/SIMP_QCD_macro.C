@@ -11,12 +11,19 @@
 #include <TH1.h>
 #include <TH2.h>
 
-#include "lists/list_QCD_300To500_PUMoriond17.h"
-#include "lists/list_QCD_500To700_PUMoriond17.h"
-#include "lists/list_QCD_700To1000_PUMoriond17.h"
-#include "lists/list_QCD_1000To1500_PUMoriond17.h"
-#include "lists/list_QCD_1500To2000_PUMoriond17.h"
-#include "lists/list_QCD_2000ToInf_PUMoriond17.h"
+// #include "lists/list_QCD_300To500_PUMoriond17.h"
+// #include "lists/list_QCD_500To700_PUMoriond17.h"
+// #include "lists/list_QCD_700To1000_PUMoriond17.h"
+// #include "lists/list_QCD_1000To1500_PUMoriond17.h"
+// #include "lists/list_QCD_1500To2000_PUMoriond17.h"
+// #include "lists/list_QCD_2000ToInf_PUMoriond17.h"
+
+#include "lists/list_QCD_300To500_PUMoriond17_photoninfo.h"
+#include "lists/list_QCD_500To700_PUMoriond17_photoninfo.h"
+#include "lists/list_QCD_700To1000_PUMoriond17_photoninfo.h"
+#include "lists/list_QCD_1000To1500_PUMoriond17_photoninfo.h"
+#include "lists/list_QCD_1500To2000_PUMoriond17_photoninfo.h"
+#include "lists/list_QCD_2000ToInf_PUMoriond17_photoninfo.h"
 
 void SIMP_QCD_macro(){
   
@@ -40,10 +47,11 @@ void SIMP_QCD_macro(){
 	TRandom3 r;
 	int nJet, vtx_N;
 	double pswgt_dijet_170;
-  double jet_pt[8], jet_eta[8], jet_phi[8], jet_efrac_ch_Had[8], jet_efrac_ch_EM[8], jet_efrac_ch_Mu[8], chi2[3], vtx_x[3], vtx_y[3], vtx_z[3], vtx_d0[3];
-	double CHEF_jet[8], genjet_efrac_ch[4];
+  double jet_pt[8], jet_eta[8], jet_phi[8], jet_efrac_ch_Had[8], jet_efrac_ch_EM[8], jet_efrac_ch_Mu[8], jet_efrac_ne_EM[8], chi2[3], vtx_x[3], vtx_y[3], vtx_z[3], vtx_d0[3];
+	double CHEF_jet[8], EMF_jet[8], genjet_efrac_ch[4];
 	double track_pt[10], track_ptError[10], track_dzError[10], track_dz[10];
 	int track_fromPV[10], nhits[10], nPixHits[10], ndof[3];
+	double photon_eta[4], photon_phi[4], photon_pt[4];
 // 	E[4], M[4];
   
 	TH1F *njets = new TH1F("njets", "Number of jets", 11, -0.5, 10.5);
@@ -63,6 +71,8 @@ void SIMP_QCD_macro(){
 	TH1F *jet1_phi = new TH1F("jet1_phi", "Leading jet phi", 100, -3.14, 3.14);
 	TH1F *jet2_phi = new TH1F("jet2_phi", "Subleading jet phi", 100, -3.14, 3.14);
 	TH1F *deltaphi = new TH1F("DeltaPhi", "DeltaPhi", 100, 0, 3.14);
+	TH1F *jet1_emf = new TH1F("jet1_emf", "EM energy fraction (leading jet)", 100, 0, 1);
+	TH1F *jet2_emf = new TH1F("jet2_emf", "EM energy fraction (subleading jet)", 100, 0, 1);
 	TH1F *jet1_chf = new TH1F("jet1_chf", "Charged energy fraction (leading jet)", 100, 0, 1);
 	TH1F *jet1_chf_jet2_0p5 = new TH1F("jet1_chf_jet2_0p5", "Leading jet charged energy fraction (jet2_chf > 0.5)", 100, 0, 1);
 	TH1F *jet2_chf = new TH1F("jet2_chf", "Charged energy fraction (subleading jet)", 100, 0, 1);
@@ -105,6 +115,14 @@ void SIMP_QCD_macro(){
   TH1F *genjet2_chf = new TH1F("genjet2_chf", "Charged energy fraction (subleading genjet)", 100, 0, 1);
   TH2D *eta1vsnpixhits = new TH2D("eta1vsnpixhits", "eta vs. # pixel hits (leading jet)", 11, -0.5, 10.5, 100, -3.14, 3.14);
   TH2D *eta2vsnpixhits = new TH2D("eta2vsnpixhits", "eta vs. # pixel hits (subleading jet)", 11, -0.5, 10.5, 100, -3.14, 3.14);
+  TH1F *photon1_pt = new TH1F("photon1_pt", "Photon p_{T} (leading photon)", 100, 0, 500);
+  TH1F *photon2_pt = new TH1F("photon2_pt", "Photon p_{T} (subleading photon)", 100, 0, 500);
+  TH1F *photon1_eta = new TH1F("photon1_eta", "Photon #eta (leading photon)", 100, -3.14, 3.14);
+  TH1F *photon2_eta = new TH1F("photon2_eta", "Photon #eta (subleading photon)", 100, -3.14, 3.14);
+  TH1F *photon1_phi = new TH1F("photon1_phi", "Photon #phi (leading photon)", 100, -3.14, 3.14);
+  TH1F *photon2_phi = new TH1F("photon2_phi", "Photon #phi (subleading photon)", 100, -3.14, 3.14);
+  TH1F *dR_1 = new TH1F("dR_1", "dR(photon, leading jet)", 100, 0, 1);
+  TH1F *dR_2 = new TH1F("dR_2", "dR(photon, subleading jet)", 100, 0, 1);
 	
 // 	double QCD_xsec[6] = {343500, 32050, 6791, 1214, 118.7, 24.91}; //in pb//Spring16
 	double QCD_xsec[6] = {346400, 32010, 6842, 1203, 120.1, 25.40}; //PUMoriond17
@@ -118,9 +136,11 @@ void SIMP_QCD_macro(){
 		chain->SetBranchAddress("jet_pt", &jet_pt);
 		chain->SetBranchAddress("jet_eta", &jet_eta);
 		chain->SetBranchAddress("jet_phi", &jet_phi);
+		chain->SetBranchAddress("genjet_efrac_ch", &genjet_efrac_ch);
 		chain->SetBranchAddress("jet_efrac_ch_Had", &jet_efrac_ch_Had);
 		chain->SetBranchAddress("jet_efrac_ch_EM", &jet_efrac_ch_EM);
 		chain->SetBranchAddress("jet_efrac_ch_Mu", &jet_efrac_ch_Mu);
+		chain->SetBranchAddress("jet_efrac_ne_EM", &jet_efrac_ne_EM);
 		chain->SetBranchAddress("vtx_normalizedChi2", &chi2);
 		chain->SetBranchAddress("vtx_d0", &vtx_d0);
 		chain->SetBranchAddress("vtx_x", &vtx_x);
@@ -132,8 +152,11 @@ void SIMP_QCD_macro(){
 		chain->SetBranchAddress("track_nPixHits", &nPixHits);
 		chain->SetBranchAddress("track_pt", &track_pt);
 		chain->SetBranchAddress("track_fromPV", &track_fromPV);
-//     chain->SetBranchAddress("track_dzError", &track_dzError);
-//     chain->SetBranchAddress("track_dz", &track_dz);
+    chain->SetBranchAddress("track_dzError", &track_dzError);
+    chain->SetBranchAddress("track_dz", &track_dz);
+    chain->SetBranchAddress("photon_pt", &photon_pt);
+    chain->SetBranchAddress("photon_eta", &photon_eta);
+    chain->SetBranchAddress("photon_phi", &photon_phi);
 
 		
 		Int_t Nentries = chain->GetEntries(); 
@@ -152,15 +175,29 @@ void SIMP_QCD_macro(){
 			if(deltajet_phi > TMath::Pi()) deltajet_phi -= 2*TMath::Pi();
 			if(deltajet_phi < -TMath::Pi()) deltajet_phi += 2*TMath::Pi();
 			
+			double deltaphi_jet1photon = jet_phi[0] - photon_phi[0];
+			if(deltaphi_jet1photon > TMath::Pi()) deltaphi_jet1photon -= 2*TMath::Pi();
+			if(deltaphi_jet1photon < -TMath::Pi()) deltaphi_jet1photon += 2*TMath::Pi();
+			double deltaphi_jet2photon = jet_phi[1] - photon_phi[0];
+			if(deltaphi_jet2photon > TMath::Pi()) deltaphi_jet2photon -= 2*TMath::Pi();
+			if(deltaphi_jet2photon < -TMath::Pi()) deltaphi_jet2photon += 2*TMath::Pi();
+			
+			double deltaeta_jet1photon = jet_eta[0] - photon_eta[0];
+			double deltaeta_jet2photon = jet_eta[1] - photon_eta[0];
+			
+			double dR1 = TMath::Sqrt(deltaphi_jet1photon*deltaphi_jet1photon + deltaeta_jet1photon*deltaeta_jet1photon);
+			double dR2 = TMath::Sqrt(deltaphi_jet2photon*deltaphi_jet2photon + deltaeta_jet2photon*deltaeta_jet2photon);
+			
 			for (int i = 0; i < 8; i++){
 				CHEF_jet[i] = jet_efrac_ch_Had[i]+jet_efrac_ch_EM[i]+jet_efrac_ch_Mu[i];
+				EMF_jet[i] = jet_efrac_ch_EM[i]+jet_efrac_ne_EM[i];
 			} 
 			
 			output->cd();
 			
 			//std::cout<<jet_pt[0]<<" "<<jet_pt[1]<<" "<<jet_eta[0]<<" "<<jet_eta[1]<<" "<<deltajet_phi<<" "<<CHEF_jet[0]<<" "<<CHEF_jet[1]<<std::endl;
 			
-			if (jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2 && nPixHits > 0){
+			if (jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2 && nPixHits[0] > 0){
 				njets->Fill(nJet, weight);
 				nvtx->Fill(vtx_N, weight);
 				HT->Fill(jet_pt[0]+jet_pt[1]+jet_pt[2]+jet_pt[3], weight);
@@ -177,6 +214,8 @@ void SIMP_QCD_macro(){
 				jet2_phi->Fill(jet_phi[1], weight);
 				deltaphi->Fill(deltajet_phi, weight);
 				
+				jet1_emf->Fill(EMF_jet[0], weight);
+				jet2_emf->Fill(EMF_jet[1], weight);
 				jet1_chf->Fill(CHEF_jet[0], weight);
 				if (CHEF_jet[1] > 0.5) jet1_chf_jet2_0p5->Fill(CHEF_jet[0], weight);
 				jet2_chf->Fill(CHEF_jet[1], weight);
@@ -214,6 +253,9 @@ void SIMP_QCD_macro(){
 				ndofvsCHF1->Fill(CHEF_jet[0], ndof[0], weight);
 				ndofvsCHF2->Fill(CHEF_jet[1], ndof[0], weight);
 				
+				dR_1->Fill(dR1, weight);
+				dR_2->Fill(dR2, weight);
+				
 				track1_nhits->Fill(nhits[0], weight);
 				track1_npixhits->Fill(nPixHits[0], weight);
 				track1_pt->Fill(track_pt[0], weight);
@@ -223,6 +265,13 @@ void SIMP_QCD_macro(){
 				track1_dz->Fill(track_dz[0], weight);
 				track1_dzRelError->Fill(track_dzError[0]/track_dz[0], weight);
 				track1_reldzErrorvsdz->Fill(track_dz[0], track_dzError[0]/track_dz[0], weight);
+				
+				if(photon_pt[0] > 10) photon1_pt->Fill(photon_pt[0], weight);
+				if(photon_pt[1] > 10) photon2_pt->Fill(photon_pt[1], weight);
+				if(photon_pt[0] > 10) photon1_eta->Fill(photon_eta[0], weight);
+				if(photon_pt[1] > 10) photon2_eta->Fill(photon_eta[1], weight);
+				if(photon_pt[0] > 10) photon1_phi->Fill(photon_phi[0], weight);
+				if(photon_pt[1] > 10) photon2_phi->Fill(photon_phi[1], weight);
 				
 // 				if (ndof[0] == 0) std::cout<<vtx_x[0]<<"\t"<<vtx_y[0]<<"\t"<<vtx_z[0]<<"\t"<<vtx_d0[0]<<std::endl;
 				
