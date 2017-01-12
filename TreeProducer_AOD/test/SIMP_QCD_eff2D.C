@@ -36,12 +36,13 @@ void SIMP_QCD_eff2D(){
 // 	TRandom3 r;
   double jet_pt[8], jet_eta[8], jet_phi[8], jet_efrac_ch_Had[8], jet_efrac_ch_EM[8], jet_efrac_ch_Mu[8], CHEF_jet[8];
 	double track_pt[10], track_ptError[10], track_dzError[10], track_dz[10];
+	int npixhits[10];
 	
 	double chf_cuts[11] = {0.5, 0.4, 0.3, 0.2, 0.15, 0.1, 0.05, 0.04, 0.03, 0.02, 0.01};
 	double pt_bins[10] = {250, 275, 300, 350, 400, 450, 550, 700, 900, 10000};
 	double eta_bins[5] = {0, 0.5, 1.0, 1.5, 2.0};
   
-  TFile *output = new TFile("eff2D_QCD_dzCut1_PUMoriond17_AOD.root", "RECREATE");
+  TFile *output = new TFile("eff2D_QCD_npixCut_PUMoriond17_AOD.root", "RECREATE");
 	TH2D* total = new TH2D("total", "total", 4, eta_bins, 9, pt_bins);
 	total->GetYaxis()->SetTitle("p_{T}");
 	total->GetXaxis()->SetTitle("#eta");
@@ -85,6 +86,7 @@ void SIMP_QCD_eff2D(){
 		chain->SetBranchAddress("track_ptError", &track_ptError);
 		chain->SetBranchAddress("track_dzError", &track_dzError);
 		chain->SetBranchAddress("track_dz", &track_dz);
+		chain->SetBranchAddress("track_nPixHits", &npixhits);
 		
 		Int_t Nentries = chain->GetEntries(); 
 		double weight = QCD_xsec[l]*lumi/Nentries;
@@ -106,7 +108,7 @@ void SIMP_QCD_eff2D(){
 			
 			output->cd();
 			
-			if (jet_pt[0] > 250.0 && jet_pt[1] > 250.0 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2.0 && track_dzError[0]/track_dz[0] < 1){
+			if (jet_pt[0] > 250.0 && jet_pt[1] > 250.0 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2.0 /*&& fabs(track_dzError[0]/track_dz[0]) < 1 && track_dz[0] < 5.0 */&& npixhits[0] > 0){
 // 				if (track_ptError[0]/track_pt[0] < 0.5){
 					if(CHEF_jet[0] > 0.5){
 						total->Fill(fabs(jet_eta[1]), jet_pt[1], weight);
