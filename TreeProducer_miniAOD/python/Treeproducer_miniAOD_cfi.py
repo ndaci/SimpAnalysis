@@ -12,5 +12,6 @@ tree = cms.EDAnalyzer(
     vertexCollection = cms.InputTag("offlineSlimmedPrimaryVertices"),
     METCollection    = cms.InputTag("slimmedMETs"),
     photonCollection    = cms.InputTag("slimmedPhotons"),
-    packedPFCollection    = cms.InputTag("packedPFCandidates")    
+    packedPFCollection    = cms.InputTag("packedPFCandidates"),
+    isData = cms.untracked.bool(True)
 )

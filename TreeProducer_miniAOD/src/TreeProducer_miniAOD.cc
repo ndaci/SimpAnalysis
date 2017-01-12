@@ -26,7 +26,9 @@ TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
   _vertexCollectionToken(consumes<vector<reco::Vertex> >(_vertexCollectionTag)),
   _METCollectionToken(consumes<vector<pat::MET> >(_METCollectionTag)),
   _photonCollectionToken(consumes<vector<pat::Photon> >(_photonCollectionTag)),
-  _packedPFCollectionToken(consumes<vector<pat::PackedCandidate> >(_packedPFCollectionTag))
+  _packedPFCollectionToken(consumes<vector<pat::PackedCandidate> >(_packedPFCollectionTag)),
+  
+  _isData(pset.getUntrackedParameter<bool>("isData"))
 {
 
 }
@@ -80,8 +82,8 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   edm::Handle<vector<pat::Jet> > H_pfjets;
   iEvent.getByToken(_pfjetCollectionToken , H_pfjets);
 	
-  edm::Handle<vector<reco::GenJet> > H_genjets;
-  iEvent.getByToken(_genjetCollectionToken , H_genjets);
+	edm::Handle<vector<reco::GenJet> > H_genjets;
+	if (!_isData) iEvent.getByToken(_genjetCollectionToken , H_genjets);
   
   edm::Handle<vector<pat::MET> > H_MET;
   iEvent.getByToken(_METCollectionToken , H_MET);
@@ -215,35 +217,37 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	
   UInt_t iGJ=0;
   //
-  for (vector<reco::GenJet>::const_iterator theGenJet = H_genjets->begin(); theGenJet != H_genjets->end(); ++theGenJet){
-		if (theGenJet->pt() > 20){
-			//Area
-			_genjet_area[iJ] = theGenJet->jetArea();  
+	if(!_isData){
+		for (vector<reco::GenJet>::const_iterator theGenJet = H_genjets->begin(); theGenJet != H_genjets->end(); ++theGenJet){
+			if (theGenJet->pt() > 20){
+				//Area
+				_genjet_area[iJ] = theGenJet->jetArea();  
+					
+				// Vertex
+				_genjet_vx[iGJ] = theGenJet->vx();
+				_genjet_vy[iGJ] = theGenJet->vy();
+				_genjet_vz[iGJ] = theGenJet->vz();
+
+				// Kinematics
+				_genjet_pt[iGJ]  = theGenJet->pt();
+				_genjet_eta[iGJ] = theGenJet->eta();
+				_genjet_phi[iGJ] = theGenJet->phi();
+				_genjet_e[iGJ]   = theGenJet->energy();
+				_genjet_m[iGJ]   = theGenJet->mass();
+
+				// Energy fractions
+				for (size_t i = 0; i < theGenJet->numberOfDaughters(); i++){
+					const reco::Candidate * constituent = theGenJet->daughter(i);
+					if (constituent->charge() != 0) _genjet_efrac_ch[iGJ] += constituent->energy()/theGenJet->energy();
+				}
 				
-			// Vertex
-			_genjet_vx[iGJ] = theGenJet->vx();
-			_genjet_vy[iGJ] = theGenJet->vy();
-			_genjet_vz[iGJ] = theGenJet->vz();
-
-			// Kinematics
-			_genjet_pt[iGJ]  = theGenJet->pt();
-			_genjet_eta[iGJ] = theGenJet->eta();
-			_genjet_phi[iGJ] = theGenJet->phi();
-			_genjet_e[iGJ]   = theGenJet->energy();
-			_genjet_m[iGJ]   = theGenJet->mass();
-
-			// Energy fractions
-			for (size_t i = 0; i < theGenJet->numberOfDaughters(); i++){
-				 const reco::Candidate * constituent = theGenJet->daughter(i);
-				if (constituent->charge() != 0) _genjet_efrac_ch[iGJ] += constituent->energy()/theGenJet->energy();
+				iGJ++ ;
 			}
-			
-			iGJ++ ;
+			if(iGJ>=nGJ) break;
 		}
-    if(iGJ>=nGJ) break;
+		_nGenJet = iGJ;
+		_nGenJet_stored = nGJ;
 	}
-  _nGenJet = iGJ;
-  _nGenJet_stored = nGJ;
   
   //MET//
   const pat::MET &met = H_MET->front();

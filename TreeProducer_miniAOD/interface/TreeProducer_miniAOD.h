@@ -101,6 +101,9 @@ class TreeProducer_miniAOD : public edm::one::EDAnalyzer<edm::one::SharedResourc
   edm::EDGetTokenT<vector<pat::MET> > _METCollectionToken;
   edm::EDGetTokenT<vector<pat::Photon> > _photonCollectionToken;
   edm::EDGetTokenT<vector<pat::PackedCandidate> > _packedPFCollectionToken;
+	
+	bool _isData;
+	
 //   GlobalPoint vertexPosition;
 
   // Tree and its branches
