@@ -4,6 +4,12 @@ process = cms.Process("SIMPTREE")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
+process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
+
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+from Configuration.AlCa.GlobalTag import GlobalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')
+
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.source = cms.Source("PoolSource",
@@ -38,12 +44,19 @@ process.triggerSelection =  HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.c
       'HLT_SingleCentralPFJet170_CFMax0p1_v*'],
     throw = False
 )
+
+from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
+dataFormat = DataFormat.MiniAOD
+switchOnVIDPhotonIdProducer(process, dataFormat)
+my_id_modules = ['RecoEgamma.PhotonIdentification.Identification.cutBasedPhotonID_Spring16_V2p2_cff']
+for idmod in my_id_modules:
+	setupAllVIDIdsInModule(process,idmod,setupVIDPhotonSelection)
     
 # Tree producer
 process.load("SimpAnalysis.TreeProducer_miniAOD.Treeproducer_miniAOD_cfi") 
-process.p = cms.Path(process.triggerSelection * process.tree)
+process.p = cms.Path(process.triggerSelection * process.egmPhotonIDSequence * process.tree)
 
 # Output
 process.TFileService = cms.Service('TFileService',
-    fileName = cms.string('simptree.root')
+    fileName = cms.string('Data_PR_test.root')
 )
