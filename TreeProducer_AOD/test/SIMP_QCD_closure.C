@@ -193,7 +193,8 @@ void SIMP_QCD_closure(){
 	ratio_oneleg->SetMarkerColor(2);
 	ratio_oneleg->Draw("AP");
   ratio_oneleg->SetTitle("");
-  ratio_oneleg->GetYaxis()->SetTitle("(1/2-leg - MCtruth)/MCtruth");
+  ratio_oneleg->GetYaxis()->SetRangeUser(0.8, 1.2);
+  ratio_oneleg->GetYaxis()->SetTitle("#frac{1/2-leg}{MCtruth}");
 	
 	TGraphErrors *ratio_twoleg = new TGraphErrors(11, chf_cuts, ratio_2leg, zero, err_ratio_2leg);
 	ratio_twoleg->SetMarkerStyle(20);
