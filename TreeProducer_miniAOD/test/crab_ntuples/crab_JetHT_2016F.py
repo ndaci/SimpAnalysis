@@ -13,9 +13,9 @@ config.General.transferLogs = True
 # JOB TYPE
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'treeproducer_cfg.py'
+config.JobType.psetName = '../treeproducer_cfg.py'
 #config.JobType.pyCfgParams = []
-#config.JobType.inputFiles = ''
+config.JobType.inputFiles = ['../../../../../external/slc6_amd64_gcc530/data/RecoEgamma/PhotonIdentification/data/Spring16/photon_general_MVA_Spring16_EB_V3.weights.xml', '../../../../../external/slc6_amd64_gcc530/data/RecoEgamma/PhotonIdentification/data/Spring16/photon_general_MVA_Spring16_EE_V3.weights.xml']
 #config.JobType.allowNonProductionCMSSW = True
 
 # INPUT DATA
