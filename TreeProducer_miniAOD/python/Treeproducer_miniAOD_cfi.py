@@ -13,5 +13,8 @@ tree = cms.EDAnalyzer(
     METCollection    = cms.InputTag("slimmedMETs"),
     photonCollection    = cms.InputTag("slimmedPhotons"),
     packedPFCollection    = cms.InputTag("packedPFCandidates"),
-    isData = cms.untracked.bool(True)
+    isData = cms.untracked.bool(True),
+    phoLooseIdMap = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Spring16-V2p2-loose"),
+    phoMediumIdMap = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Spring16-V2p2-medium"),
+    phoTightIdMap = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Spring16-V2p2-tight"),
 )

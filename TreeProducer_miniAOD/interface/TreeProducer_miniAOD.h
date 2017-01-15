@@ -90,17 +90,23 @@ class TreeProducer_miniAOD : public edm::one::EDAnalyzer<edm::one::SharedResourc
   edm::InputTag _METCollectionTag;
   edm::InputTag _photonCollectionTag;
   edm::InputTag _packedPFCollectionTag;
-  edm::EDGetTokenT<edm::TriggerResults> _trigResultsToken;
-//   edm::EDGetTokenT<edm::TriggerResults> _trigResultsToken2;
-  edm::EDGetTokenT<pat::PackedTriggerPrescales> _triggerPrescalesToken;
-  edm::EDGetTokenT<pat::PackedTriggerPrescales> _triggerPrescalesToken2;
-  edm::EDGetTokenT<edm::TriggerResults> _METfilterToken;
-  edm::EDGetTokenT<vector<pat::Jet> > _pfjetCollectionToken;
-  edm::EDGetTokenT<vector<reco::GenJet> > _genjetCollectionToken;
-  edm::EDGetTokenT<vector<reco::Vertex> > _vertexCollectionToken;
-  edm::EDGetTokenT<vector<pat::MET> > _METCollectionToken;
-  edm::EDGetTokenT<vector<pat::Photon> > _photonCollectionToken;
-  edm::EDGetTokenT<vector<pat::PackedCandidate> > _packedPFCollectionToken;
+	edm::InputTag _phoLooseIdMapTag;
+	edm::InputTag _phoMediumIdMapTag;
+	edm::InputTag _phoTightIdMapTag;
+  edm::EDGetTokenT<edm::TriggerResults> trigResultsToken_;
+//   edm::EDGetTokenT<edm::TriggerResults> trigResultsToken2_;
+  edm::EDGetTokenT<pat::PackedTriggerPrescales> triggerPrescalesToken_;
+  edm::EDGetTokenT<pat::PackedTriggerPrescales> triggerPrescalesToken2_;
+  edm::EDGetTokenT<edm::TriggerResults> METfilterToken_;
+  edm::EDGetTokenT<vector<pat::Jet> > pfjetCollectionToken_;
+  edm::EDGetTokenT<vector<reco::GenJet> > genjetCollectionToken_;
+  edm::EDGetTokenT<vector<reco::Vertex> > vertexCollectionToken_;
+  edm::EDGetTokenT<vector<pat::MET> > METCollectionToken_;
+  edm::EDGetTokenT<edm::View<reco::Photon> > photonCollectionToken_;
+  edm::EDGetTokenT<vector<pat::PackedCandidate> > packedPFCollectionToken_;
+	edm::EDGetTokenT<edm::ValueMap<bool> > phoLooseIdMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > phoMediumIdMapToken_;
+	edm::EDGetTokenT<edm::ValueMap<bool> > phoTightIdMapToken_;
 	
 	bool _isData;
 	
@@ -141,6 +147,7 @@ class TreeProducer_miniAOD : public edm::one::EDAnalyzer<edm::one::SharedResourc
   //Photons
   int _nPhoton_stored;
   double _photon_pt[nP], _photon_eta[nP], _photon_phi[nP];
+	int _passLooseId[nP], _passMediumId[nP], _passTightId[nP];
 
   // MET
   double _MET, _MET_phi;

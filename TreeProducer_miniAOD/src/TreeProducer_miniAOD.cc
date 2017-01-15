@@ -15,18 +15,24 @@ TreeProducer_miniAOD::TreeProducer_miniAOD(const edm::ParameterSet& pset):
   _METCollectionTag(pset.getParameter<edm::InputTag>("METCollection")),
   _photonCollectionTag(pset.getParameter<edm::InputTag>("photonCollection")),
   _packedPFCollectionTag(pset.getParameter<edm::InputTag>("packedPFCollection")),
-  
-  _trigResultsToken(consumes<edm::TriggerResults>(_trigResultsTag)),
-//   _trigResultsToken2(consumes<edm::TriggerResults>(_trigResultsTag2)),
-  _triggerPrescalesToken(consumes<pat::PackedTriggerPrescales>(_prescalesTag)),
-  _triggerPrescalesToken2(consumes<pat::PackedTriggerPrescales>(_prescalesTag2)),
-  _METfilterToken(consumes<edm::TriggerResults>(_METfilterTag)),
-  _pfjetCollectionToken(consumes<vector<pat::Jet> >(_pfjetCollectionTag)),
-  _genjetCollectionToken(consumes<vector<reco::GenJet> >(_genjetCollectionTag)),
-  _vertexCollectionToken(consumes<vector<reco::Vertex> >(_vertexCollectionTag)),
-  _METCollectionToken(consumes<vector<pat::MET> >(_METCollectionTag)),
-  _photonCollectionToken(consumes<vector<pat::Photon> >(_photonCollectionTag)),
-  _packedPFCollectionToken(consumes<vector<pat::PackedCandidate> >(_packedPFCollectionTag)),
+  _phoLooseIdMapTag(pset.getParameter<edm::InputTag>("phoLooseIdMap")),
+  _phoMediumIdMapTag(pset.getParameter<edm::InputTag>("phoMediumIdMap")),
+  _phoTightIdMapTag(pset.getParameter<edm::InputTag>("phoTightIdMap")),
+	
+  trigResultsToken_(consumes<edm::TriggerResults>(_trigResultsTag)),
+//   _trigResultsToken2_(consumes<edm::TriggerResults>(_trigResultsTag2)),
+  triggerPrescalesToken_(consumes<pat::PackedTriggerPrescales>(_prescalesTag)),
+  triggerPrescalesToken2_(consumes<pat::PackedTriggerPrescales>(_prescalesTag2)),
+  METfilterToken_(consumes<edm::TriggerResults>(_METfilterTag)),
+  pfjetCollectionToken_(consumes<vector<pat::Jet> >(_pfjetCollectionTag)),
+  genjetCollectionToken_(consumes<vector<reco::GenJet> >(_genjetCollectionTag)),
+  vertexCollectionToken_(consumes<vector<reco::Vertex> >(_vertexCollectionTag)),
+  METCollectionToken_(consumes<vector<pat::MET> >(_METCollectionTag)),
+  photonCollectionToken_(consumes<edm::View<reco::Photon> >(_photonCollectionTag)),
+  packedPFCollectionToken_(consumes<vector<pat::PackedCandidate> >(_packedPFCollectionTag)),
+  phoLooseIdMapToken_(consumes<edm::ValueMap<bool> >(_phoLooseIdMapTag)),
+  phoMediumIdMapToken_(consumes<edm::ValueMap<bool> >(_phoMediumIdMapTag)),
+	phoTightIdMapToken_(consumes<edm::ValueMap<bool> >(_phoTightIdMapTag)),
   
   _isData(pset.getUntrackedParameter<bool>("isData"))
 {
@@ -55,7 +61,7 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   // HANDLES //
   // Get collections
   edm::Handle<edm::TriggerResults> H_METfilter;
-	iEvent.getByToken(_METfilterToken, H_METfilter);
+	iEvent.getByToken(METfilterToken_, H_METfilter);
   
   edm::Handle<edm::TriggerResults> H_trig;//, H_trig1, H_trig2;
 // 	try {iEvent.getByToken(_trigResultsToken, H_trig1);} catch (...) {;}
@@ -68,31 +74,39 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 // 		H_trig = H_trig2;
 // 		_trigResultsTag = _trigResultsTag2;
 // 	}
-	iEvent.getByToken(_trigResultsToken, H_trig);
+	iEvent.getByToken(trigResultsToken_, H_trig);
   
   edm::Handle<pat::PackedTriggerPrescales> H_prescale, H_prescale1, H_prescale2;
-  try {iEvent.getByToken(_triggerPrescalesToken, H_prescale1);} catch (...) {;}
-  try {iEvent.getByToken(_triggerPrescalesToken2, H_prescale2);} catch (...) {;}
+  try {iEvent.getByToken(triggerPrescalesToken_, H_prescale1);} catch (...) {;}
+  try {iEvent.getByToken(triggerPrescalesToken2_, H_prescale2);} catch (...) {;}
   if(H_prescale1.isValid()) H_prescale = H_prescale1;
   else if(H_prescale2.isValid()) H_prescale = H_prescale2;
 
   edm::Handle<vector<reco::Vertex> > H_vert;
-  iEvent.getByToken(_vertexCollectionToken, H_vert);
+  iEvent.getByToken(vertexCollectionToken_, H_vert);
 
   edm::Handle<vector<pat::Jet> > H_pfjets;
-  iEvent.getByToken(_pfjetCollectionToken , H_pfjets);
+  iEvent.getByToken(pfjetCollectionToken_ , H_pfjets);
 	
 	edm::Handle<vector<reco::GenJet> > H_genjets;
-	if (!_isData) iEvent.getByToken(_genjetCollectionToken , H_genjets);
+	if (!_isData) iEvent.getByToken(genjetCollectionToken_ , H_genjets);
   
   edm::Handle<vector<pat::MET> > H_MET;
-  iEvent.getByToken(_METCollectionToken , H_MET);
+  iEvent.getByToken(METCollectionToken_ , H_MET);
   
-  edm::Handle<vector<pat::Photon> > H_photon;
-  iEvent.getByToken(_photonCollectionToken , H_photon);
+  edm::Handle<edm::View<reco::Photon> > H_photon;
+  iEvent.getByToken(photonCollectionToken_ , H_photon);
 	
   edm::Handle<vector<pat::PackedCandidate> > H_packedPF;
-  iEvent.getByToken(_packedPFCollectionToken , H_packedPF);
+  iEvent.getByToken(packedPFCollectionToken_ , H_packedPF);
+	
+	
+  edm::Handle<edm::ValueMap<bool> > loose_id_decisions;
+  edm::Handle<edm::ValueMap<bool> > medium_id_decisions;
+  edm::Handle<edm::ValueMap<bool> > tight_id_decisions;
+  iEvent.getByToken(phoLooseIdMapToken_ ,loose_id_decisions);
+  iEvent.getByToken(phoMediumIdMapToken_,medium_id_decisions);
+  iEvent.getByToken(phoTightIdMapToken_ ,tight_id_decisions);
 
   // Check validity
   if(!H_trig.isValid()) {
@@ -256,12 +270,18 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 	
 	// PHOTONS//
 	UInt_t iP=0;
-	for (vector<pat::Photon>::const_iterator thePhoton = H_photon->begin(); thePhoton
-		!= H_photon->end(); ++thePhoton){
+// 	for (vector<pat::Photon>::const_iterator thePhoton = H_photon->begin(); thePhoton != H_photon->end(); ++thePhoton){
+	for (size_t i = 0; i < H_photon->size(); ++i){
+		const auto thePhoton = H_photon->ptrAt(i);
 		_photon_pt[iP] = thePhoton->pt();
 		_photon_eta[iP] = thePhoton->eta();
 		_photon_phi[iP] = thePhoton->phi();
-// 		_photon_loose[iP] = (*loose_id_decisions)[thePhoton->ptrAt(iP)];
+		bool isPassLoose  = (*loose_id_decisions)[thePhoton];
+    bool isPassMedium = (*medium_id_decisions)[thePhoton];
+    bool isPassTight  = (*tight_id_decisions)[thePhoton];
+    _passLooseId[iP] = ( (int)isPassLoose );
+    _passMediumId[iP] = ( (int)isPassMedium);
+		_passTightId[iP] = ( (int)isPassTight );
 		iP++;
 		if (iP>=nP) break;
 	}
@@ -387,7 +407,10 @@ TreeProducer_miniAOD::beginJob()
   _tree->Branch("photon_eta",&_photon_eta,"photon_eta[nPhoton_stored]/D");
   _tree->Branch("photon_phi",&_photon_phi,"photon_phi[nPhoton_stored]/D");
   _tree->Branch("photon_pt",&_photon_pt,"photon_pt[nPhoton_stored]/D");
-  
+  _tree->Branch("photon_passLooseId",&_passLooseId, "photon_passLooseId[nPhoton_stored]/I");
+  _tree->Branch("photon_passMediumId",&_passMediumId, "photon_passLooseId[nPhoton_stored]/I");
+  _tree->Branch("photon_passTightId",&_passTightId, "photon_passLooseId[nPhoton_stored]/I");
+
   //MET
   _tree->Branch("MET", &_MET, "MET/D");
   _tree->Branch("MET_phi", &_MET_phi, "MET_phi/D");
@@ -607,6 +630,9 @@ TreeProducer_miniAOD::Init()
 		_photon_eta[i] = 0;
 		_photon_phi[i] = 0;
 		_photon_pt[i] = 0;
+		_passLooseId[i] = 0;
+		_passMediumId[i] = 0;
+		_passTightId[i] = 0;
 	}
 }
 
