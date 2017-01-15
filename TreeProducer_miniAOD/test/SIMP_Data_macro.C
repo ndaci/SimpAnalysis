@@ -11,42 +11,44 @@
 #include <TH1.h>
 #include <TH2.h>
 
-#include "list_JetHT_2016B.h"
-#include "list_JetHT_2016C.h"
-#include "list_JetHT_2016D.h"
-#include "list_JetHT_2016E.h"
-#include "list_JetHT_2016F.h"
-#include "list_JetHT_2016G.h"
+// #include "lists/list_JetHT_2016B.h"
+// #include "lists/list_JetHT_2016C.h"
+// #include "lists/list_JetHT_2016D.h"
+// #include "lists/list_JetHT_2016E.h"
+// #include "lists/list_JetHT_2016F.h"
+// #include "lists/list_JetHT_2016G.h"
 
-// #include "list_JetHT_rereco_2016B.h"
-// #include "list_JetHT_rereco_2016C.h"
-// #include "list_JetHT_rereco_2016D.h"
-// #include "list_JetHT_rereco_2016E.h"
-// #include "list_JetHT_rereco_2016F.h"
-// #include "list_JetHT_rereco_2016G.h"
+#include "lists/list_JetHT_rereco_2016B.h"
+#include "lists/list_JetHT_rereco_2016C.h"
+#include "lists/list_JetHT_rereco_2016D.h"
+#include "lists/list_JetHT_rereco_2016E.h"
+#include "lists/list_JetHT_rereco_2016F.h"
+#include "lists/list_JetHT_rereco_2016G.h"
 
-void SIMP_macro(){
+void SIMP_Data_macro(){
   
   TChain * chain = new TChain("tree/SimpAnalysis");
-	list_JetHT_2016B(chain);
-	list_JetHT_2016C(chain);
-	list_JetHT_2016D(chain);
-	list_JetHT_2016E(chain);
-	list_JetHT_2016F(chain);
-	list_JetHT_2016G(chain);
-// 	list_JetHT_rereco_2016B(chain);
-// 	list_JetHT_rereco_2016C(chain);
-// 	list_JetHT_rereco_2016D(chain);
-// 	list_JetHT_rereco_2016E(chain);
-// 	list_JetHT_rereco_2016F(chain);
-// 	list_JetHT_rereco_2016G(chain);
+// 	list_JetHT_2016B(chain);
+// 	list_JetHT_2016C(chain);
+// 	list_JetHT_2016D(chain);
+// 	list_JetHT_2016E(chain);
+// 	list_JetHT_2016F(chain);
+// 	list_JetHT_2016G(chain);
+	list_JetHT_rereco_2016B(chain);
+	list_JetHT_rereco_2016C(chain);
+	list_JetHT_rereco_2016D(chain);
+	list_JetHT_rereco_2016E(chain);
+	list_JetHT_rereco_2016F(chain);
+	list_JetHT_rereco_2016G(chain);
 	std::cout<<"TChain ready"<<std::endl;
+
+  TFile *output = new TFile("plots_CR_rereco.root", "RECREATE");
   
 	TRandom3 *r = new TRandom3();
 	int dijet_170, vtx_N;
 	double pswgt_dijet_170;
-  double jet_pt[4], jet_eta[4], jet_phi[4], jet_efrac_ch_Had[4], jet_efrac_ch_EM[4], jet_efrac_ch_Mu[4];
-	double CHEF_jet[4];
+//   double jet_pt[4], jet_eta[4], jet_phi[4], jet_efrac_ch_Had[4], jet_efrac_ch_EM[4], jet_efrac_ch_Mu[4], CHEF_jet[4];
+  double jet_pt[8], jet_eta[8], jet_phi[8], jet_efrac_ch_Had[8], jet_efrac_ch_EM[8], jet_efrac_ch_Mu[8], CHEF_jet[8];
 	int selection = 0;
 	int CR_region = 0;
   
@@ -59,8 +61,6 @@ void SIMP_macro(){
   chain->SetBranchAddress("jet_efrac_ch_Mu", &jet_efrac_ch_Mu);
   chain->SetBranchAddress("HLT_DiCentralPFJet170", &dijet_170);
   chain->SetBranchAddress("pswgt_dijet_170", &pswgt_dijet_170);
-  
-  TFile *output = new TFile("control_region_check.root", "RECREATE");
 	
 	TH1F *HT = new TH1F("HT", "HT (4 jets)", 100, 0, 2000);
 	TH1F *nvtx = new TH1F("nvtx", "Number of vertices", 51, -0.5, 50.5);
@@ -108,7 +108,7 @@ void SIMP_macro(){
     if(deltajet_phi > TMath::Pi()) deltajet_phi -= 2*TMath::Pi();
     if(deltajet_phi < -TMath::Pi()) deltajet_phi += 2*TMath::Pi();
     
-		for (int i = 0; i < 4; i++){
+		for (int i = 0; i < 8; i++){
 			CHEF_jet[i] = jet_efrac_ch_Had[i]+jet_efrac_ch_EM[i]+jet_efrac_ch_Mu[i];
 		}
 		
