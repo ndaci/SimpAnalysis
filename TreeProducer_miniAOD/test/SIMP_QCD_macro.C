@@ -11,19 +11,26 @@
 #include <TH1.h>
 #include <TH2.h>
 
-// #include "lists/list_QCD_300To500_PUMoriond17.h"
-// #include "lists/list_QCD_500To700_PUMoriond17.h"
-// #include "lists/list_QCD_700To1000_PUMoriond17.h"
-// #include "lists/list_QCD_1000To1500_PUMoriond17.h"
-// #include "lists/list_QCD_1500To2000_PUMoriond17.h"
-// #include "lists/list_QCD_2000ToInf_PUMoriond17.h"
+// #include "lists/list_QCD_300To500.h"
+// #include "lists/list_QCD_500To700.h"
+// #include "lists/list_QCD_700To1000.h"
+// #include "lists/list_QCD_1000To1500.h"
+// #include "lists/list_QCD_1500To2000.h"
+// #include "lists/list_QCD_2000ToInf.h"
 
-#include "lists/list_QCD_300To500_PUMoriond17_photoninfo.h"
-#include "lists/list_QCD_500To700_PUMoriond17_photoninfo.h"
-#include "lists/list_QCD_700To1000_PUMoriond17_photoninfo.h"
-#include "lists/list_QCD_1000To1500_PUMoriond17_photoninfo.h"
-#include "lists/list_QCD_1500To2000_PUMoriond17_photoninfo.h"
-#include "lists/list_QCD_2000ToInf_PUMoriond17_photoninfo.h"
+#include "lists/list_QCD_300To500_PUMoriond17.h"
+#include "lists/list_QCD_500To700_PUMoriond17.h"
+#include "lists/list_QCD_700To1000_PUMoriond17.h"
+#include "lists/list_QCD_1000To1500_PUMoriond17.h"
+#include "lists/list_QCD_1500To2000_PUMoriond17.h"
+#include "lists/list_QCD_2000ToInf_PUMoriond17.h"
+
+// #include "lists/list_QCD_300To500_PUMoriond17_photoninfo.h"
+// #include "lists/list_QCD_500To700_PUMoriond17_photoninfo.h"
+// #include "lists/list_QCD_700To1000_PUMoriond17_photoninfo.h"
+// #include "lists/list_QCD_1000To1500_PUMoriond17_photoninfo.h"
+// #include "lists/list_QCD_1500To2000_PUMoriond17_photoninfo.h"
+// #include "lists/list_QCD_2000ToInf_PUMoriond17_photoninfo.h"
 
 void SIMP_QCD_macro(){
   
@@ -42,22 +49,23 @@ void SIMP_QCD_macro(){
 	TChain* chains[6] = {chain0, chain1, chain2, chain3, chain4, chain5};
 	std::cout<<"TChains ready"<<std::endl;
   
-  TFile *output = new TFile("plots_QCD_prescaledlumi0p062_nPixHitsCut_PUMoriond17_miniAOD.root", "RECREATE");
+  TFile *output = new TFile("plots_QCD_prescaledlumi23p015_npixhits_photonVeto_PUMoriond17_miniAOD.root", "RECREATE");
   
 	TRandom3 r;
 	int nJet, vtx_N;
-	double pswgt_dijet_170;
-  double jet_pt[8], jet_eta[8], jet_phi[8], jet_efrac_ch_Had[8], jet_efrac_ch_EM[8], jet_efrac_ch_Mu[8], jet_efrac_ne_EM[8], chi2[3], vtx_x[3], vtx_y[3], vtx_z[3], vtx_d0[3];
-	double CHEF_jet[8], EMF_jet[8], genjet_efrac_ch[4];
-	double track_pt[10], track_ptError[10], track_dzError[10], track_dz[10];
+	double pswgt_dijet_170, MET;
+  double jet_pt[8], jet_eta[8], jet_phi[8], jet_efrac_ch_Had[8], jet_efrac_ch_EM[8], jet_efrac_ch_Mu[8], jet_efrac_ne_EM[8], jet_efrac_ne_Had[8], chi2[3], vtx_x[3], vtx_y[3], vtx_z[3], vtx_d0[3];
+	double CHEF_jet[8],NEF_jet[8], EMF_jet[8], genjet_efrac_ch[4];
+	double track_pt[10], track_ptError[10], track_dzError[10], track_dz[10], track_d0[10], track_dxy[10];
 	int track_fromPV[10], nhits[10], nPixHits[10], ndof[3];
 	double photon_eta[4], photon_phi[4], photon_pt[4];
-// 	E[4], M[4];
+	int passLooseId[4], passMediumId[4], passTightId[4];
   
 	TH1F *njets = new TH1F("njets", "Number of jets", 11, -0.5, 10.5);
 	TH1F *nvtx = new TH1F("nvtx", "Number of vertices", 51, -0.5, 50.5);
 	TH1F *HT = new TH1F("HT", "HT (4 jets)", 100, 0, 2000);
 	TH1F *HT_nowgt = new TH1F("HT_noweight", "HT (4 jets) without correct weights", 100, 0, 2000);
+	TH1F *METOverHT = new TH1F("METOverHT", "MET / HT(4 jets)", 100, 0, 1);	
 	TH1F *jet1_pt = new TH1F("jet1_pt", "Leading jet pt", 100, 0, 2000);
 	TH1F *jet2_pt = new TH1F("jet2_pt", "Subleading jet pt", 100, 0, 2000);
 	TH1F *jet3_pt = new TH1F("jet3_pt", "3rd jet pt", 100, 0, 2000);
@@ -73,9 +81,15 @@ void SIMP_QCD_macro(){
 	TH1F *deltaphi = new TH1F("DeltaPhi", "DeltaPhi", 100, 0, 3.14);
 	TH1F *jet1_emf = new TH1F("jet1_emf", "EM energy fraction (leading jet)", 100, 0, 1);
 	TH1F *jet2_emf = new TH1F("jet2_emf", "EM energy fraction (subleading jet)", 100, 0, 1);
+	TH1F *jet1_nf = new TH1F("jet1_nf", "Neutral energy fraction (leading jet)", 100, 0, 1);
+	TH1F *jet2_nf = new TH1F("jet2_nf", "Neutral energy fraction (subleading jet)", 100, 0, 1);
+	TH1F *jet1_nhf = new TH1F("jet1_nhf", "Neutral hadronic energy fraction (leading jet)", 100, 0, 1);
+	TH1F *jet2_nhf = new TH1F("jet2_nhf", "Neutral hadronic energy fraction (subleading jet)", 100, 0, 1);
 	TH1F *jet1_chf = new TH1F("jet1_chf", "Charged energy fraction (leading jet)", 100, 0, 1);
-	TH1F *jet1_chf_jet2_0p5 = new TH1F("jet1_chf_jet2_0p5", "Leading jet charged energy fraction (jet2_chf > 0.5)", 100, 0, 1);
 	TH1F *jet2_chf = new TH1F("jet2_chf", "Charged energy fraction (subleading jet)", 100, 0, 1);
+	TH1F *jet1_chhf = new TH1F("jet1_chhf", "Charged hadronic energy fraction (leading jet)", 100, 0, 1);
+	TH1F *jet2_chhf = new TH1F("jet2_chhf", "Charged hadronic energy fraction (subleading jet)", 100, 0, 1);
+	TH1F *jet1_chf_jet2_0p5 = new TH1F("jet1_chf_jet2_0p5", "Leading jet charged energy fraction (jet2_chf > 0.5)", 100, 0, 1);
 	TH1F *chf0p5 = new TH1F("chf_Min0p5", "Charged energy fraction (other jet ChF > 0.5)", 100, 0, 1);
 	TH1F *chf0p2 = new TH1F("chf_Max0p2", "Charged energy fraction (other jet ChF < 0.2)", 100, 0, 1);
 	TH1F *jet3_chf = new TH1F("jet3_chf", "Charged energy fraction (3rd jet)", 100, 0, 1);
@@ -106,7 +120,15 @@ void SIMP_QCD_macro(){
 	TH1F *track1_fromPV = new TH1F("track1_fromPV", "Hardest track from PV?", 2, -0.5, 1.5);
   TH1F *track1_dzError = new TH1F("track1_dzError", "dzError of hardest track", 100, 0, 100);
   TH1F *track1_dz = new TH1F("track1_dz", "dz of hardest track", 100, 0, 100);
-  TH1F *track1_dzRelError = new TH1F("track1_dzRelError", "dzError/dz of hardest track", 100, 0, 100);;
+  TH1F *track1_d0 = new TH1F("track1_d0", "d_{0} of hardest track", 100, 0, 10);
+  TH1F *track1_dxy = new TH1F("track1_dxy", "dxy of hardest track", 100, 0, 10);
+  TH1F *track1_dzRelError = new TH1F("track1_dzRelError", "dzError/dz of hardest track", 100, 0, 100);
+  TH2D *track1_d0vsdxy = new TH2D("track1_d0vsdxy", "d_{0} vs dxy of hardest track", 100, 0, 100, 100, 0, 100);
+  TH2D *track1_d0vsnpixhits = new TH2D("track1_d0vsnpixhits", "d_{0} vs # pix hits of hardest track", 11, -0.5, 10.5, 100, 0, 10);
+  TH2D *track1_dxyvsnpixhits = new TH2D("track1_dxyvsnpixhits", "dxy vs # pix hits of hardest track", 11, -0.5, 10.5, 100, 0, 10);
+  TH2D *track1_d0vsCHF = new TH2D("track1_d0vsCHF", "d_{0} of hardest track vs ChF (both jets)", 100, 0, 1, 100, 0, 10);
+  TH2D *track1_dxyvsCHF = new TH2D("track1_dxyvsCHF", "dxy of hardest track vs ChF (both jets)", 100, 0, 1, 100, 0, 10);
+  TH2D *track1_dzvsCHF = new TH2D("track1_dzvsCHF", "dz of hardest track vs ChF (both jets)", 100, 0, 1, 100, 0, 50);
   TH2D *CHFvsGenCHF1 = new TH2D("CHFvsGenCHF1", "ChF vs. ChF GenJet (leading jet)", 100, 0, 1, 100, 0, 1);
   TH2D *CHFvsGenCHF2 = new TH2D("CHFvsGenCHF2", "ChF vs. ChF GenJet (subleading jet)", 100, 0, 1, 100, 0, 1);
   TH1F *relChF1 = new TH1F("relChF1", "(ChF - ChF GenJet)/ChF GenJet (leading jet)", 1000, -10, 10);
@@ -127,10 +149,11 @@ void SIMP_QCD_macro(){
 // 	double QCD_xsec[6] = {343500, 32050, 6791, 1214, 118.7, 24.91}; //in pb//Spring16
 	double QCD_xsec[6] = {346400, 32010, 6842, 1203, 120.1, 25.40}; //PUMoriond17
 // 	double QCD_events[5] = {16830696, 19199088, 15621634, 4980387, 3846616};
-	double lumi = 0.062*1000; // in 1000 fb^-1 = pb^-1
+	double lumi = 23.015*1000; // in 1000 * x fb^-1 = x pb^-1
   
 	for (int j = 0; j < 6; j++){
 		TChain* chain = chains[j];		
+		chain->SetBranchAddress("MET", &MET);
 		chain->SetBranchAddress("vtx_N", &vtx_N);
 		chain->SetBranchAddress("nJet",&nJet);
 		chain->SetBranchAddress("jet_pt", &jet_pt);
@@ -141,6 +164,7 @@ void SIMP_QCD_macro(){
 		chain->SetBranchAddress("jet_efrac_ch_EM", &jet_efrac_ch_EM);
 		chain->SetBranchAddress("jet_efrac_ch_Mu", &jet_efrac_ch_Mu);
 		chain->SetBranchAddress("jet_efrac_ne_EM", &jet_efrac_ne_EM);
+		chain->SetBranchAddress("jet_efrac_ne_Had", &jet_efrac_ne_Had);
 		chain->SetBranchAddress("vtx_normalizedChi2", &chi2);
 		chain->SetBranchAddress("vtx_d0", &vtx_d0);
 		chain->SetBranchAddress("vtx_x", &vtx_x);
@@ -154,9 +178,14 @@ void SIMP_QCD_macro(){
 		chain->SetBranchAddress("track_fromPV", &track_fromPV);
     chain->SetBranchAddress("track_dzError", &track_dzError);
     chain->SetBranchAddress("track_dz", &track_dz);
+    chain->SetBranchAddress("track_dxy", &track_dxy);
+    chain->SetBranchAddress("track_d0", &track_d0);
     chain->SetBranchAddress("photon_pt", &photon_pt);
     chain->SetBranchAddress("photon_eta", &photon_eta);
     chain->SetBranchAddress("photon_phi", &photon_phi);
+		chain->SetBranchAddress("photon_passLooseId",&passLooseId);
+		chain->SetBranchAddress("photon_passMediumId",&passMediumId);
+		chain->SetBranchAddress("photon_passTightId",&passTightId);
 
 		
 		Int_t Nentries = chain->GetEntries(); 
@@ -174,6 +203,7 @@ void SIMP_QCD_macro(){
 			double deltajet_phi = jet_phi[0] - jet_phi[1];
 			if(deltajet_phi > TMath::Pi()) deltajet_phi -= 2*TMath::Pi();
 			if(deltajet_phi < -TMath::Pi()) deltajet_phi += 2*TMath::Pi();
+			deltajet_phi = fabs(deltajet_phi);
 			
 			double deltaphi_jet1photon = jet_phi[0] - photon_phi[0];
 			if(deltaphi_jet1photon > TMath::Pi()) deltaphi_jet1photon -= 2*TMath::Pi();
@@ -190,6 +220,7 @@ void SIMP_QCD_macro(){
 			
 			for (int i = 0; i < 8; i++){
 				CHEF_jet[i] = jet_efrac_ch_Had[i]+jet_efrac_ch_EM[i]+jet_efrac_ch_Mu[i];
+				NEF_jet[i] = jet_efrac_ne_Had[i]+jet_efrac_ne_EM[i];
 				EMF_jet[i] = jet_efrac_ch_EM[i]+jet_efrac_ne_EM[i];
 			} 
 			
@@ -197,10 +228,11 @@ void SIMP_QCD_macro(){
 			
 			//std::cout<<jet_pt[0]<<" "<<jet_pt[1]<<" "<<jet_eta[0]<<" "<<jet_eta[1]<<" "<<deltajet_phi<<" "<<CHEF_jet[0]<<" "<<CHEF_jet[1]<<std::endl;
 			
-			if (jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2 && nPixHits[0] > 0){
+			if (jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2 && nPixHits[0] > 0 && (passLooseId[0] == 0 || (passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1))){
 				njets->Fill(nJet, weight);
 				nvtx->Fill(vtx_N, weight);
 				HT->Fill(jet_pt[0]+jet_pt[1]+jet_pt[2]+jet_pt[3], weight);
+				METOverHT->Fill(MET/(jet_pt[0]+jet_pt[1]+jet_pt[2]+jet_pt[3]), weight);
 				HT_nowgt->Fill(jet_pt[0]+jet_pt[1]+jet_pt[2]+jet_pt[3]);
 				
 				jet1_pt->Fill(jet_pt[0], weight);
@@ -216,9 +248,15 @@ void SIMP_QCD_macro(){
 				
 				jet1_emf->Fill(EMF_jet[0], weight);
 				jet2_emf->Fill(EMF_jet[1], weight);
+				jet1_nf->Fill(NEF_jet[0], weight);
+				jet2_nf->Fill(NEF_jet[1], weight);
 				jet1_chf->Fill(CHEF_jet[0], weight);
-				if (CHEF_jet[1] > 0.5) jet1_chf_jet2_0p5->Fill(CHEF_jet[0], weight);
 				jet2_chf->Fill(CHEF_jet[1], weight);
+				jet1_nhf->Fill(jet_efrac_ne_Had[0], weight);
+				jet2_nhf->Fill(jet_efrac_ne_Had[1], weight);
+				jet1_chhf->Fill(jet_efrac_ch_Had[0], weight);
+				jet2_chhf->Fill(jet_efrac_ch_Had[1], weight);
+				if (CHEF_jet[1] > 0.5) jet1_chf_jet2_0p5->Fill(CHEF_jet[0], weight);
 				if (jet_pt[2] > 20) jet3_chf->Fill(CHEF_jet[2], weight);
 				if (jet_pt[3] > 20) jet4_chf->Fill(CHEF_jet[3], weight);
 				CHF->Fill(CHEF_jet[0], weight);
@@ -236,7 +274,6 @@ void SIMP_QCD_macro(){
 
 				eta1vsnpixhits->Fill(nPixHits[0], jet_eta[0], weight);
         eta2vsnpixhits->Fill(nPixHits[0], jet_eta[1], weight);
-
 				
 				NVTXvsCHF->Fill(CHEF_jet[0], vtx_N, weight);
 				NVTXvsCHF->Fill(CHEF_jet[1], vtx_N, weight);
@@ -263,8 +300,19 @@ void SIMP_QCD_macro(){
 				track1_fromPV->Fill(track_fromPV[0], weight);
 				track1_dzError->Fill(track_dzError[0], weight);
 				track1_dz->Fill(track_dz[0], weight);
+				track1_dxy->Fill(track_dxy[0], weight);
+				track1_d0->Fill(track_d0[0], weight);
 				track1_dzRelError->Fill(track_dzError[0]/track_dz[0], weight);
 				track1_reldzErrorvsdz->Fill(track_dz[0], track_dzError[0]/track_dz[0], weight);
+				track1_d0vsdxy->Fill(track_dxy[0], track_d0[0], weight);
+				track1_dxyvsnpixhits->Fill(nPixHits[0], track_dxy[0], weight);
+				track1_d0vsnpixhits->Fill(nPixHits[0], track_d0[0], weight);
+				track1_dxyvsCHF->Fill(CHEF_jet[0], track_dxy[0], weight);
+				track1_dxyvsCHF->Fill(CHEF_jet[1], track_dxy[0], weight);
+				track1_d0vsCHF->Fill(CHEF_jet[0], track_d0[0], weight);
+				track1_d0vsCHF->Fill(CHEF_jet[1], track_d0[0], weight);
+				track1_dzvsCHF->Fill(CHEF_jet[0], track_dz[0], weight);
+				track1_dzvsCHF->Fill(CHEF_jet[1], track_dz[0], weight);
 				
 				if(photon_pt[0] > 10) photon1_pt->Fill(photon_pt[0], weight);
 				if(photon_pt[1] > 10) photon2_pt->Fill(photon_pt[1], weight);
