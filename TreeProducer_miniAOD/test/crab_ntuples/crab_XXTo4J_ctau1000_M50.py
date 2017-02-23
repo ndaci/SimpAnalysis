@@ -13,9 +13,9 @@ config.General.transferLogs = True
 # JOB TYPE
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'treeproducer_MC_cfg.py'
+config.JobType.psetName = '../treeproducer_MC_cfg.py'
 #config.JobType.pyCfgParams = []
-#config.JobType.inputFiles = ''
+config.JobType.inputFiles = ['../../../../../external/slc6_amd64_gcc530/data/RecoEgamma/PhotonIdentification/data/Spring16/photon_general_MVA_Spring16_EB_V3.weights.xml', '../../../../../external/slc6_amd64_gcc530/data/RecoEgamma/PhotonIdentification/data/Spring16/photon_general_MVA_Spring16_EE_V3.weights.xml']
 #config.JobType.allowNonProductionCMSSW = True
 
 # INPUT DATA
@@ -44,4 +44,4 @@ config.Data.ignoreLocality = False # allows to process inputs on CE != site host
 config.section_("Site")
 config.Site.storageSite = 'T2_BE_IIHE'
 #config.Site.whitelist = 
-config.Site.blacklist = ['T1_US_FNAL','T2_UA_KIPT','T2_UK_London_Brunel','T2_CH_CSCS','T2_US_*']
+config.Site.blacklist = ['T1_US_FNAL','T2_UA_KIPT','T2_UK_London_Brunel','T2_CH_CSCS','T2_US_*','T1_RU_JINR']
