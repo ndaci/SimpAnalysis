@@ -18,9 +18,12 @@
 #include "TPRegexp.h"
 
 // CMSSW standard lib
+#include "FWCore/Utilities/interface/EDGetToken.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/EventSetup.h"
+#include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
@@ -28,6 +31,7 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 // CMSSW specific lib
+#include "DataFormats/Common/interface/ValueMap.h"
 #include "RecoVertex/PrimaryVertexProducer/interface/PrimaryVertexSorter.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
@@ -41,6 +45,10 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/L1Trigger/interface/L1EtMissParticle.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
+#include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
 // others
 using namespace std;
@@ -88,6 +96,9 @@ class TreeProducer_AOD : public edm::one::EDAnalyzer<edm::one::SharedResources,e
   edm::InputTag _METCollectionTag;
   edm::InputTag _photonCollectionTag;
   edm::InputTag _trackCollectionTag;
+	edm::InputTag _phoLooseIdMapTag;
+	edm::InputTag _phoMediumIdMapTag;
+	edm::InputTag _phoTightIdMapTag;
   edm::EDGetTokenT<edm::TriggerResults> _trigResultsToken;
 //   edm::EDGetTokenT<edm::TriggerResults> _trigResultsToken2;
 //   edm::EDGetTokenT<pat::PackedTriggerPrescales> _triggerPrescalesToken;
@@ -97,10 +108,16 @@ class TreeProducer_AOD : public edm::one::EDAnalyzer<edm::one::SharedResources,e
   edm::EDGetTokenT<vector<reco::GenJet> > _genjetCollectionToken;
   edm::EDGetTokenT<vector<reco::Vertex> > _vertexCollectionToken;
   edm::EDGetTokenT<vector<reco::PFMET> > _METCollectionToken;
-  edm::EDGetTokenT<vector<reco::Photon> > _photonCollectionToken;
+  edm::EDGetTokenT<edm::View<reco::Photon> > _photonCollectionToken;
   edm::EDGetTokenT<vector<reco::Track> > _trackCollectionToken;
-//   GlobalPoint vertexPosition;
+	edm::EDGetTokenT<edm::ValueMap<bool> > phoLooseIdMapToken_;
+  edm::EDGetTokenT<edm::ValueMap<bool> > phoMediumIdMapToken_;
+	edm::EDGetTokenT<edm::ValueMap<bool> > phoTightIdMapToken_;
+	
+	bool _isData;
 
+//   GlobalPoint vertexPosition;
+  
   // Tree and its branches
   TTree* _tree;
 
@@ -112,12 +129,9 @@ class TreeProducer_AOD : public edm::one::EDAnalyzer<edm::one::SharedResources,e
   double _vtx_x[nV], _vtx_y[nV], _vtx_z[nV];
   double _vtx_normalizedChi2[nV], _vtx_d0[nV];
 	
-	//Photons
-	
-	
 	//Tracks
 	int _track_fromPV[nT], _track_Nhits[nT], _track_NpixHits[nT], _track_purity[nT], _track_ndof[nT];
-	double _track_eta[nT], _track_pt[nT], _track_phi[nT], _track_ptError[nT], _track_dzError[nT], _track_dz[nT], _track_normalizedChi2[nT];	
+	double _track_eta[nT], _track_pt[nT], _track_phi[nT], _track_ptError[nT], _track_dxy[nT], _track_d0[nT], _track_dzError[nT], _track_dz[nT], _track_normalizedChi2[nT];	
 
   // Jets
   int _jet_mult_ch[nJ], _jet_mult_mu[nJ], _jet_mult_ne[nJ]; // multiplicities
@@ -126,6 +140,7 @@ class TreeProducer_AOD : public edm::one::EDAnalyzer<edm::one::SharedResources,e
   double _jet_eta[nJ], _jet_phi[nJ], _jet_pt[nJ], _jet_e[nJ], _jet_m[nJ];
   double _jet_efrac_ne_Had[nJ], _jet_efrac_ne_EM[nJ]; // neutral energy fractions
   double _jet_efrac_ch_Had[nJ], _jet_efrac_ch_EM[nJ], _jet_efrac_ch_Mu[nJ]; // charged energy fractions
+  double _jet_unc[nJ], _jet_ptCor_up[nJ], _jet_ptCor_down[nJ]; //JEC uncertainties
   
   // GenJets
   double _genjet_vx[nGJ], _genjet_vy[nGJ], _genjet_vz[nGJ];//vertex position
@@ -136,6 +151,7 @@ class TreeProducer_AOD : public edm::one::EDAnalyzer<edm::one::SharedResources,e
   //Photons
   int _nPhoton_stored;
   double _photon_pt[nP], _photon_eta[nP], _photon_phi[nP];
+	int _passLooseId[nP], _passMediumId[nP], _passTightId[nP];
 
   // MET
   double _MET, _MET_phi;

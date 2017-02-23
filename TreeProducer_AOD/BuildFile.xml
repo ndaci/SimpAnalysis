@@ -8,4 +8,8 @@
 <use name="CommonTools/Utils"/>
 <use name="DataFormats/TrackReco"/>
 <use name="RecoVertex/PrimaryVertexProducer"/>
+<use name="RecoEgamma/EgammaTools" />
+<use name="JetMETCorrections/Objects"/>
+<use name="CondFormats/JetMETObjects"/>
+<use name="JetMETCorrections/Algorithms"/>
 <flags EDM_PLUGIN="1"/>

@@ -12,5 +12,9 @@ tree = cms.EDAnalyzer(
     vertexCollection = cms.InputTag("offlinePrimaryVertices"),
     METCollection    = cms.InputTag("pfMet"),
     photonCollection    = cms.InputTag("gedPhotons"),
-    trackCollection    = cms.InputTag("generalTracks", "", "RECO")    
+    trackCollection    = cms.InputTag("generalTracks", "", "RECO"),
+    isData = cms.untracked.bool(True),
+    phoLooseIdMap = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Spring16-V2p2-loose"),
+    phoMediumIdMap = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Spring16-V2p2-medium"),
+    phoTightIdMap = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Spring16-V2p2-tight"),    
 )
