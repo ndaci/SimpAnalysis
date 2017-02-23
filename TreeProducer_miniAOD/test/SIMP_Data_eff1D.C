@@ -102,6 +102,7 @@ void SIMP_Data_eff1D(){
 		double deltajet_phi = jet_phi[0] - jet_phi[1];
 		if(deltajet_phi > TMath::Pi()) deltajet_phi -= 2*TMath::Pi();
 		if(deltajet_phi < -TMath::Pi()) deltajet_phi += 2*TMath::Pi();
+		deltajet_phi = fabs(deltajet_phi);
 		
 		for (int i = 0; i < 8; i++){
 			CHEF_jet[i] = jet_efrac_ch_Had[i]+jet_efrac_ch_EM[i]+jet_efrac_ch_Mu[i];
