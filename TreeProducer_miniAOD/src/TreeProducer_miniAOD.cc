@@ -52,7 +52,7 @@ TreeProducer_miniAOD::~TreeProducer_miniAOD()
 
 // ------------ method called for each event  ------------
 void
-TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+TreeProducer_miniAOD::analyze(const edm::Event& iEvent, edm::EventSetup const& iSetup)
 {
 
   // Initialize branches
@@ -107,6 +107,11 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   iEvent.getByToken(phoLooseIdMapToken_ ,loose_id_decisions);
   iEvent.getByToken(phoMediumIdMapToken_,medium_id_decisions);
   iEvent.getByToken(phoTightIdMapToken_ ,tight_id_decisions);
+  
+  edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
+  iSetup.get<JetCorrectionsRecord>().get("AK4PFchs",JetCorParColl); 
+  JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+  JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar);
 
   // Check validity
   if(!H_trig.isValid()) {
@@ -174,11 +179,13 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 		_track_pt[iT] = trackRef[i]->pt();
 		_track_eta[iT] = trackRef[i]->eta();
 		_track_phi[iT] = trackRef[i]->phi();
+		_track_dzError[iT] = trackRef[i]->dzError();
+		_track_dz[iT] = trackRef[i]->dz();
+		_track_dxy[iT] = trackRef[i]->dxy();
+		_track_d0[iT] = trackRef[i]->pseudoTrack().d0();
 		_track_normalizedChi2[iT] = trackRef[i]->pseudoTrack().normalizedChi2();
 		_track_ndof[iT] = trackRef[i]->pseudoTrack().ndof();
 		_track_ptError[iT] = trackRef[i]->pseudoTrack().ptError();
-		_track_dzError[iT] = trackRef[i]->pseudoTrack().dzError();
-		_track_dz[iT] = trackRef[i]->pseudoTrack().dz();
 		iT++ ;
     if(iT>=nT) break;
 	}
@@ -221,7 +228,13 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 			_jet_mult_ch[iJ] = theJet->chargedMultiplicity();
 			_jet_mult_mu[iJ] = theJet->muonMultiplicity();
 			_jet_mult_ne[iJ] = theJet->neutralMultiplicity();
-			
+      
+      jecUnc->setJetEta(_jet_eta[iJ]);
+      jecUnc->setJetPt(_jet_pt[iJ]); // here you must use the CORRECTED jet pt
+      _jet_unc[iJ] = jecUnc->getUncertainty(true);
+      _jet_ptCor_up[iJ] = (theJet->pt())*(1+_jet_unc[iJ]) ; // shift = +1(up), or -1(down)
+      _jet_ptCor_down[iJ] = (theJet->pt())*(1-_jet_unc[iJ]) ;
+      
 			iJ++ ;
 		}
     if(iJ>=nJ) break;
@@ -310,6 +323,8 @@ TreeProducer_miniAOD::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   if (filterPathsMap[filterPathsVector[5]] != -1 && H_METfilter->accept(filterPathsMap[filterPathsVector[5]])) _beamhaloFlag = 1;
 
   _tree->Fill();
+  
+  delete jecUnc;
 }
 
 
@@ -357,6 +372,8 @@ TreeProducer_miniAOD::beginJob()
 	_tree->Branch("track_nhits",&_track_Nhits,"track_nhits[nTrack_stored]/I");
 	_tree->Branch("track_nPixHits",&_track_NpixHits,"track_nPixHits[nTrack_stored]/I");
 	_tree->Branch("track_dz",&_track_dz,"track_dz[nTrack_stored]/D");
+	_tree->Branch("track_d0",&_track_d0,"track_d0[nTrack_stored]/D");
+	_tree->Branch("track_dxy",&_track_dxy,"track_dxy[nTrack_stored]/D");
 	//
   // Jets
   _tree->Branch("nJet_stored",&_nJet_stored,"nJet_stored/I");
@@ -383,6 +400,9 @@ TreeProducer_miniAOD::beginJob()
   _tree->Branch("jet_efrac_ch_Had", &_jet_efrac_ch_Had, "jet_efrac_ch_Had[nJet_stored]/D");
   _tree->Branch("jet_efrac_ch_EM",  &_jet_efrac_ch_EM,  "jet_efrac_ch_EM[nJet_stored]/D" );
   _tree->Branch("jet_efrac_ch_Mu",  &_jet_efrac_ch_Mu,  "jet_efrac_ch_Mu[nJet_stored]/D" );
+  _tree->Branch("jet_unc",&_jet_unc,"jet_unc[nJet_stored]/D");
+  _tree->Branch("_jet_ptCor_up",&_jet_ptCor_up,"_jet_ptCor_up[nJet_stored]/D");
+  _tree->Branch("_jet_ptCor_down",&_jet_ptCor_down,"_jet_ptCor_down[nJet_stored]/D");
 	//
   // GenJets
   _tree->Branch("nGenJet_stored",&_nGenJet_stored,"nGenJet_stored/I");
@@ -583,6 +603,9 @@ TreeProducer_miniAOD::Init()
 		_track_pt[it] = 0;
 		_track_ptError[it] = 0;
 		_track_dzError[it] = 0;
+		_track_dz[it] = 0;
+		_track_d0[it] = 0;
+		_track_dxy[it] = 0;
 		_track_purity[it] = 0;
 	}  
 
@@ -607,6 +630,9 @@ TreeProducer_miniAOD::Init()
     _jet_efrac_ch_Had[i] = 0; 
     _jet_efrac_ch_EM[i] = 0; 
     _jet_efrac_ch_Mu[i] = 0;
+    _jet_unc[i]  = 0;
+    _jet_ptCor_up[i]  = 0;
+    _jet_ptCor_down[i]  = 0;
 	}
 
   //GenJets

@@ -18,9 +18,12 @@
 #include "TPRegexp.h"
 
 // CMSSW standard lib
+#include "FWCore/Utilities/interface/EDGetToken.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/EventSetup.h"
+#include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
@@ -43,6 +46,10 @@
 #include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
 #include "DataFormats/L1Trigger/interface/L1EtMissParticle.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
+#include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
 // others
 using namespace std;
@@ -67,7 +74,7 @@ class TreeProducer_miniAOD : public edm::one::EDAnalyzer<edm::one::SharedResourc
 
  private:
   virtual void beginJob() ;
-  virtual void analyze(const edm::Event&, const edm::EventSetup&);
+  virtual void analyze(const edm::Event&, edm::EventSetup const&);
   virtual void endJob() ;
 
   virtual void beginRun(edm::Run const&, edm::EventSetup const&);
@@ -128,7 +135,7 @@ class TreeProducer_miniAOD : public edm::one::EDAnalyzer<edm::one::SharedResourc
 	
 	//Tracks
 	int _track_fromPV[nT], _track_Nhits[nT], _track_NpixHits[nT], _track_purity[nT], _track_ndof[nT];
-	double _track_eta[nT], _track_pt[nT], _track_phi[nT], _track_ptError[nT], _track_dz[nT], _track_dzError[nT], _track_normalizedChi2[nT];	
+	double _track_eta[nT], _track_pt[nT], _track_phi[nT], _track_ptError[nT], _track_dxy[nT], _track_d0[nT], _track_dz[nT], _track_dzError[nT], _track_normalizedChi2[nT];	
 
   // Jets
   int _jet_mult_ch[nJ], _jet_mult_mu[nJ], _jet_mult_ne[nJ]; // multiplicities
@@ -137,6 +144,7 @@ class TreeProducer_miniAOD : public edm::one::EDAnalyzer<edm::one::SharedResourc
   double _jet_eta[nJ], _jet_phi[nJ], _jet_pt[nJ], _jet_e[nJ], _jet_m[nJ];
   double _jet_efrac_ne_Had[nJ], _jet_efrac_ne_EM[nJ]; // neutral energy fractions
   double _jet_efrac_ch_Had[nJ], _jet_efrac_ch_EM[nJ], _jet_efrac_ch_Mu[nJ]; // charged energy fractions
+  double _jet_unc[nJ], _jet_ptCor_up[nJ], _jet_ptCor_down[nJ]; //JEC uncertainties
   
   // GenJets
   double _genjet_vx[nGJ], _genjet_vy[nGJ], _genjet_vz[nGJ];//vertex position
