@@ -10,49 +10,71 @@
 void SIMP_XXTo4J_macro(){
   
   TChain * chain = new TChain("tree/SimpAnalysis");
-	//ctau=1m M=3000GeV
-	chain->Add("/pnfs/iihe/cms/store/user/isdebruy/XXTo4J_M-3000_CTau-1000mm_TuneCUETP8M1_13TeV_pythia8/SIMPs_XXTo4J_ctau1000_M3000_new/161114_110710/0000/simptree_1.root");
-  TFile *output = new TFile("XXTo4J_ctau1000_M3000_selection.root", "RECREATE");
 	
-	//ctau=2m M=50GeV
-// 	chain->Add("/pnfs/iihe/cms/store/user/isdebruy/XXTo4J_M-50_CTau-2000mm_TuneCUETP8M1_13TeV_pythia8/SIMPs_XXTo4J_ctau2000_M50/161110_132239/0000/simptree_1.root");
-// 	TFile *output = new TFile("XXTo4J_ctau2000_M50_reallynocut.root", "RECREATE");	
+	chain->Add("/pnfs/iihe/cms/store/user/isdebruy/XXTo4J_M-300_CTau-2000mm_TuneCUETP8M1_13TeV_pythia8/SIMPs_XXTo4J_ctau2000_M300/170125_151018/0000/XXTo4J_1.root");
+
+// 	chain->Add("/pnfs/iihe/cms/store/user/isdebruy/XXTo4J_M-500_CTau-2000mm_TuneCUETP8M1_13TeV_pythia8/SIMPs_XXTo4J_ctau2000_M500/170124_155759/0000/QCD_PUMoriond17_test_1.root");
+// 	chain->Add("/pnfs/iihe/cms/store/user/isdebruy/XXTo4J_M-500_CTau-2000mm_TuneCUETP8M1_13TeV_pythia8/SIMPs_XXTo4J_ctau2000_M500/170124_155759/0000/QCD_PUMoriond17_test_2.root");
+// 
+// 	chain->Add("/pnfs/iihe/cms/store/user/isdebruy/XXTo4J_M-700_CTau-2000mm_TuneCUETP8M1_13TeV_pythia8/SIMPs_XXTo4J_ctau2000_M700/170124_155734/0000/QCD_PUMoriond17_test_1.root");
+// 
+// 	chain->Add("/pnfs/iihe/cms/store/user/isdebruy/XXTo4J_M-1000_CTau-2000mm_TuneCUETP8M1_13TeV_pythia8/SIMPs_XXTo4J_ctau2000_M1000/170124_155709/0000/QCD_PUMoriond17_test_1.root");
+// 	chain->Add("/pnfs/iihe/cms/store/user/isdebruy/XXTo4J_M-1000_CTau-2000mm_TuneCUETP8M1_13TeV_pythia8/SIMPs_XXTo4J_ctau2000_M1000/170124_155709/0000/QCD_PUMoriond17_test_2.root");
+// 
+// 	chain->Add("/pnfs/iihe/cms/store/user/isdebruy/XXTo4J_M-1500_CTau-2000mm_TuneCUETP8M1_13TeV_pythia8/SIMPs_XXTo4J_ctau2000_M1500/170124_155644/0000/QCD_PUMoriond17_test_1.root");
+// 
+// 	chain->Add("lists/XXTo4J_ctau-2m_M-3000.root");
 	
-	//ctau=2m M=3000GeV
-// 	chain->Add("/pnfs/iihe/cms/store/user/isdebruy/XXTo4J_M-3000_CTau-2000mm_TuneCUETP8M1_13TeV_pythia8/SIMPs_XXTo4J_ctau2000_M3000/161110_132227/0000/simptree_1.root");
-// 	chain->Add("/pnfs/iihe/cms/store/user/isdebruy/XXTo4J_M-3000_CTau-2000mm_TuneCUETP8M1_13TeV_pythia8/SIMPs_XXTo4J_ctau2000_M3000/161110_132227/0000/simptree_2.root");
-// 	chain->Add("/pnfs/iihe/cms/store/user/isdebruy/XXTo4J_M-3000_CTau-2000mm_TuneCUETP8M1_13TeV_pythia8/SIMPs_XXTo4J_ctau2000_M3000/161110_132227/0000/simptree_3.root");
-//   TFile *output = new TFile("XXTo4J_ctau2000_M3000_nocut.root", "RECREATE");
-  
-  
+// 	chain->Add("SIMPs_PUMoriond17_AOD_M1.root");
+	
+  TFile *output = new TFile("XXTo4J_ctau2000_M300.root", "RECREATE");
+//   TFile *output = new TFile("XXTo4J_ctau2000_M500.root", "RECREATE");
+//   TFile *output = new TFile("XXTo4J_ctau2000_M700.root", "RECREATE");
+//   TFile *output = new TFile("XXTo4J_ctau2000_M1000.root", "RECREATE");
+//   TFile *output = new TFile("XXTo4J_ctau2000_M1500.root", "RECREATE");
+//   TFile *output = new TFile("XXTo4J_ctau2000_M3000.root", "RECREATE");
+//   TFile *output = new TFile("SIMP_M1.root", "RECREATE");
+//   
 	int nJet, dijet_170, dijet_170_0p1, dijet_220_0p3, dijet_330_0p5, dijet_430;
-	double pswgt_dijet_170;
-  double jet_pt[4], jet_eta[4], jet_phi[4], jet_efrac_ch_Had[4], jet_efrac_ch_EM[4], jet_efrac_ch_Mu[4];
-	double CHEF_jet[4];
-// 	E[4], M[4];
+  double jet_pt[8], jet_eta[8], jet_phi[8], jet_efrac_ch_Had[8], jet_efrac_ch_EM[8], jet_efrac_ch_Mu[8], CHEF_jet[8], EMF_jet[8];
+	double track_pt[10], track_ptError[10], track_dzError[10], track_dz[10];
+	int track_fromPV[10], nhits[10], nPixHits[10], ndof[3];
+	double photon_eta[4], photon_phi[4], photon_pt[4];
+	int passLooseId[4], passMediumId[4], passTightId[4];
+	int passed_deltaphi = 0, passed_eta = 0, passed_npix = 0, passed_photonveto = 0, passed_pt = 0;
+	int passed[11] = {0,0,0,0,0,0,0,0,0,0,0};
+	double chf_cuts[11] = {0.5, 0.4, 0.3, 0.2, 0.15, 0.1, 0.05, 0.04, 0.03, 0.02, 0.01};
   
   chain->SetBranchAddress("nJet",&nJet);
   chain->SetBranchAddress("jet_pt", &jet_pt);
   chain->SetBranchAddress("jet_eta", &jet_eta);
   chain->SetBranchAddress("jet_phi", &jet_phi);
-//   chain->SetBranchAddress("jet_e", &E);
-//   chain->SetBranchAddress("jet_m", &M);
   chain->SetBranchAddress("jet_efrac_ch_Had", &jet_efrac_ch_Had);
   chain->SetBranchAddress("jet_efrac_ch_EM", &jet_efrac_ch_EM);
   chain->SetBranchAddress("jet_efrac_ch_Mu", &jet_efrac_ch_Mu);
+	chain->SetBranchAddress("track_ptError", &track_ptError);
+	chain->SetBranchAddress("track_nhits", &nhits);
+	chain->SetBranchAddress("track_nPixHits", &nPixHits);
+	chain->SetBranchAddress("track_pt", &track_pt);
+	chain->SetBranchAddress("track_fromPV", &track_fromPV);
+	chain->SetBranchAddress("track_dzError", &track_dzError);
+	chain->SetBranchAddress("track_dz", &track_dz);
+// 	chain->SetBranchAddress("photon_pt", &photon_pt);
+// 	chain->SetBranchAddress("photon_eta", &photon_eta);
+// 	chain->SetBranchAddress("photon_phi", &photon_phi);
+//   chain->SetBranchAddress("photon_passLooseId",&passLooseId);
+//   chain->SetBranchAddress("photon_passMediumId",&passMediumId);
+//   chain->SetBranchAddress("photon_passTightId",&passTightId);
   chain->SetBranchAddress("HLT_DiCentralPFJet170_CFMax0p1", &dijet_170_0p1);
   chain->SetBranchAddress("HLT_DiCentralPFJet220_CFMax0p3", &dijet_220_0p3);
   chain->SetBranchAddress("HLT_DiCentralPFJet330_CFMax0p5", &dijet_330_0p5);
   chain->SetBranchAddress("HLT_DiCentralPFJet430", &dijet_430);
   chain->SetBranchAddress("HLT_DiCentralPFJet170", &dijet_170);
-  chain->SetBranchAddress("pswgt_dijet_170", &pswgt_dijet_170);
 	
 	TH1F *jet1_pt = new TH1F("jet1_pt", "Leading jet pt", 100, 0, 2000);
 	TH1F *jet2_pt = new TH1F("jet2_pt", "Subleading jet pt", 100, 0, 2000);
 	TH1F *jet3_pt = new TH1F("jet3_pt", "3rd jet pt", 100, 0, 2000);
 	TH1F *jet4_pt = new TH1F("jet4_pt", "4th jet pt", 100, 0, 2000);
-	TH1F *jet1_pt_withps = new TH1F("jet1_pt_withps", "Leading jet pt", 100, 0, 2000);
-	TH1F *jet2_pt_withps = new TH1F("jet2_pt_withps", "Subleading jet pt", 100, 0, 2000);
 	TH1F *jet1_eta = new TH1F("jet1_eta", "Leading jet eta", 100, -3.14, 3.14);
 	TH1F *jet2_eta = new TH1F("jet2_eta", "Subleading jet eta", 100, -3.14, 3.14);
 	TH1F *jet1_phi = new TH1F("jet1_phi", "Leading jet phi", 100, -3.14, 3.14);
@@ -70,27 +92,6 @@ void SIMP_XXTo4J_macro(){
 	TH1F *trigger_dijet_330_0p5 = new TH1F("trigger_dijet_330_0p5", "Dijet_330_0p5", 2, -0.5, 1.5);
 	TH1F *trigger_dijet_430 = new TH1F("trigger_dijet_430", "Dijet_430", 2, -0.5, 1.5);
 	TH1F *njets = new TH1F("njets", "Number of jets", 2, -0.5, 10.5);
-	
-	int total = 0;
-	double chf_cuts[11] = {0.5, 0.4, 0.3, 0.2, 0.15, 0.1, 0.05, 0.04, 0.03, 0.02, 0.01};
-	double pt_bins[7] = {0, 400, 450, 500, 600, 800, 10000};
-	double eta_bins[3] = {0, 1.5, 2.5};
-	int passed_pt[6][11];
-	int passed_eta[2][11];
-	double eff_pt[6][11], red_pt[6][11], eff_eta[2][11], red_eta[2][11];
-	double err_eff_pt[6][11], err_eff_eta[6][11], err_red_pt[2][11], err_red_eta[2][11];
-	double zero[11] = {0,0,0,0,0,0,0,0,0,0,0};
-	
-	for (int j = 0; j < 11; j++){
-		for (int i = 0; i < 6; i++){
-			passed_pt[i][j] = 0;
-		}
-	}
-	for (int j = 0; j < 11; j++){
-		for (int i = 0; i < 2; i++){
-			passed_eta[i][j] = 0;
-		}
-	}
   
   Int_t Nentries = chain->GetEntries(); 
 	std::cout<<"Processing "<<Nentries<<"entries"<<std::endl;
@@ -100,167 +101,79 @@ void SIMP_XXTo4J_macro(){
     double deltajet_phi = jet_phi[0] - jet_phi[1];
     if(deltajet_phi > TMath::Pi()) deltajet_phi -= 2*TMath::Pi();
     if(deltajet_phi < -TMath::Pi()) deltajet_phi += 2*TMath::Pi();
+		deltajet_phi = fabs(deltajet_phi);
+			
+// 		double deltaphi_jet1photon = jet_phi[0] - photon_phi[0];
+// 		if(deltaphi_jet1photon > TMath::Pi()) deltaphi_jet1photon -= 2*TMath::Pi();
+// 		if(deltaphi_jet1photon < -TMath::Pi()) deltaphi_jet1photon += 2*TMath::Pi();
+// 		double deltaphi_jet2photon = jet_phi[1] - photon_phi[0];
+// 		if(deltaphi_jet2photon > TMath::Pi()) deltaphi_jet2photon -= 2*TMath::Pi();
+// 		if(deltaphi_jet2photon < -TMath::Pi()) deltaphi_jet2photon += 2*TMath::Pi();
+// 		
+// 		double deltaeta_jet1photon = jet_eta[0] - photon_eta[0];
+// 		double deltaeta_jet2photon = jet_eta[1] - photon_eta[0];
+// 		
+// 		double dR1 = TMath::Sqrt(deltaphi_jet1photon*deltaphi_jet1photon + deltaeta_jet1photon*deltaeta_jet1photon);
+// 		double dR2 = TMath::Sqrt(deltaphi_jet2photon*deltaphi_jet2photon + deltaeta_jet2photon*deltaeta_jet2photon);
     
-		for (int i = 0; i < 4; i++){
+		for (int i = 0; i < 8; i++){
 			CHEF_jet[i] = jet_efrac_ch_Had[i]+jet_efrac_ch_EM[i]+jet_efrac_ch_Mu[i];
 		} 
 		
 		output->cd();
 		
-		if (jet_phi[0] == 0 || jet_phi[1] == 0) continue;
-		if (jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2){
-			jet1_pt->Fill(jet_pt[0]);
-			jet2_pt->Fill(jet_pt[1]);
-			jet3_pt->Fill(jet_pt[2]);
-			jet4_pt->Fill(jet_pt[3]);
-			jet1_pt_withps->Fill(jet_pt[0], pswgt_dijet_170);
-			jet2_pt_withps->Fill(jet_pt[1], pswgt_dijet_170);
-			jet1_eta->Fill(jet_eta[0]);
-			jet2_eta->Fill(jet_eta[1]);
-			jet1_phi->Fill(jet_phi[0]);
-			jet2_phi->Fill(jet_phi[1]);
-			deltaphi->Fill(deltajet_phi);
-			jet1_chf->Fill(CHEF_jet[0]);
-			if (CHEF_jet[1] > 0.5) jet1_chf_jet2_0p5->Fill(CHEF_jet[0]);
-			jet2_chf->Fill(CHEF_jet[1]);
-			jet3_chf->Fill(CHEF_jet[2]);
-			jet4_chf->Fill(CHEF_jet[3]);
-			jet1_chf_withps->Fill(CHEF_jet[0], pswgt_dijet_170);
-			jet2_chf_withps->Fill(CHEF_jet[1], pswgt_dijet_170);
-			trigger_dijet_170_0p1->Fill(dijet_170_0p1);
-			trigger_dijet_220_0p3->Fill(dijet_220_0p3);
-			trigger_dijet_330_0p5->Fill(dijet_330_0p5);
-			trigger_dijet_430->Fill(dijet_430);
-			
-			if(CHEF_jet[0] > CHEF_jet[1] && CHEF_jet[0] > 0.5){
-				total++;
-				for(int j = 0; j < 11; j++){
-					for (int i = 0; i < 6; i++){
-						if (jet_pt[1]>pt_bins[i] && jet_pt[1]<pt_bins[i+1] && CHEF_jet[1]<chf_cuts[j]) passed_pt[i][j]++;
-					}
-					for (int i = 0; i < 2; i++){
-						if (jet_eta[1]>eta_bins[i] && jet_eta[1]<eta_bins[i+1] && CHEF_jet[1]<chf_cuts[j]) passed_eta[i][j]++;
-					}
-				}
-			}
-			else if(CHEF_jet[0] < CHEF_jet[1] && CHEF_jet[1] > 0.5){
-				total++;
-				for(int j = 0; j < 11; j++){
-					for (int i = 0; i < 6; i++){
-						if (jet_pt[0]>pt_bins[i] && jet_pt[0]<pt_bins[i+1] && CHEF_jet[0]<chf_cuts[j]) passed_pt[i][j]++;
-					}
-					for (int i = 0; i < 2; i++){
-						if (jet_eta[0]>eta_bins[i] && jet_eta[0]<eta_bins[i+1] && CHEF_jet[0]<chf_cuts[j]) passed_eta[i][j]++;
+		if (fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0){
+			passed_eta++;
+			if(jet_pt[0] > 250 && jet_pt[1] > 250){
+				passed_pt++;
+				if(deltajet_phi > 2){
+					passed_deltaphi++;
+					if(nPixHits[0] > 0){
+						passed_npix++;
+// 						if(passLooseId[0] == 0 || (passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1)){
+							passed_photonveto++;
+							jet1_pt->Fill(jet_pt[0]);
+							jet2_pt->Fill(jet_pt[1]);
+							jet3_pt->Fill(jet_pt[2]);
+							jet4_pt->Fill(jet_pt[3]);
+							jet1_eta->Fill(jet_eta[0]);
+							jet2_eta->Fill(jet_eta[1]);
+							jet1_phi->Fill(jet_phi[0]);
+							jet2_phi->Fill(jet_phi[1]);
+							deltaphi->Fill(deltajet_phi);
+							jet1_chf->Fill(CHEF_jet[0]);
+							if (CHEF_jet[1] > 0.5) jet1_chf_jet2_0p5->Fill(CHEF_jet[0]);
+							jet2_chf->Fill(CHEF_jet[1]);
+							jet3_chf->Fill(CHEF_jet[2]);
+							jet4_chf->Fill(CHEF_jet[3]);
+							trigger_dijet_170_0p1->Fill(dijet_170_0p1);
+							trigger_dijet_220_0p3->Fill(dijet_220_0p3);
+							trigger_dijet_330_0p5->Fill(dijet_330_0p5);
+							trigger_dijet_430->Fill(dijet_430);
+							for(int j = 0; j < 11; j++){
+								if (CHEF_jet[0]<chf_cuts[j] && CHEF_jet[1]<chf_cuts[j]) passed[j]++;
+							}
+// 						}
 					}
 				}
 			}
-		}    
-	}
-	
-	for (int j = 0; j < 11; j++){
-		for (int i = 0; i < 6; i++){
-			double tot = (double)total;
-			double passed = (double)passed_pt[i][j];
-			eff_pt[i][j] = passed/tot;
-			err_eff_pt[i][j] = pow(tot, -2)*TMath::Sqrt(pow(tot - passed, 2)*passed + (pow(passed, 2)*(tot - passed)));
-			if (passed_pt[i][j] != 0){
-				red_pt[i][j] = tot/(double)passed;
-				err_red_pt[i][j] = pow(passed, -2)*TMath::Sqrt(pow(tot - passed, 2)*passed + (pow(passed, 2)*(tot - passed)));
-			}
-			else{
-				red_pt[i][j] = 0;
-				err_red_pt[i][j] = 0;
-			}
-// 			std::cout<<passed_pt[i][j]<<"  "<<eff_pt[i][j]<<std::endl;
-// 			std::cout<<total<<"/"<<passed_pt[i][j]<<"  "<<red_pt[i][j]<<std::endl;
 		}
 	}
-		for (int j = 0; j < 11; j++){
-		for (int i = 0; i < 2; i++){
-			double tot = (double)total;
-			double passed = (double)passed_eta[i][j];
-			eff_eta[i][j] = passed/tot;
-			err_eff_eta[i][j] = pow(tot, -2)*TMath::Sqrt(pow(tot - passed, 2)*passed + (pow(passed, 2)*(tot - passed)));
-			if (passed_eta[i][j] != 0){
-				red_eta[i][j] = tot/passed;
-				err_red_eta[i][j] = pow(passed, -2)*TMath::Sqrt(pow(tot - passed, 2)*passed + (pow(passed, 2)*(tot - passed)));
-			}
-			else{
-				red_eta[i][j] = 0;
-				err_red_eta[i][j] = 0;
-				
-			}
-		}
-	}	
+	std::cout<<"passed eta cut: "<<passed_eta<<std::endl;
+	std::cout<<"passed pt cut: "<<passed_pt<<std::endl;
+	std::cout<<"passed deltaphi cut: "<<passed_deltaphi<<std::endl;
+	std::cout<<"passed nPixHits cut: "<<passed_npix<<std::endl;
+	std::cout<<"passed photon veto: "<<passed_photonveto<<std::endl;
+	for(int j = 0; j < 11; j++) std::cout<<passed[j]<<" ";
 	
-	TCanvas *c1 = new TCanvas("efficiency_pt", "efficiency_pt");
-	c1->cd();
-	TLegend *leg1 = new TLegend();
-	TGraphErrors *firstptbin = new TGraphErrors(11, chf_cuts, eff_pt[0], zero, err_eff_pt[0]);
-	firstptbin->SetTitle("CHF cut efficiency");
-	firstptbin->GetXaxis()->SetTitle("CHF cut");
-	firstptbin->GetYaxis()->SetTitle("efficiency");
-	firstptbin->SetMarkerStyle(20);
-	firstptbin->Draw("AP");
-	leg1->AddEntry(firstptbin, "250 < pt < 400", "lep");
-	for (int i = 1; i < 6; i++){
-		TGraphErrors *otherptbin = new TGraphErrors(11, chf_cuts, eff_pt[i], zero, err_eff_pt[i]);
-		otherptbin->SetMarkerStyle(20);
-		otherptbin->SetMarkerColor(i+1);
-		otherptbin->Draw("P");
-		leg1->AddEntry(otherptbin, " < pt < ", "lep");
-	}
-	leg1->Draw();
-	c1->Print("ptbinned_eff.png");
-	
-	TCanvas *c2 = new TCanvas("rejection_pt", "rejection_pt");
-	c2->cd();
-	TGraphErrors *firstptbin2 = new TGraphErrors(11, chf_cuts, red_pt[0], zero, err_red_pt[0]);
-	firstptbin2->SetTitle("CHF cut rejection factor");
-	firstptbin2->GetXaxis()->SetTitle("CHF cut");
-	firstptbin2->GetYaxis()->SetTitle("rejection factor");
-	firstptbin2->SetMarkerStyle(20);
-	firstptbin2->Draw("AP");
-	for (int i = 1; i < 6; i++){
-		TGraphErrors *otherptbin2 = new TGraphErrors(11, chf_cuts, red_pt[i], zero, err_red_pt[i]);
-		otherptbin2->SetMarkerStyle(20);
-		otherptbin2->SetMarkerColor(i+1);
-		otherptbin2->Draw("P");
-	}
-	c2->Print("ptbinned_red.png");
-	
-	TCanvas *c3 = new TCanvas("efficiency_eta", "efficiency_eta");
-	c3->cd();
-	TGraphErrors *firstetabin = new TGraphErrors(11, chf_cuts, eff_eta[0], zero, err_eff_eta[0]);
-	firstetabin->SetTitle("CHF cut efficiency");
-	firstetabin->GetXaxis()->SetTitle("CHF cut");
-	firstetabin->GetYaxis()->SetTitle("efficiency");
-	firstetabin->SetMarkerStyle(20);
-	firstetabin->Draw("AP");
-	TGraphErrors *otheretabin = new TGraphErrors(11, chf_cuts, eff_eta[1], zero, err_eff_eta[1]);
-	otheretabin->SetMarkerStyle(20);
-	otheretabin->SetMarkerColor(2);
-	otheretabin->Draw("P");
-	c3->Print("etabinned_eff.png");
-	
-	TCanvas *c4 = new TCanvas("rejection_eta", "rejection_eta");
-	c4->cd();
-	TGraphErrors *firstetabin2 = new TGraphErrors(11, chf_cuts, red_eta[0], zero, err_red_eta[0]);
-	firstetabin2->SetTitle("CHF cut rejection factor");
-	firstetabin2->GetXaxis()->SetTitle("CHF cut");
-	firstetabin2->GetYaxis()->SetTitle("rejection factor");
-	firstetabin2->SetMarkerStyle(20);
-	firstetabin2->Draw("AP");
-	TGraphErrors *otheretabin2 = new TGraphErrors(11, chf_cuts, red_eta[1], zero, err_red_eta[1]);
-	otheretabin2->SetMarkerStyle(20);
-	otheretabin2->SetMarkerColor(2);
-	otheretabin2->Draw("P");
-	c4->Print("etabinned_red.png");
-	
-	output->Append(c1);
-	output->Append(c2);
-	output->Append(c3);
-	output->Append(c4);
+// 	TCanvas *c1 = new TCanvas("Signal yield", "Signal yield");
+// 	c1->cd();
+// 	TGraphErrors *XXTo4J = new TGraphErrors(11, chf_cuts, passed, zero, zero);
+// 	XXTo4J->SetTitle("Signal yield");
+// 	XXTo4J->GetXaxis()->SetTitle("CHF cut");
+// 	XXTo4J->GetYaxis()->SetTitle("# events");
+// 	XXTo4J->SetMarkerStyle(20);
+// 	XXTo4J->Draw("AP");
 	
   output->Write();
   output->Close();
