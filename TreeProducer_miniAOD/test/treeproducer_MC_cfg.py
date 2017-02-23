@@ -8,7 +8,7 @@ process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_TrancheIV_v8', '')
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
@@ -64,5 +64,5 @@ process.p = cms.Path(process.egmPhotonIDSequence * process.tree)
 
 # Output
 process.TFileService = cms.Service('TFileService',
-    fileName = cms.string('QCD_PUMoriond17_test.root')
+    fileName = cms.string('QCD.root')
 )
