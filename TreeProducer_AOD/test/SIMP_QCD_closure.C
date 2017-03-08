@@ -11,32 +11,47 @@
 #include <TGraphErrors.h>
 #include <TCanvas.h>
 
+#include "SANtuple.h"
+
 #include "lists/list_QCD_300To500_PUMoriond17_AOD.h"
 #include "lists/list_QCD_500To700_PUMoriond17_AOD.h"
 #include "lists/list_QCD_700To1000_PUMoriond17_AOD.h"
 #include "lists/list_QCD_1000To1500_PUMoriond17_AOD.h"
 #include "lists/list_QCD_1500To2000_PUMoriond17_AOD.h"
+#include "lists/list_QCD_2000ToInf_PUMoriond17_AOD.h"
 
 void SIMP_QCD_closure(){
   
-  TChain* chain0 = new TChain("tree/SimpAnalysis");
+  TChain* chain0 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_300To500(chain0);
-  TChain* chain1 = new TChain("tree/SimpAnalysis");
+  TChain* chain1 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_500To700(chain1);
-  TChain* chain2 = new TChain("tree/SimpAnalysis");
+  TChain* chain2 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_700To1000(chain2);
-  TChain* chain3 = new TChain("tree/SimpAnalysis");
+  TChain* chain3 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_1000To1500(chain3);
-  TChain* chain4 = new TChain("tree/SimpAnalysis");
+  TChain* chain4 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_1500To2000(chain4);
-//   TChain* chain5 = new TChain("tree/SimpAnalysis");
-// 	list_QCD_2000ToInf(chain5);
-	TChain* chains[5] = {chain0, chain1, chain2, chain3, chain4};
+  TChain* chain5 = new TChain("treeCorr/SimpAnalysis");
+	list_QCD_2000ToInf(chain5);
+	TChain* chains[6] = {chain0, chain1, chain2, chain3, chain4, chain5};
+  
+  TChain* SPVchain0 = new TChain("treeSPV/SimpAnalysis");
+	list_QCD_300To500(SPVchain0);
+  TChain* SPVchain1 = new TChain("treeSPV/SimpAnalysis");
+	list_QCD_500To700(SPVchain1);
+  TChain* SPVchain2 = new TChain("treeSPV/SimpAnalysis");
+	list_QCD_700To1000(SPVchain2);
+  TChain* SPVchain3 = new TChain("treeSPV/SimpAnalysis");
+	list_QCD_1000To1500(SPVchain3);
+  TChain* SPVchain4 = new TChain("treeSPV/SimpAnalysis");
+	list_QCD_1500To2000(SPVchain4);
+  TChain* SPVchain5 = new TChain("treeSPV/SimpAnalysis");
+	list_QCD_2000ToInf(SPVchain5);
+	TChain* SPVchains[6] = {SPVchain0, SPVchain1, SPVchain2, SPVchain3, SPVchain4, SPVchain5};
 	std::cout<<"TChains ready"<<std::endl;
   
-  double jet_pt[8], jet_eta[8], jet_phi[8], jet_efrac_ch_Had[8], jet_efrac_ch_EM[8], jet_efrac_ch_Mu[8], CHEF_jet[8];
-	double track_pt[10], track_ptError[10], track_dzError[10], track_dz[10]; 
-	int npixhits[10];
+  double CHEF_SPVjet[8], CHEF_corrjet[8];
 	
 	double chf_cuts[11] = {0.5, 0.4, 0.3, 0.2, 0.15, 0.1, 0.05, 0.04, 0.03, 0.02, 0.01};
 	double pt_bins[10] = {250, 275, 300, 350, 400, 450, 550, 700, 900, 10000};
@@ -60,7 +75,7 @@ void SIMP_QCD_closure(){
 	double err_ratio_2leg[11] = {0,0,0,0,0,0,0,0,0,0,0};
   
 	std::cout<<"Getting the efficiency histos...";
-	TFile* efficiencies = new TFile("eff2D_QCD_npixCut_PUMoriond17_AOD.root", "READ");
+	TFile* efficiencies = new TFile("eff2D_QCD_PUMoriond17_AOD.root", "READ");
 	TH2D* eff_histos[11];
 	for(int j = 0; j < 11; j++){
 		std::ostringstream strs;
@@ -72,77 +87,87 @@ void SIMP_QCD_closure(){
 	}
 	std::cout<<"done"<<std::endl;
 	
-  TFile *output = new TFile("closure_test_fullnpixhitCut_errorbars_ratio_PUMoriond17_AOD.root", "RECREATE");
+  TFile *output = new TFile("closure_test_SPVcollectioncut_PUMoriond17_AOD_testing.root", "RECREATE");
 	
 // 	double QCD_xsec[6] = {343500, 32050, 6791, 1214, 118.7, 24.91};//Spring16
 	double QCD_xsec[6] = {346400, 32010, 6842, 1203, 120.1, 25.40}; //PUMoriond17
 // 	double QCD_events[5] = {16830696, 19199088, 15621634, 4980387, 3846616};
 	double lumi = 20;
   
-	for (int l = 0; l < 5; l++){
+	for (int l = 0; l < 6; l++){
 		TChain* chain = chains[l];
-		chain->SetBranchAddress("jet_pt", &jet_pt);
-		chain->SetBranchAddress("jet_eta", &jet_eta);
-		chain->SetBranchAddress("jet_phi", &jet_phi);
-		chain->SetBranchAddress("jet_efrac_ch_Had", &jet_efrac_ch_Had);
-		chain->SetBranchAddress("jet_efrac_ch_EM", &jet_efrac_ch_EM);
-		chain->SetBranchAddress("jet_efrac_ch_Mu", &jet_efrac_ch_Mu);
-		chain->SetBranchAddress("track_dzError", &track_dzError);
-		chain->SetBranchAddress("track_dz", &track_dz);
-		chain->SetBranchAddress("track_nPixHits", &npixhits);
-// 		chain->SetBranchAddress("track_pt", &track_pt);
-// 		chain->SetBranchAddress("track_ptError", &track_ptError);
+		TChain* SPVchain = SPVchains[l];		
+    SANtuple corrjets;
+    corrjets.Init(chain);
+    SANtuple SPVjets;
+    SPVjets.Init(SPVchain);
 		
-		Int_t Nentries = chain->GetEntries(); 
-// 		Int_t Nentries = 1000000;
+// 		Int_t Nentries = corrjets.fChain->GetEntries(); 
+		Int_t Nentries = 6000000; 
 		double weight = QCD_xsec[l]*lumi/Nentries;
 		std::cout<<"QCD bin "<<l<<": Processing "<<Nentries<<" entries with weight "<<weight<<std::endl;
 		
 		for(Int_t entry = 0; entry < Nentries; ++entry){
 			if(entry%1000000==0) std::cout<<"processed "<<entry/1000000<<"M events"<<std::endl;
-			chain->GetEntry(entry);
+      SPVjets.GetEntry(entry);
+      corrjets.GetEntry(entry);
 			
-			double deltajet_phi = jet_phi[0] - jet_phi[1];
+			double deltajet_phi =  corrjets.jet_phi[0] -  corrjets.jet_phi[1];
 			if(deltajet_phi > TMath::Pi()) deltajet_phi -= 2*TMath::Pi();
 			if(deltajet_phi < -TMath::Pi()) deltajet_phi += 2*TMath::Pi();
+			deltajet_phi = fabs(deltajet_phi);
+			
+			double deltaphi_jet1photon =  corrjets.jet_phi[0] -  corrjets.photon_phi[0];
+			if(deltaphi_jet1photon > TMath::Pi()) deltaphi_jet1photon -= 2*TMath::Pi();
+			if(deltaphi_jet1photon < -TMath::Pi()) deltaphi_jet1photon += 2*TMath::Pi();
+			double deltaphi_jet2photon =  corrjets.jet_phi[1] -  corrjets.photon_phi[0];
+			if(deltaphi_jet2photon > TMath::Pi()) deltaphi_jet2photon -= 2*TMath::Pi();
+			if(deltaphi_jet2photon < -TMath::Pi()) deltaphi_jet2photon += 2*TMath::Pi();
+			
+			double deltaeta_jet1photon =  corrjets.jet_eta[0] -  corrjets.photon_eta[0];
+			double deltaeta_jet2photon =  corrjets.jet_eta[1] -  corrjets.photon_eta[0];
+			
+			double dR1 = TMath::Sqrt(deltaphi_jet1photon*deltaphi_jet1photon + deltaeta_jet1photon*deltaeta_jet1photon);
+			double dR2 = TMath::Sqrt(deltaphi_jet2photon*deltaphi_jet2photon + deltaeta_jet2photon*deltaeta_jet2photon);
 			
 			for (int i = 0; i < 8; i++){
-				CHEF_jet[i] = jet_efrac_ch_Had[i]+jet_efrac_ch_EM[i]+jet_efrac_ch_Mu[i];
+				CHEF_SPVjet[i] = SPVjets.jet_efrac_ch_Had[i]+SPVjets.jet_efrac_ch_EM[i]+SPVjets.jet_efrac_ch_Mu[i];
+				CHEF_corrjet[i] = corrjets.jet_efrac_ch_Had[i]+corrjets.jet_efrac_ch_EM[i]+corrjets.jet_efrac_ch_Mu[i];
 			} 
 			
 			output->cd();
 			
-			if (jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2/* && fabs(track_dzError[0]/track_dz[0]) < 1 && track_dz[0] < 5.0*/ && npixhits[0] > 0){
-// 				if (track_ptError[0]/track_pt[0] < 0.5){
-					for(int j = 0; j < 11; j++){
-						if (CHEF_jet[0]<chf_cuts[j] && CHEF_jet[1]<chf_cuts[j]){
-							passed_MCtruth[j]+= weight;
-							err_MCtruth[j] += pow(weight, 2);
-						}
-						double eff1 = eff_histos[j]->GetBinContent(eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[0])), eff_histos[j]->GetYaxis()->FindBin(jet_pt[0]));
-						double eff2 = eff_histos[j]->GetBinContent(eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[1])), eff_histos[j]->GetYaxis()->FindBin(jet_pt[1]));
-						double erreff1 = eff_histos[j]->GetBinError(eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[0])), eff_histos[j]->GetYaxis()->FindBin(jet_pt[0]));
-						double erreff2 = eff_histos[j]->GetBinError(eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[1])), eff_histos[j]->GetYaxis()->FindBin(jet_pt[1]));
-	// 					std::cout<<chf_cuts[j]<<std::endl;
-	// 					std::cout<<jet_eta[0]<<"  "<<jet_pt[0]<<" bin "<<eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[0]))<<", "<<eff_histos[j]->GetYaxis()->FindBin(jet_pt[0])<<std::endl;
-	// 					std::cout<<jet_eta[1]<<"  "<<jet_pt[1]<<" bin "<<eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[1]))<<", "<<eff_histos[j]->GetYaxis()->FindBin(jet_pt[1])<<std::endl;
-	// 					std::cout<<"eff1 = "<<eff1<<std::endl;
-	// 					std::cout<<"eff2 = "<<eff2<<std::endl;
-						if (CHEF_jet[1]<chf_cuts[j]) passed_eff1[j]+=weight*eff1;
-						if (CHEF_jet[0]<chf_cuts[j]) passed_eff2[j]+=weight*eff2;
-						passed_effboth[j]+=eff1*eff2*weight;
-						
-	// 					err_eff1[j] += ;
-	// 					err_eff2[j] += ;
-						err_effboth[j] += (eff2*eff2*weight*weight*erreff1*erreff1) + (eff1*eff1*weight*weight*erreff2*erreff2);
-					}
-// 				} 
+			if (corrjets.jet_pt[0] > 250 && corrjets.jet_pt[1] > 250 && fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0 && deltajet_phi > 2 && corrjets.track_nPixHits[0] > 0 && (corrjets.photon_passLooseId[0] == 0 || (corrjets.photon_passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1))){
+        for(int j = 0; j < 11; j++){
+          if (CHEF_SPVjet[0]<chf_cuts[j] && CHEF_SPVjet[1]<chf_cuts[j] && CHEF_corrjet[0]<chf_cuts[j] && CHEF_corrjet[1]<chf_cuts[j]){
+            passed_MCtruth[j]+= weight;
+            err_MCtruth[j] += pow(weight, 2);
+          }
+          double eff1 = eff_histos[j]->GetBinContent(eff_histos[j]->GetXaxis()->FindBin(fabs(corrjets.jet_eta[0])), eff_histos[j]->GetYaxis()->FindBin(corrjets.jet_pt[0]));
+          double eff2 = eff_histos[j]->GetBinContent(eff_histos[j]->GetXaxis()->FindBin(fabs(corrjets.jet_eta[1])), eff_histos[j]->GetYaxis()->FindBin(corrjets.jet_pt[1]));
+          double erreff1 = eff_histos[j]->GetBinError(eff_histos[j]->GetXaxis()->FindBin(fabs(corrjets.jet_eta[0])), eff_histos[j]->GetYaxis()->FindBin(corrjets.jet_pt[0]));
+          double erreff2 = eff_histos[j]->GetBinError(eff_histos[j]->GetXaxis()->FindBin(fabs(corrjets.jet_eta[1])), eff_histos[j]->GetYaxis()->FindBin(corrjets.jet_pt[1]));
+// 					std::cout<<chf_cuts[j]<<std::endl;
+// 					std::cout<<jet_eta[0]<<"  "<<jet_pt[0]<<" bin "<<eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[0]))<<", "<<eff_histos[j]->GetYaxis()->FindBin(jet_pt[0])<<std::endl;
+// 					std::cout<<jet_eta[1]<<"  "<<jet_pt[1]<<" bin "<<eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[1]))<<", "<<eff_histos[j]->GetYaxis()->FindBin(jet_pt[1])<<std::endl;
+// 					std::cout<<"eff1 = "<<eff1<<std::endl;
+// 					std::cout<<"eff2 = "<<eff2<<std::endl;
+          if (CHEF_SPVjet[1]<chf_cuts[j] && CHEF_corrjet[1]<chf_cuts[j]) passed_eff1[j]+=weight*eff1;
+          if (CHEF_SPVjet[0]<chf_cuts[j] && CHEF_corrjet[0]<chf_cuts[j]) passed_eff2[j]+=weight*eff2;
+          passed_effboth[j]+=eff1*eff2*weight;
+          
+          err_eff1[j] += weight*weight*erreff1*erreff1;
+          err_eff2[j] += weight*weight*erreff2*erreff2;
+          err_effboth[j] += (eff2*eff2*weight*weight*erreff1*erreff1) + (eff1*eff1*weight*weight*erreff2*erreff2);
+        }
 			}
 		}
 	}
 	for(int j = 0; j < 11; j++){
 		err_MCtruth[j] = TMath::Sqrt(err_MCtruth[j]);
 		err_effboth[j] = TMath::Sqrt(err_effboth[j]);
+		err_eff1[j] = TMath::Sqrt(err_eff1[j]);
+		err_eff2[j] = TMath::Sqrt(err_eff2[j]);
 		err_eff[j] = (err_eff1[j]+err_eff2[j])/2.0 ;
 		passed_eff[j] = (passed_eff1[j]+passed_eff2[j])/2;
 		ratio_1leg[j] = passed_eff[j]/passed_MCtruth[j];
@@ -185,6 +210,7 @@ void SIMP_QCD_closure(){
 	TPad *pad2 = new TPad("pad2","pad2",0,0,1,0.3);
   pad2->SetTopMargin(0);
   pad2->SetBottomMargin(0.35);
+  pad2->SetLogy();
   pad2->Draw();
   pad2->cd();
 	
