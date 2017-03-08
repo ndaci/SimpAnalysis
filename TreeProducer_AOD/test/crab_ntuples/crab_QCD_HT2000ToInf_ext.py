@@ -23,7 +23,7 @@ config.section_("Data")
 config.Data.inputDataset = '/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/AODSIM'
 config.Data.inputDBS  = 'global'
 config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 3
+config.Data.unitsPerJob = 4
 config.Data.publication = False
 config.Data.publishDBS = 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter/'
 config.Data.outputDatasetTag = name
@@ -43,5 +43,6 @@ config.Data.ignoreLocality = False # allows to process inputs on CE != site host
 # GRID
 config.section_("Site")
 config.Site.storageSite = 'T2_BE_IIHE'
-#config.Site.whitelist = 
-#config.Site.blacklist = ['T1_US_FNAL','T2_UA_KIPT','T2_UK_London_Brunel','T2_CH_CSCS','T2_US_*']
+config.Site.ignoreGlobalBlacklist = True
+config.Site.whitelist = ['T2_ES_IFCA']
+config.Site.blacklist = ['T3_US_Rice', 'T2_BR_UERJ', 'T2_TR_METU', 'T2_EE_Estonia', 'T2_PK_NCP', 'T2_RU_PNPI', 'T3_RU_FIAN', 'T3_US_MIT', 'T3_UK_London_UCL', 'T3_US_UCD', 'T3_CO_Uniandes', 'T3_TW_NTU_HEP', 'T3_ES_Oviedo', 'T3_US_NU', 'T3_US_NotreDame', 'T2_RU_SINP', 'T2_CH_CERN_AI', 'T3_IN_PUHEP', 'T2_CH_CSCS_HPC', 'T2_GR_Ioannina', 'T2_CH_CERN_HLT', 'T2_MY_UPM_BIRUNI', 'T3_UK_London_RHUL', 'T2_TH_CUNSTDA', 'T3_US_Kansas', 'T3_US_Princeton_ICSE', 'T3_IN_TIFRCloud', 'T0_CH_CERN', 'T3_GR_IASA', 'T3_CN_PKU', 'T3_US_Baylor', 'T2_PL_Warsaw', 'T2_RU_INR', 'T3_US_JHU', 'T3_BY_NCPHEP', 'T3_US_FSU', 'T3_KR_UOS', 'T3_CH_PSI']

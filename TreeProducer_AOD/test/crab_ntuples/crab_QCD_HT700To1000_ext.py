@@ -23,7 +23,7 @@ config.section_("Data")
 config.Data.inputDataset = '/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/AODSIM'
 config.Data.inputDBS  = 'global'
 config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 3
+config.Data.unitsPerJob = 4
 config.Data.publication = False
 config.Data.publishDBS = 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter/'
 config.Data.outputDatasetTag = name
@@ -44,4 +44,4 @@ config.Data.ignoreLocality = False # allows to process inputs on CE != site host
 config.section_("Site")
 config.Site.storageSite = 'T2_BE_IIHE'
 #config.Site.whitelist = 
-config.Site.blacklist = ['T1_US_FNAL','T2_UA_KIPT','T2_UK_London_Brunel','T2_CH_CSCS','T2_US_*']
+#config.Site.blacklist = ['T2_UA_KIPT','T2_UK_London_Brunel','T2_CH_CSCS']

@@ -1,7 +1,7 @@
 from CRABClient.UserUtilities import config
 config = config()
 
-name = 'SIMPs_QCD_HT1500To2000_ext_PUMoriond17_AOD'
+name = 'SIMPs_JetHT_2016Hv2_rereco_AOD'
 
 # GENERAL
 config.section_("General")
@@ -13,17 +13,17 @@ config.General.transferLogs = True
 # JOB TYPE
 config.section_("JobType")
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = '../treeproducer_AOD_MC_cfg.py'
+config.JobType.psetName = '../treeproducer_AOD_data_cfg.py'
 #config.JobType.pyCfgParams = []
 config.JobType.inputFiles = ['../../../../../external/slc6_amd64_gcc530/data/RecoEgamma/PhotonIdentification/data/Spring16/photon_general_MVA_Spring16_EB_V3.weights.xml', '../../../../../external/slc6_amd64_gcc530/data/RecoEgamma/PhotonIdentification/data/Spring16/photon_general_MVA_Spring16_EE_V3.weights.xml']
 #config.JobType.allowNonProductionCMSSW = True
 
 # INPUT DATA
 config.section_("Data")
-config.Data.inputDataset = '/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16DR80Premix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/AODSIM'
+config.Data.inputDataset = '/JetHT/Run2016H-PromptReco-v2/AOD'
 config.Data.inputDBS  = 'global'
-config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 4
+config.Data.splitting = 'EventAwareLumiBased'
+config.Data.unitsPerJob = 800000
 config.Data.publication = False
 config.Data.publishDBS = 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter/'
 config.Data.outputDatasetTag = name
