@@ -49,6 +49,7 @@
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
+#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 
 // others
 using namespace std;
@@ -99,6 +100,7 @@ class TreeProducer_AOD : public edm::one::EDAnalyzer<edm::one::SharedResources,e
 	edm::InputTag _phoLooseIdMapTag;
 	edm::InputTag _phoMediumIdMapTag;
 	edm::InputTag _phoTightIdMapTag;
+  edm::InputTag _srcPFRhoTag;
   edm::EDGetTokenT<edm::TriggerResults> _trigResultsToken;
 //   edm::EDGetTokenT<edm::TriggerResults> _trigResultsToken2;
 //   edm::EDGetTokenT<pat::PackedTriggerPrescales> _triggerPrescalesToken;
@@ -113,7 +115,8 @@ class TreeProducer_AOD : public edm::one::EDAnalyzer<edm::one::SharedResources,e
 	edm::EDGetTokenT<edm::ValueMap<bool> > phoLooseIdMapToken_;
   edm::EDGetTokenT<edm::ValueMap<bool> > phoMediumIdMapToken_;
 	edm::EDGetTokenT<edm::ValueMap<bool> > phoTightIdMapToken_;
-	
+	edm::EDGetTokenT<double> _pfRhoToken;
+  
 	bool _isData;
 
 //   GlobalPoint vertexPosition;
@@ -167,7 +170,10 @@ class TreeProducer_AOD : public edm::one::EDAnalyzer<edm::one::SharedResources,e
   std::vector<std::string>   filterPathsVector;
   std::map<std::string, int> filterPathsMap;
   int _HBHENoiseFlag, _HBHENoiseIsoFlag, _ECALFlag, _vertexFlag, _eeFlag, _beamhaloFlag;
-
+  
+//PFRho
+  double _pfrho;
+  
 };
 
 namespace reco {

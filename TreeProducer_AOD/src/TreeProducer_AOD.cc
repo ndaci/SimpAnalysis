@@ -18,6 +18,7 @@ TreeProducer_AOD::TreeProducer_AOD(const edm::ParameterSet& pset):
   _phoLooseIdMapTag(pset.getParameter<edm::InputTag>("phoLooseIdMap")),
   _phoMediumIdMapTag(pset.getParameter<edm::InputTag>("phoMediumIdMap")),
   _phoTightIdMapTag(pset.getParameter<edm::InputTag>("phoTightIdMap")),
+  _srcPFRhoTag(pset.getParameter<edm::InputTag>("pfRho")),
   
   _trigResultsToken(consumes<edm::TriggerResults>(_trigResultsTag)),
 //   _trigResultsToken2(consumes<edm::TriggerResults>(_trigResultsTag2)),
@@ -33,7 +34,7 @@ TreeProducer_AOD::TreeProducer_AOD(const edm::ParameterSet& pset):
   phoLooseIdMapToken_(consumes<edm::ValueMap<bool> >(_phoLooseIdMapTag)),
   phoMediumIdMapToken_(consumes<edm::ValueMap<bool> >(_phoMediumIdMapTag)),
 	phoTightIdMapToken_(consumes<edm::ValueMap<bool> >(_phoTightIdMapTag)),
-  
+  _pfRhoToken(consumes<double >(_srcPFRhoTag)),
   _isData(pset.getUntrackedParameter<bool>("isData"))  
 {
 
@@ -107,10 +108,26 @@ TreeProducer_AOD::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   iEvent.getByToken(phoMediumIdMapToken_,medium_id_decisions);
   iEvent.getByToken(phoTightIdMapToken_ ,tight_id_decisions);
   
+  edm::Handle<double> H_rho;
+  iEvent.getByToken(_pfRhoToken, H_rho);
+  _pfrho = *H_rho;
+  
   edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
   iSetup.get<JetCorrectionsRecord>().get("AK4PFchs",JetCorParColl); 
   JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+  JetCorrectorParameters const & JetCorParL1 = (*JetCorParColl)["L1FastJet"];
+  JetCorrectorParameters const & JetCorParL2 = (*JetCorParColl)["L2Relative"];
+  JetCorrectorParameters const & JetCorParL3 = (*JetCorParColl)["L3Absolute"];
+  JetCorrectorParameters const & JetCorParL2L3 = (*JetCorParColl)["L2L3Residual"];
   JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar);
+  
+  vector<JetCorrectorParameters> vecL1L2L3Res;
+  vecL1L2L3Res.push_back(JetCorParL1);
+  vecL1L2L3Res.push_back(JetCorParL2);
+  vecL1L2L3Res.push_back(JetCorParL3);
+  vecL1L2L3Res.push_back(JetCorParL2L3);
+  
+  FactorizedJetCorrector *jecCorrector =  new FactorizedJetCorrector(vecL1L2L3Res);
 
   // Check validity
   if(!H_trig.isValid()) {
@@ -206,8 +223,46 @@ TreeProducer_AOD::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   // only count jets with pt > 20 GeV
   //
   UInt_t iJ=0;
-  //
+  
+  vector<reco::PFJet> corrected_PFJet;
+  typedef math::XYZTLorentzVector LorentzVector;
+  
   for (vector<reco::PFJet>::const_iterator theJet = H_pfjets->begin(); theJet != H_pfjets->end(); ++theJet){
+    
+    ///JEC
+    jecCorrector->setJetPt(theJet->pt());
+    jecCorrector->setJetEta(theJet->eta());
+    jecCorrector->setJetA(theJet->jetArea());
+    jecCorrector->setRho(_pfrho);
+
+    double corFactor = jecCorrector->getCorrection();
+    LorentzVector uncJet;
+    uncJet.SetPxPyPzE(theJet->px(), theJet->py(), theJet->pz(), theJet->energy());
+    const LorentzVector correctedP4 =  uncJet * corFactor;
+    //reco::PFJet tmpJet(correctedP4, theJet->vertex(), theJet->getSpecific(), theJet->getJetConstituents());
+    reco::PFJet::Specific spec = theJet->getSpecific();
+
+    spec.mChargedHadronEnergy *= corFactor;
+    spec.mNeutralHadronEnergy *= corFactor;
+    spec.mPhotonEnergy *= corFactor;
+    spec.mElectronEnergy *= corFactor;
+    spec.mMuonEnergy *= corFactor;
+    spec.mHFHadronEnergy *= corFactor;
+    spec.mHFEMEnergy *= corFactor;
+
+    reco::PFJet tmpJet(correctedP4, theJet->vertex(), spec, theJet->getJetConstituents());
+    corrected_PFJet.push_back( tmpJet );
+
+  }
+
+  ///Sort corrected jets by pt
+  sort(corrected_PFJet.begin(), corrected_PFJet.end(), [](const reco::PFJet & a, const reco::PFJet & b)
+  {
+      return a.pt() > b.pt();
+  });
+
+  for (vector<reco::PFJet>::const_iterator theJet = corrected_PFJet.begin(); theJet != corrected_PFJet.end(); ++theJet){
+    
 		if (theJet->pt() > 20){
 			//Area
 			_jet_area[iJ] = theJet->jetArea();  
@@ -330,6 +385,9 @@ TreeProducer_AOD::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if (filterPathsMap[filterPathsVector[5]] != -1 && H_METfilter->accept(filterPathsMap[filterPathsVector[5]])) _beamhaloFlag = 1;
 
   _tree->Fill();
+  
+  delete jecUnc;
+  delete jecCorrector;
 }
 
 
