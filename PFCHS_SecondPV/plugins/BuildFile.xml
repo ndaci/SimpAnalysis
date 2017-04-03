@@ -1,0 +1,12 @@
+<library   file="*.cc" name="SimpAnalysisPFCHS_SecondPV">
+<use name="FWCore/ServiceRegistry"/>
+<use name="CondFormats/DataRecord"/>
+<use name="SimpAnalysis/PFCHS_SecondPV"/>
+<use name="DataFormats/HepMCCandidate"/>
+<use name="DataFormats/ParticleFlowCandidate"/>
+<use name="DataFormats/JetReco"/>
+<use name="RecoJets/JetAlgorithms"/>
+<flags LDFLAGS="-fPIC"/>
+<flags EDM_PLUGIN="1"/>
+<flags ADD_SUBDIR="1"/>
+</library>
