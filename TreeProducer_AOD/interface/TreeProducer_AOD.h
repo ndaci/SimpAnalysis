@@ -42,9 +42,14 @@
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/METReco/interface/PFMET.h"
 #include "DataFormats/EgammaCandidates/interface/Photon.h"
+#include "DataFormats/EgammaCandidates/interface/PhotonCore.h"
+#include "DataFormats/EgammaCandidates/interface/ConversionFwd.h"
+#include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
+#include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/L1Trigger/interface/L1EtMissParticle.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+#include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
@@ -56,7 +61,7 @@ using namespace std;
 int verbose=1;
 const UInt_t nJ=8; // #jets
 const UInt_t nGJ=4; // #genjets
-const UInt_t nV=3; // #vertices
+const UInt_t nV=10; // #vertices
 const UInt_t nT=10; // #tracks
 const UInt_t nP=4; // #photons
 
@@ -101,6 +106,8 @@ class TreeProducer_AOD : public edm::one::EDAnalyzer<edm::one::SharedResources,e
 	edm::InputTag _phoMediumIdMapTag;
 	edm::InputTag _phoTightIdMapTag;
   edm::InputTag _srcPFRhoTag;
+  edm::InputTag _tagBS;
+  edm::InputTag _tagCONV;
   edm::EDGetTokenT<edm::TriggerResults> _trigResultsToken;
 //   edm::EDGetTokenT<edm::TriggerResults> _trigResultsToken2;
 //   edm::EDGetTokenT<pat::PackedTriggerPrescales> _triggerPrescalesToken;
@@ -117,8 +124,17 @@ class TreeProducer_AOD : public edm::one::EDAnalyzer<edm::one::SharedResources,e
 	edm::EDGetTokenT<edm::ValueMap<bool> > phoTightIdMapToken_;
 	edm::EDGetTokenT<double> _pfRhoToken;
   
-	bool _isData;
+  bool _isData;
+  
+  HLTConfigProvider hltConfig_;
+  HLTPrescaleProvider hltPrescale_;
+  
+  edm::EDGetTokenT<reco::ConversionCollection> tokenCOV;
+  edm::EDGetTokenT<reco::BeamSpot> tokenBS;
 
+  std::vector<std::string> triggerNames_;
+  std::vector<unsigned int> triggerIndex_;
+  
 //   GlobalPoint vertexPosition;
   
   // Tree and its branches
@@ -143,6 +159,7 @@ class TreeProducer_AOD : public edm::one::EDAnalyzer<edm::one::SharedResources,e
   double _jet_eta[nJ], _jet_phi[nJ], _jet_pt[nJ], _jet_e[nJ], _jet_m[nJ];
   double _jet_efrac_ne_Had[nJ], _jet_efrac_ne_EM[nJ]; // neutral energy fractions
   double _jet_efrac_ch_Had[nJ], _jet_efrac_ch_EM[nJ], _jet_efrac_ch_Mu[nJ]; // charged energy fractions
+  double _jet_efrac_photon[nJ];
   double _jet_unc[nJ], _jet_ptCor_up[nJ], _jet_ptCor_down[nJ]; //JEC uncertainties
   
   // GenJets
@@ -155,6 +172,8 @@ class TreeProducer_AOD : public edm::one::EDAnalyzer<edm::one::SharedResources,e
   int _nPhoton_stored;
   double _photon_pt[nP], _photon_eta[nP], _photon_phi[nP];
 	int _passLooseId[nP], _passMediumId[nP], _passTightId[nP];
+  int pc_matched[nP];
+  double convtracks_pt[nP];
 
   // MET
   double _MET, _MET_phi;
@@ -173,7 +192,6 @@ class TreeProducer_AOD : public edm::one::EDAnalyzer<edm::one::SharedResources,e
   
 //PFRho
   double _pfrho;
-  
 };
 
 namespace reco {

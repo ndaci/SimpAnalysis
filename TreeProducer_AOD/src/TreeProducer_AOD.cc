@@ -19,10 +19,12 @@ TreeProducer_AOD::TreeProducer_AOD(const edm::ParameterSet& pset):
   _phoMediumIdMapTag(pset.getParameter<edm::InputTag>("phoMediumIdMap")),
   _phoTightIdMapTag(pset.getParameter<edm::InputTag>("phoTightIdMap")),
   _srcPFRhoTag(pset.getParameter<edm::InputTag>("pfRho")),
-  
+  _tagBS(pset.getParameter<edm::InputTag>("BeamSpot")),
+  _tagCONV(pset.getParameter<edm::InputTag>("Conversions")),
+
   _trigResultsToken(consumes<edm::TriggerResults>(_trigResultsTag)),
 //   _trigResultsToken2(consumes<edm::TriggerResults>(_trigResultsTag2)),
-//   _triggerPrescalesToken(consumes<pat::PackedTriggerPrescales>(_prescalesTag)),
+//   _triggerPrescalesToken(consumes<edm::TriggerResults>(_prescalesTag)),
 //   _triggerPrescalesToken2(consumes<pat::PackedTriggerPrescales>(_prescalesTag2)),
   _METfilterToken(consumes<edm::TriggerResults>(_METfilterTag)),
   _pfjetCollectionToken(consumes<vector<reco::PFJet> >(_pfjetCollectionTag)),
@@ -35,9 +37,12 @@ TreeProducer_AOD::TreeProducer_AOD(const edm::ParameterSet& pset):
   phoMediumIdMapToken_(consumes<edm::ValueMap<bool> >(_phoMediumIdMapTag)),
 	phoTightIdMapToken_(consumes<edm::ValueMap<bool> >(_phoTightIdMapTag)),
   _pfRhoToken(consumes<double >(_srcPFRhoTag)),
-  _isData(pset.getUntrackedParameter<bool>("isData"))  
+  _isData(pset.getUntrackedParameter<bool>("isData")),
+   hltPrescale_(pset, consumesCollector(), *this),
+  tokenCOV(consumes<reco::ConversionCollection>(_tagCONV)),
+  tokenBS(consumes<reco::BeamSpot>(_tagBS))
 {
-
+  triggerNames_ = pset.getParameter<std::vector<std::string> > ("triggerName");
 }
 
 
@@ -77,7 +82,8 @@ TreeProducer_AOD::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 // 	}
   iEvent.getByToken(_trigResultsToken, H_trig);
 	
-//   edm::Handle<pat::PackedTriggerPrescales> H_prescale, H_prescale1, H_prescale2;
+//   edm::Handle<pat::PackedTriggerPrescales> H_prescale;//, H_prescale1, H_prescale2;
+//   iEvent.getByToken(_triggerPrescalesToken, H_prescale);
 //   try {iEvent.getByToken(_triggerPrescalesToken, H_prescale1);} catch (...) {;}
 //   try {iEvent.getByToken(_triggerPrescalesToken2, H_prescale2);} catch (...) {;}
 //   if(H_prescale1.isValid()) H_prescale = H_prescale1;
@@ -173,7 +179,6 @@ TreeProducer_AOD::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     _vtx_normalizedChi2[vtx_counter] = PV->normalizedChi2();
     _vtx_ndof[vtx_counter] = PV->ndof();
     _vtx_nTracks[vtx_counter] = PV->tracksSize();
-//     _vtx_nTracks[vtx_counter] = PV->nTracks();
     _vtx_d0[vtx_counter] = PV->position().Rho();
     _vtx_x[vtx_counter] = PV->x();
     _vtx_y[vtx_counter] = PV->y();
@@ -251,6 +256,7 @@ TreeProducer_AOD::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     spec.mHFEMEnergy *= corFactor;
 
     reco::PFJet tmpJet(correctedP4, theJet->vertex(), spec, theJet->getJetConstituents());
+    tmpJet.setJetArea(theJet->jetArea());
     corrected_PFJet.push_back( tmpJet );
 
   }
@@ -285,6 +291,7 @@ TreeProducer_AOD::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			_jet_efrac_ch_Had[iJ] = theJet->chargedHadronEnergyFraction();
 			_jet_efrac_ch_EM[ iJ] = theJet->chargedEmEnergyFraction();
 			_jet_efrac_ch_Mu[ iJ] = theJet->chargedMuEnergyFraction();
+      _jet_efrac_photon[iJ] = theJet->photonEnergyFraction();
 
 			// Multiplicities
 			_jet_mult_ch[iJ] = theJet->chargedMultiplicity();
@@ -344,6 +351,10 @@ TreeProducer_AOD::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   _MET_phi = met.phi();
 	
 	// PHOTONS//
+  edm::Handle<reco::ConversionCollection> hConversions;
+  edm::Handle<reco::BeamSpot> bsHandle;
+  iEvent.getByToken(tokenCOV, hConversions);
+  
 	UInt_t iP=0;
 // 	for (vector<reco::Photon>::const_iterator thePhoton = H_photon->begin(); thePhoton != H_photon->end(); ++thePhoton){
   for (size_t i = 0; i < H_photon->size(); ++i){
@@ -357,12 +368,39 @@ TreeProducer_AOD::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     _passLooseId[iP] = ( (int)isPassLoose );
     _passMediumId[iP] = ( (int)isPassMedium);
 		_passTightId[iP] = ( (int)isPassTight );
+    bool matched = false;
+    double total_convs_pt = 0;
+    for (reco::ConversionCollection::const_iterator conv = hConversions->begin(); conv!= hConversions->end(); ++conv) {
+      if(conv->EoverP()>2.5 or conv->EoverP()<0.5) continue;
+      math::XYZVectorF rpm = conv->pairMomentum();
+      double pt = 0;
+      std::vector<edm::RefToBase<reco::Track> > reftrack = conv->tracks();
+      for(unsigned int tr=0; tr<reftrack.size(); tr++){
+        pt+=reftrack[tr]->pt();
+      }
+      if(deltaR(thePhoton->eta(), thePhoton->phi(), rpm.eta(), rpm.phi()) < 0.2) {
+        matched = true;
+        total_convs_pt += pt;
+      }
+    }
+
+    if(matched) {
+      pc_matched[iP] = 1;
+      convtracks_pt[iP] = total_convs_pt;
+    }
+    else{
+      pc_matched[iP] = 0;
+      convtracks_pt[iP] = 0;
+    }
 		iP++;
 		if (iP>=nP) break;
 	}
   _nPhoton_stored = nP;
   
   //TRIGGER//
+  
+//   unsigned int psValueCombo;
+  
   if (triggerPathsMap[triggerPathsVector[0]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[0]])) _dijet_170_0p1 = 1;
   if (triggerPathsMap[triggerPathsVector[1]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[1]])) _dijet_220_0p3 = 1;
   if (triggerPathsMap[triggerPathsVector[2]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[2]])) _dijet_330_0p5 = 1;
@@ -370,11 +408,37 @@ TreeProducer_AOD::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if (triggerPathsMap[triggerPathsVector[4]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[4]])) _dijet_170 = 1;
   if (triggerPathsMap[triggerPathsVector[5]] != -1 && H_trig->accept(triggerPathsMap[triggerPathsVector[5]])) _singlejet_170_0p1 = 1;
   //prescales
-//   const edm::TriggerNames &trignames = iEvent.triggerNames(*H_trig);
-// 	for (size_t i = 0; i < H_trig->size(); i++) {
-// 			if (trignames.triggerName(i).find("HLT_DiCentralPFJet170_v") != string::npos) _pswgt_dijet_170 = H_prescale->getPrescaleForIndex(i);
-// 			if (trignames.triggerName(i).find("HLT_SingleCentralPFJet170_CFMax0p1_v") != string::npos) _pswgt_singlejet_170_0p1 = H_prescale->getPrescaleForIndex(i);
-// 	}
+ 
+  // sanity check
+  assert(H_trig->size() == hltConfig_.size());
+  //------ loop over all trigger names ---------
+  for(unsigned itrig=0;itrig<triggerNames_.size() ;itrig++) {
+    int preL1(-1);
+    int preHLT(-1);
+
+    if (triggerIndex_[itrig] < hltConfig_.size()) {
+      ///In detail get prescale info from hltConfig_
+      std::pair<std::vector<std::pair<std::string,int> >,int> detailedPrescaleInfo = hltPrescale_.prescaleValuesInDetail(iEvent, iSetup, triggerNames_[itrig]);
+      preHLT = detailedPrescaleInfo.second ;
+
+      // save l1 prescale values in standalone vector
+      std::vector <int> l1prescalevals;
+      for( size_t varind = 0; varind < detailedPrescaleInfo.first.size(); varind++ ){
+        l1prescalevals.push_back(detailedPrescaleInfo.first.at(varind).second);
+      }
+
+      //find and save minimum l1 prescale of any ORed L1 that seeds the HLT
+      std::vector<int>::iterator result = std::min_element(std::begin(l1prescalevals), std::end(l1prescalevals));
+      size_t minind = std::distance(std::begin(l1prescalevals), result);
+      // sometimes there are no L1s associated with a HLT. In that case, this branch stores -1 for the l1prescale
+      preL1 = minind < l1prescalevals.size() ? l1prescalevals.at(minind) : -1 ;//commented for 76X
+
+      //prescales
+      if(triggerNames_[itrig].find("HLT_DiCentralPFJet170_v") != std::string::npos)   _pswgt_dijet_170 = preL1 * preHLT;
+      if(triggerNames_[itrig].find("HLT_SingleCentralPFJet170_CFMax0p1_v") != std::string::npos)   _pswgt_singlejet_170_0p1 = preL1 * preHLT;
+
+    }
+  }
 
   //MET filters//
   if (filterPathsMap[filterPathsVector[0]] != -1 && H_METfilter->accept(filterPathsMap[filterPathsVector[0]])) _HBHENoiseFlag = 1;
@@ -453,7 +517,8 @@ TreeProducer_AOD::beginJob()
   _tree->Branch("jet_pt",&_jet_pt,"jet_pt[nJet_stored]/D");
   _tree->Branch("jet_e",&_jet_e,"jet_e[nJet_stored]/D");
   _tree->Branch("jet_m",&_jet_m,"jet_m[nJet_stored]/D");
-  //
+  _tree->Branch("jet_efrac_photon",  &_jet_efrac_photon,  "jet_efrac_photon[nJet_stored]/D" );
+  
   _tree->Branch("jet_mult_ch",&_jet_mult_ch,"jet_mult_ch[nJet_stored]/I");
   _tree->Branch("jet_mult_mu",&_jet_mult_mu,"jet_mult_mu[nJet_stored]/I");
   _tree->Branch("jet_mult_ne",&_jet_mult_ne,"jet_mult_ne[nJet_stored]/I");
@@ -493,6 +558,8 @@ TreeProducer_AOD::beginJob()
   _tree->Branch("photon_passLooseId",&_passLooseId, "photon_passLooseId[nPhoton_stored]/I");
   _tree->Branch("photon_passMediumId",&_passMediumId, "photon_passLooseId[nPhoton_stored]/I");
   _tree->Branch("photon_passTightId",&_passTightId, "photon_passLooseId[nPhoton_stored]/I");
+  _tree->Branch("pc_matched",&pc_matched,"pc_matched[nPhoton_stored]/I");
+  _tree->Branch("convtracks_pt",&convtracks_pt,"convtracks_pt[nPhoton_stored]/D");
   
   //MET
   _tree->Branch("MET", &_MET, "MET/D");
@@ -538,9 +605,8 @@ TreeProducer_AOD::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
   triggerPathsVector.push_back("HLT_DiCentralPFJet170_v");
   triggerPathsVector.push_back("HLT_SingleCentralPFJet170_CFMax0p1_v");
   
-  HLTConfigProvider hltConfig;
   bool changedConfig = false;
-  hltConfig.init(iRun, iSetup, _trigResultsTag.process(), changedConfig);
+  hltConfig_.init(iRun, iSetup, _trigResultsTag.process(), changedConfig);
 
   for (size_t i = 0; i < triggerPathsVector.size(); i++) {
     triggerPathsMap[triggerPathsVector[i]] = -1;
@@ -548,8 +614,8 @@ TreeProducer_AOD::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
   
   for(size_t i = 0; i < triggerPathsVector.size(); i++){
     TPRegexp pattern(triggerPathsVector[i]);
-    for(size_t j = 0; j < hltConfig.triggerNames().size(); j++){
-      std::string pathName = hltConfig.triggerNames()[j];
+    for(size_t j = 0; j < hltConfig_.triggerNames().size(); j++){
+      std::string pathName = hltConfig_.triggerNames()[j];
       if(TString(pathName).Contains(pattern)){
         triggerPathsMap[triggerPathsVector[i]] = j;
       }
@@ -580,6 +646,33 @@ TreeProducer_AOD::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
       }
     }
   }
+  
+  bool changed(true);
+  if (hltConfig_.init(iRun,iSetup,"HLT",changed) && hltPrescale_.init(iRun, iSetup, "HLT", changed) ) {
+    if (changed) {
+      // check if trigger names in (new) config
+      cout<<"New trigger menu found !!!"<<endl;
+      triggerIndex_.clear();
+      const unsigned int n(hltConfig_.size());
+      for(unsigned itrig=0;itrig<triggerNames_.size();itrig++) {
+        triggerIndex_.push_back(hltConfig_.triggerIndex(triggerNames_[itrig]));
+        cout<<triggerNames_[itrig]<<" "<<triggerIndex_[itrig]<<" ";
+        if (triggerIndex_[itrig] >= n)
+          cout<<"does not exist in the current menu"<<endl;
+        else
+          cout<<"exists"<<endl;
+      }
+      cout << "Available TriggerNames are: " << endl;
+      if (true)
+        hltConfig_.dump("Triggers");
+    }
+  }
+  else {
+    cout << "ProcessedTreeProducerBTag::analyze:"
+         << " config extraction failure with process name "
+         << "HLT" << endl;
+  }
+  
 }
 
 // ------------ method called when ending the processing of a run  ------------
@@ -722,6 +815,8 @@ TreeProducer_AOD::Init()
 		_passLooseId[i] = 0;
 		_passMediumId[i] = 0;
 		_passTightId[i] = 0;
+    pc_matched[i] = 0;
+    convtracks_pt[i] = 0;
 	}
 }
 

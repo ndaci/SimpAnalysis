@@ -4,8 +4,8 @@ tree = cms.EDAnalyzer(
     'TreeProducer_AOD',
     triggerResults   = cms.InputTag("TriggerResults", "", "HLT"),
     #triggerResults2  = cms.InputTag("TriggerResults", "", "HLT2"),
-    prescales        = cms.InputTag("patTrigger", "", "RECO"), #not found
-    prescales2        = cms.InputTag("patTrigger", "", "PAT"), #not found
+    #prescales        = cms.InputTag("patTrigger", "", "RECO"), #not found
+    #prescales2        = cms.InputTag("patTrigger", "", "PAT"), #not found
     METfilter        = cms.InputTag("TriggerResults", "", "RECO"),
     pfjetCollection  = cms.InputTag("ak4PFJetsCHS"),
     genjetCollection  = cms.InputTag("ak4GenJetsNoNu", "", "HLT"),
@@ -17,5 +17,8 @@ tree = cms.EDAnalyzer(
     phoLooseIdMap = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Spring16-V2p2-loose"),
     phoMediumIdMap = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Spring16-V2p2-medium"),
     phoTightIdMap = cms.InputTag("egmPhotonIDs:cutBasedPhotonID-Spring16-V2p2-tight"), 
-    pfRho = cms.InputTag("fixedGridRhoFastjetAll")
+    pfRho = cms.InputTag("fixedGridRhoFastjetAll"),
+    triggerName = cms.vstring('HLT_DiCentralPFJet170_v1'),
+    BeamSpot = cms.InputTag("offlineBeamSpot"),
+    Conversions = cms.InputTag("conversions")
 )
