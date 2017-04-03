@@ -9,12 +9,14 @@ process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_TrancheIV_v8', '')
+process.load("FWCore.MessageService.MessageLogger_cfi")
+
+process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-      #'file:pickevents_HT-1000To1500_ChFMax0p04_AODSIM.root')
 										'/store/mc/RunIISummer16DR80Premix/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/AODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/110000/00086432-1CB2-E611-9E62-485B39897219.root')
 )
 
@@ -68,7 +70,7 @@ for idmod in my_id_modules:
 # Add an ESPrefer to override JEC that might be available from the global tag
 #process.es_prefer_jec = cms.ESPrefer('PoolDBESSource', 'jec')
 
-####Correct ak4PFCHS Jets
+###Correct ak4PFCHS Jets
 #process.load("JetMETCorrections.Configuration.CorrectedJetProducers_cff")
 #process.load("JetMETCorrections.Configuration.JetCorrectors_cff")
 #from JetMETCorrections.Configuration.JetCorrectors_cff import ak4PFCHSL1FastL2L3CorrectorChain
@@ -113,28 +115,33 @@ process.ak4PFCHSJetsSPV = ak4PFJets.clone(
     
 # Tree producer
 process.load("SimpAnalysis.TreeProducer_AOD.Treeproducer_AOD_cfi") 
-#process.tree.triggerResults = cms.InputTag("TriggerResults", "", "HLT2") #for XXTo4J
+process.tree.triggerResults = cms.InputTag("TriggerResults", "", "HLT2") #for XXTo4J
 
 process.treeSPV = process.tree.clone()
+#process.treeSPV.pfjetCollection = cms.InputTag("ak4SPVPFCHSJetsCorr")
 process.treeSPV.pfjetCollection = cms.InputTag("ak4PFCHSJetsSPV")
 process.treeSPV.vertexCollection = cms.InputTag("SPVgoodOfflinePrimaryVertices")
 process.treeSPV.isData = cms.untracked.bool(False)
 #############################
 process.treeCorr = process.tree.clone()
+#process.treeCorr.pfjetCollection = cms.InputTag("ak4PFCHSJetsCorr")
 process.treeCorr.pfjetCollection = cms.InputTag("ak4PFJetsCHS")
 process.treeCorr.pfRho = cms.InputTag("fixedGridRhoFastjetAll")
 process.treeCorr.isData = cms.untracked.bool(False)
 
 process.p = cms.Path(process.egmPhotonIDSequence                          
+                    #+process.ak4PFCHSL1FastL2L3CorrectorChain
+                    #+process.ak4PFCHSJetsCorr
                     +process.treeCorr
                     +process.pfchsSecondPV
                     +process.SPVgoodOfflinePrimaryVertices
                     +process.pfPileUpSPV
                     +process.pfNoPileUpSPV
                     +process.ak4PFCHSJetsSPV
+                    #+process.ak4SPVPFCHSJetsCorr
                     +process.treeSPV)
 
 # Output
 process.TFileService = cms.Service('TFileService',
-    fileName = cms.string('QCD_PUMoriond17_AOD_pickevents_HT-1000To1500.root')
+    fileName = cms.string('XXTo4J_AOD.root')
 )

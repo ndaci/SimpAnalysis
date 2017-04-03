@@ -8,14 +8,13 @@ process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_TrancheIV_v8', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '80X_dataRun2_2016SeptRepro_v7', '')
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-      #'file:pickevents_HT-1000To1500_ChFMax0p04_AODSIM.root')
-										'/store/mc/RunIISummer16DR80Premix/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/AODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6_ext1-v1/110000/00086432-1CB2-E611-9E62-485B39897219.root')
+										'/store/data/Run2016G/JetHT/AOD/23Sep2016-v1/100000/0006CE1E-9986-E611-8DFB-6C3BE5B5C0B0.root')
 )
 
 #process.triggerSelection = cms.EDFilter( "TriggerResultsFilter",
@@ -34,16 +33,16 @@ process.source = cms.Source("PoolSource",
     #throw = cms.bool( True )
 #)
 
-#import HLTrigger.HLTfilters.hltHighLevel_cfi
-#process.triggerSelection =  HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone(
-    #HLTPaths = ['HLT_DiCentralPFJet170_CFMax0p1_v*',
-      #'HLT_DiCentralPFJet220_CFMax0p3_v*',
-      #'HLT_DiCentralPFJet330_CFMax0p5_v*',
-      #'HLT_DiCentralPFJet430_v*',
-      #'HLT_DiCentralPFJet170_v*',
-      #'HLT_SingleCentralPFJet170_CFMax0p1_v*'],
-    #throw = False
-#)
+import HLTrigger.HLTfilters.hltHighLevel_cfi
+process.triggerSelection =  HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.clone(
+    HLTPaths = ['HLT_DiCentralPFJet170_CFMax0p1_v*',
+      'HLT_DiCentralPFJet220_CFMax0p3_v*',
+      'HLT_DiCentralPFJet330_CFMax0p5_v*',
+      'HLT_DiCentralPFJet430_v*',
+      'HLT_DiCentralPFJet170_v*',
+      'HLT_SingleCentralPFJet170_CFMax0p1_v*'],
+    throw = False
+)
 
 from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
 dataFormat = DataFormat.AOD
@@ -114,18 +113,22 @@ process.ak4PFCHSJetsSPV = ak4PFJets.clone(
 # Tree producer
 process.load("SimpAnalysis.TreeProducer_AOD.Treeproducer_AOD_cfi") 
 #process.tree.triggerResults = cms.InputTag("TriggerResults", "", "HLT2") #for XXTo4J
+process.tree.triggerName = cms.vstring(
+"HLT_DiCentralPFJet170_v1","HLT_DiCentralPFJet170_v2","HLT_DiCentralPFJet170_v3", "HLT_DiCentralPFJet170_v4", "HLT_DiCentralPFJet170_v5",
+"HLT_SingleCentralPFJet170_CFMax0p1_v1", "HLT_SingleCentralPFJet170_CFMax0p1_v1", "HLT_SingleCentralPFJet170_CFMax0p1_v3", "HLT_SingleCentralPFJet170_CFMax0p1_v4", "HLT_SingleCentralPFJet170_CFMax0p1_v5")
 
 process.treeSPV = process.tree.clone()
 process.treeSPV.pfjetCollection = cms.InputTag("ak4PFCHSJetsSPV")
 process.treeSPV.vertexCollection = cms.InputTag("SPVgoodOfflinePrimaryVertices")
-process.treeSPV.isData = cms.untracked.bool(False)
+process.treeSPV.isData = cms.untracked.bool(True)
 #############################
 process.treeCorr = process.tree.clone()
 process.treeCorr.pfjetCollection = cms.InputTag("ak4PFJetsCHS")
 process.treeCorr.pfRho = cms.InputTag("fixedGridRhoFastjetAll")
-process.treeCorr.isData = cms.untracked.bool(False)
+process.treeCorr.isData = cms.untracked.bool(True)
 
-process.p = cms.Path(process.egmPhotonIDSequence                          
+process.p = cms.Path(process.triggerSelection
+                    +process.egmPhotonIDSequence                          
                     +process.treeCorr
                     +process.pfchsSecondPV
                     +process.SPVgoodOfflinePrimaryVertices
@@ -136,5 +139,5 @@ process.p = cms.Path(process.egmPhotonIDSequence
 
 # Output
 process.TFileService = cms.Service('TFileService',
-    fileName = cms.string('QCD_PUMoriond17_AOD_pickevents_HT-1000To1500.root')
+    fileName = cms.string('Data_AOD_test.root')
 )
