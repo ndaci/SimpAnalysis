@@ -200,23 +200,43 @@ TreeProducer_AOD::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	
   UInt_t iT=0;  
 	for (size_t i = 0; i < trackRef.size(); i++) {
-		_track_purity[iT] = trackRef[i]->highPurity;
-		_track_Nhits[iT] = trackRef[i]->numberOfValidHits();
-		_track_NpixHits[iT] = trackRef[i]->hitPattern().numberOfValidPixelHits();
-		if (trackRef[i]->vz() == 0) _track_fromPV[iT] = 1;
-		else _track_fromPV[iT] = 0;
-		_track_pt[iT] = trackRef[i]->pt();
-		_track_eta[iT] = trackRef[i]->eta();
-		_track_phi[iT] = trackRef[i]->phi();
-		_track_normalizedChi2[iT] = trackRef[i]->normalizedChi2();
-		_track_ndof[iT] = trackRef[i]->ndof();
-		_track_ptError[iT] = trackRef[i]->ptError();
-		_track_dzError[iT] = trackRef[i]->dzError();
-		_track_dz[iT] = trackRef[i]->dz();
-		_track_dxy[iT] = trackRef[i]->dxy();
-		_track_d0[iT] = trackRef[i]->d0();
+    if (iT < nT){
+      _track_purity[iT] = trackRef[i]->highPurity;
+      _track_Nhits[iT] = trackRef[i]->numberOfValidHits();
+      _track_NpixHits[iT] = trackRef[i]->hitPattern().numberOfValidPixelHits();
+      if (trackRef[i]->vz() == 0) _track_fromPV[iT] = 1;
+      else _track_fromPV[iT] = 0;
+      _track_pt[iT] = trackRef[i]->pt();
+      _track_eta[iT] = trackRef[i]->eta();
+      _track_phi[iT] = trackRef[i]->phi();
+      _track_normalizedChi2[iT] = trackRef[i]->normalizedChi2();
+      _track_ndof[iT] = trackRef[i]->ndof();
+      _track_ptError[iT] = trackRef[i]->ptError();
+      _track_dzError[iT] = trackRef[i]->dzError();
+      _track_dz[iT] = trackRef[i]->dz();
+      _track_dxy[iT] = trackRef[i]->dxy();
+      _track_d0[iT] = trackRef[i]->d0();
+    }
+    
+    double deltaz = 99;
+    UInt_t vtx_index = 0;
+    UInt_t index = 0;
+    
+    for( std::vector<reco::Vertex>::const_iterator PV = sortedVertices.begin(); PV != sortedVertices.end(); ++PV){
+      double deltaz_new = fabs(trackRef[i]->dz({0,0,0}) - PV->z());
+      if (deltaz_new < deltaz && deltaz_new < 0.5){
+        deltaz = deltaz_new;
+        vtx_index = index;
+      }
+      index++;
+    }
+    
+    if (deltaz != 99 && vtx_index < nV){
+      _vtx_sumpttracks[vtx_index] += trackRef[i]->pt();
+      _vtx_nTracks_dz[vtx_index]++;
+    }
+    
 		iT++ ;
-    if(iT>=nT) break;
 	}
 		
   _nTrack = iT;
@@ -743,6 +763,8 @@ TreeProducer_AOD::Init()
     _vtx_x[iv] = 0.;
     _vtx_y[iv] = 0.;
     _vtx_z[iv] = 0.;
+    _vtx_sumpttracks[iv] = 0.;
+    _vtx_nTracks_dz[iv] = 0.;
   }
   
   //Tracks

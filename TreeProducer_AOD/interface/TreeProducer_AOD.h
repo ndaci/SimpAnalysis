@@ -144,9 +144,10 @@ class TreeProducer_AOD : public edm::one::EDAnalyzer<edm::one::SharedResources,e
   int _nEvent, _nRun, _nLumi, _nJet, _nJet_stored, _nGenJet, _nGenJet_stored, _nTrack, _nTrack_stored;
 
   // Vertices
-  int _vtx_N, _vtx_N_stored, _vtx_ndof[nV], _vtx_nTracks[nV];
+  int _vtx_N, _vtx_N_stored, _vtx_ndof[nV], _vtx_nTracks[nV], _vtx_nTracks_dz[nV];
   double _vtx_x[nV], _vtx_y[nV], _vtx_z[nV];
   double _vtx_normalizedChi2[nV], _vtx_d0[nV];
+  double _vtx_sumpttracks[nV];
 	
 	//Tracks
 	int _track_fromPV[nT], _track_Nhits[nT], _track_NpixHits[nT], _track_purity[nT], _track_ndof[nT];
