@@ -13,6 +13,8 @@
 #include "lists/list_JetHT_rereco_2016E.h"
 #include "lists/list_JetHT_rereco_2016F.h"
 #include "lists/list_JetHT_rereco_2016G.h"
+#include "lists/list_JetHT_rereco_2016Hv2.h"
+#include "lists/list_JetHT_rereco_2016Hv3.h"
 
 void SIMP_Data_cutflow(){
 	
@@ -23,8 +25,10 @@ void SIMP_Data_cutflow(){
 	list_JetHT_rereco_2016E(chain);
 	list_JetHT_rereco_2016F(chain);
 	list_JetHT_rereco_2016G(chain);
+	list_JetHT_rereco_2016Hv2(chain);
+	list_JetHT_rereco_2016Hv3(chain);
   
-	TFile* output = new TFile("Data_Rereco_cutflow.root", "RECREATE");
+	TFile* output = new TFile("Data_Rereco_cutflow_full2016.root", "RECREATE");
 	
 	int nJet, dijet_170, dijet_170_0p1, dijet_220_0p3, dijet_330_0p5, dijet_430;
   double jet_pt[8], jet_eta[8], jet_phi[8], jet_efrac_ch_Had[8], jet_efrac_ch_EM[8], jet_efrac_ch_Mu[8], CHEF_jet[8], EMF_jet[8];
@@ -39,19 +43,20 @@ void SIMP_Data_cutflow(){
 	double passed_npix = 0;
 	double passed_photonveto = 0;
 	double passed_pt = 0;
-	double passed[11] = {0,0,0,0,0,0,0,0,0,0,0};
-	double chf_cuts[11] = {0.5, 0.4, 0.3, 0.2, 0.15, 0.1, 0.05, 0.04, 0.03, 0.02, 0.01};
+	double passed[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+	double chf_cuts[12] = {0.5, 0.4, 0.3, 0.2, 0.15, 0.1, 0.07, 0.05, 0.04, 0.03, 0.02, 0.01};
   
   TH1D* pt_eff = new TH1D("pt_eff", "passed pt cuts", 100, 200, 300);
   TH1D* eta_eff = new TH1D("eta_eff", "passed eta cuts", 100, 0, 5);
   TH1D* deltaphi_eff = new TH1D("deltaphi_eff", "passed #Delta#phi cut", 100, 0, 5);
   TH1D* nPix_eff = new TH1D("nPix_eff", "passed nPixHits cut", 10, 0, 10);
   TH1D* photonVeto_eff = new TH1D("photonVeto_eff", "passed photon veto", 10, 0, 1);
-  TH1D* ChF_eff = new TH1D("ChF_eff", "passed ChF cuts", 100, 0, 0.5);
+  TH1D* ChF_eff_1leg = new TH1D("ChF_eff_1leg", "passed ChF cuts", 100, 0, 0.5);
+  TH1D* ChF_eff_2leg = new TH1D("ChF_eff_2leg", "passed ChF cuts", 100, 0, 0.5);
   
-	TFile* efficiencies = new TFile("eff2D_photonVeto_Data_Rereco.root", "READ");
-	TH2D* eff_histos[11];
-	for(int j = 0; j < 11; j++){
+	TFile* efficiencies = new TFile("eff2D_Data_Rereco_full2016.root", "READ");
+	TH2D* eff_histos[12];
+	for(int j = 0; j < 12; j++){
 		std::ostringstream strs;
 		double dbl = chf_cuts[j];
 		strs << dbl;
@@ -90,6 +95,7 @@ void SIMP_Data_cutflow(){
   Int_t Nentries = chain->GetEntries(); 
   std::cout<<"Processing "<<Nentries<<"entries"<<std::endl;
   for(Int_t entry = 0; entry < Nentries; ++entry){
+    if(entry%1000000==0) std::cout<<"processed "<<entry/1000000<<"M events"<<std::endl;
     chain->GetEntry(entry);
     double weight = pswgt_dijet_170;
     
@@ -126,20 +132,22 @@ void SIMP_Data_cutflow(){
         if(deltajet_phi > 2){
           passed_deltaphi += weight;
           deltaphi_eff->Fill(2, weight);
-          if(nPixHits[0] > 0){
-            passed_npix += weight;
-            nPix_eff->Fill(0.0, weight);
+//           if(nPixHits[0] > 0){
+//             passed_npix += weight;
+//             nPix_eff->Fill(0.0, weight);
             if(passLooseId[0] == 0 || (passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1)){
               passed_photonveto += weight;
               photonVeto_eff->Fill(0.1, weight);
-              for(int j = 0; j < 11; j++){
+              for(int j = 0; j < 12; j++){
                 double eff1 = eff_histos[j]->GetBinContent(eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[0])), eff_histos[j]->GetYaxis()->FindBin(jet_pt[0]));
                 double eff2 = eff_histos[j]->GetBinContent(eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[1])), eff_histos[j]->GetYaxis()->FindBin(jet_pt[1]));
 								passed[j] += weight*eff1*eff2;
-								ChF_eff->Fill(chf_cuts[j], weight*eff1*eff2);
+								if (CHEF_jet[1] < chf_cuts[j]) ChF_eff_1leg->Fill(chf_cuts[j], weight*eff1/2);
+								if (CHEF_jet[0] < chf_cuts[j]) ChF_eff_1leg->Fill(chf_cuts[j], weight*eff2/2);
+								ChF_eff_2leg->Fill(chf_cuts[j], weight*eff1*eff2);
               }
             }
-          }
+//           }
         }
       }
     }
@@ -154,12 +162,12 @@ void SIMP_Data_cutflow(){
 	std::cout<<" \\\\"<<std::endl;
 	std::cout<<"photon veto & "<<passed_photonveto;
 	std::cout<<" \\\\"<<std::endl;
-	for(int j = 0; j < 11; j++){
+	for(int j = 0; j < 12; j++){
 		std::ostringstream strs;
 		double dbl = chf_cuts[j];
 		strs << dbl;
 		std::string cut = strs.str();
-		std::cout<<"ChF$_{j1, j2}$ < "<<cut;	
+		std::cout<<"ChF$_{j1, j2}$ < "<<cut<<" prediction";	
 		std::cout<<" & "<<passed[j];
 		std::cout<<" \\\\"<<std::endl;
 	}

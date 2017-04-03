@@ -46,10 +46,10 @@ void SIMP_Data_macro(){
 	list_JetHT_rereco_2016Hv3(chain);
 	std::cout<<"TChain ready"<<std::endl;
 
-  TFile *output = new TFile("plots_CR_rereco_photonVeto_withprescale_runH.root", "RECREATE");
+  TFile *output = new TFile("plots_Data_rereco_withetacut_new.root", "RECREATE");
   
 	TRandom3 *r = new TRandom3();
-	int dijet_170, vtx_N;
+	int dijet_170, vtx_N, njet;
 	double pswgt_dijet_170, MET;
 //   double jet_pt[4], jet_eta[4], jet_phi[4], jet_efrac_ch_Had[4], jet_efrac_ch_EM[4], jet_efrac_ch_Mu[4], CHEF_jet[4];
   double jet_pt[8], jet_eta[8], jet_phi[8], jet_efrac_ne_Had[8], jet_efrac_ch_Had[8], jet_efrac_ch_EM[8], jet_efrac_ch_Mu[8], jet_efrac_ne_EM[8], chi2[3], vtx_x[3], vtx_y[3], vtx_z[3], vtx_d0[3], CHEF_jet[8], EMF_jet[8];
@@ -59,8 +59,13 @@ void SIMP_Data_macro(){
 	int passLooseId[4], passMediumId[4], passTightId[4];
 	int selection = 0;
 	int CR_region = 0;
+  int event, lumi, run ;
   
+//   chain->SetBranchAddress("nRun ", &run );
+  chain->SetBranchAddress("nLumi", &lumi);
+  chain->SetBranchAddress("nEvent", &event);
 	chain->SetBranchAddress("MET", &MET);
+  chain->SetBranchAddress("nJet", &njet);
   chain->SetBranchAddress("vtx_N", &vtx_N);
   chain->SetBranchAddress("jet_pt", &jet_pt);
   chain->SetBranchAddress("jet_eta", &jet_eta);
@@ -96,6 +101,7 @@ void SIMP_Data_macro(){
 	TH1F *HT = new TH1F("HT", "HT (4 jets)", 100, 0, 2000);
 	TH1F *METOverHT = new TH1F("METOverHT", "MET / HT(4 jets)", 100, 0, 1);	
 	TH1F *nvtx = new TH1F("nvtx", "Number of vertices", 51, -0.5, 50.5);
+	TH1F *njets = new TH1F("njets", "Number of jets", 11, -0.5, 10.5);
 	TH1F *nvtx_withps = new TH1F("nvtx_withps", "Number of vertices (weighted for prescale)", 51, -0.5, 50.5);
 	TH1F *jet1_pt = new TH1F("jet1_pt", "Leading jet pt", 100, 0, 2000);
 	TH1F *jet2_pt = new TH1F("jet2_pt", "Subleading jet pt", 100, 0, 2000);
@@ -147,11 +153,14 @@ void SIMP_Data_macro(){
   TH2D *dRvsChF2 = new TH2D("dRvsChF2", "dR_{#gamma, j2} vs. Chf_{j2}", 100, 0, 1, 100, -1, 4);
   
 	std::cout<<"Getting entries....";
-  Int_t Nentries = chain->GetEntries(); 
+  Int_t Nentries = chain->GetEntries();
+//   Int_t Nentries = 3000000;
 	std::cout<<"processing "<<Nentries<<"entries"<<std::endl;
   for(Int_t entry = 0; entry < Nentries; ++entry){
 		if(entry%1000000==0) std::cout<<"processed "<<entry/1000000<<"M events"<<std::endl;
     chain->GetEntry(entry);
+    
+//     if(run == 280242 && lumi == 451 && event > 816700000 && event < 817800000) std::cout<<pswgt_dijet_170<<std::endl;
 			
 		Double_t random1 = r->Uniform();
     
@@ -180,13 +189,13 @@ void SIMP_Data_macro(){
 		
 		output->cd();
 	
-		if (dijet_170 == 1 && jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2 && nPixHits[0] > 0 && (passLooseId[0] == 0 || (passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1))){
+		if (dijet_170 == 1 && jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2 /*&& nPixHits[0] > 0*/ && (passLooseId[0] == 0 || (passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1))){
 			selection ++;
-			if (CHEF_jet[0] > 0.5||CHEF_jet[1] > 0.5){
 				CR_region++;
 				HT->Fill(jet_pt[0]+jet_pt[1]+jet_pt[2]+jet_pt[3], pswgt_dijet_170);
 				METOverHT->Fill(MET/(jet_pt[0]+jet_pt[1]+jet_pt[2]+jet_pt[3]), pswgt_dijet_170);
 				nvtx->Fill(vtx_N, pswgt_dijet_170);
+        njets->Fill(njet, pswgt_dijet_170);
 				
 				jet1_pt->Fill(jet_pt[0], pswgt_dijet_170);
 				jet2_pt->Fill(jet_pt[1], pswgt_dijet_170);
@@ -199,62 +208,59 @@ void SIMP_Data_macro(){
 				jet2_phi->Fill(jet_phi[1], pswgt_dijet_170);
 				deltaphi->Fill(deltajet_phi, pswgt_dijet_170);
 				
+			if (CHEF_jet[0] > 0.25){
 				jet1_emf->Fill(EMF_jet[0], pswgt_dijet_170);
-				jet2_emf->Fill(EMF_jet[1], pswgt_dijet_170);
 				jet1_chf->Fill(CHEF_jet[0], pswgt_dijet_170);
-				jet2_chf->Fill(CHEF_jet[1], pswgt_dijet_170);
 				jet1_nhf->Fill(jet_efrac_ne_Had[0], pswgt_dijet_170);
-				jet2_nhf->Fill(jet_efrac_ne_Had[1], pswgt_dijet_170);
 				jet1_chhf->Fill(jet_efrac_ch_Had[0], pswgt_dijet_170);
-				jet2_chhf->Fill(jet_efrac_ch_Had[1], pswgt_dijet_170);
 				if (CHEF_jet[1] > 0.5) jet1_chf_jet2_0p5->Fill(CHEF_jet[0], pswgt_dijet_170);
-				if (jet_pt[2] > 20) jet3_chf->Fill(CHEF_jet[2], pswgt_dijet_170);
-				if (jet_pt[3] > 20) jet4_chf->Fill(CHEF_jet[3], pswgt_dijet_170);
 				CHFvsPT->Fill(jet_pt[0], CHEF_jet[0], pswgt_dijet_170);
-				CHFvsPT->Fill(jet_pt[1], CHEF_jet[1], pswgt_dijet_170);
 				CHF->Fill(CHEF_jet[0], pswgt_dijet_170);
+      }
+			if (CHEF_jet[1] > 0.25){
+				jet2_emf->Fill(EMF_jet[1], pswgt_dijet_170);
+				jet2_chf->Fill(CHEF_jet[1], pswgt_dijet_170);
+				jet2_nhf->Fill(jet_efrac_ne_Had[1], pswgt_dijet_170);
+				jet2_chhf->Fill(jet_efrac_ch_Had[1], pswgt_dijet_170);
+				CHFvsPT->Fill(jet_pt[1], CHEF_jet[1], pswgt_dijet_170);
 				CHF->Fill(CHEF_jet[1], pswgt_dijet_170);
-				CHFvsCHF->Fill(CHEF_jet[1], CHEF_jet[0], pswgt_dijet_170);
-				if(CHEF_jet[0] > CHEF_jet[1]){
-					jetA_pt->Fill(jet_pt[0], pswgt_dijet_170);
-					jetB_pt->Fill(jet_pt[1], pswgt_dijet_170);
-					jetA_eta->Fill(jet_eta[0], pswgt_dijet_170);
-					jetB_eta->Fill(jet_eta[1], pswgt_dijet_170);
-					if (CHEF_jet[0] > 0.5) chf->Fill(CHEF_jet[1], pswgt_dijet_170);
-				}
-				else if(CHEF_jet[0] < CHEF_jet[1]){
-					jetA_pt->Fill(jet_pt[1], pswgt_dijet_170);
-					jetB_pt->Fill(jet_pt[0], pswgt_dijet_170);
-					jetA_eta->Fill(jet_eta[1], pswgt_dijet_170);
-					jetB_eta->Fill(jet_eta[0], pswgt_dijet_170);
-					if (CHEF_jet[1] > 0.5) chf->Fill(CHEF_jet[0], pswgt_dijet_170);
-				}
-				if(random1 <= 0.5 && CHEF_jet[0] > 0.5) ChFOtherJet->Fill(CHEF_jet[1], pswgt_dijet_170);
-				else if (random1 > 0.5 && CHEF_jet[1] > 0.5) ChFOtherJet->Fill(CHEF_jet[0], pswgt_dijet_170);
-				
-				
-				if (passLooseId[0] == 1){
-					dR_1->Fill(dR1, pswgt_dijet_170);
-					dR_2->Fill(dR2, pswgt_dijet_170);
-					dRvsChF1->Fill(CHEF_jet[0], dR1, pswgt_dijet_170);
-					dRvsChF2->Fill(CHEF_jet[1], dR2, pswgt_dijet_170);
-					dRvsdR->Fill(dR2, dR1, pswgt_dijet_170);
-				}else{
-					dR_1->Fill(-1, pswgt_dijet_170);
-					dR_2->Fill(-1, pswgt_dijet_170);
-					dRvsChF1->Fill(CHEF_jet[0], -1, pswgt_dijet_170);
-					dRvsChF2->Fill(CHEF_jet[1], -1, pswgt_dijet_170);
-					dRvsdR->Fill(-1, -1, pswgt_dijet_170);
-				}
-				
-				if(photon_pt[0] > 10 && passLooseId[0] == 1) photon1_pt->Fill(photon_pt[0], pswgt_dijet_170);
-				if(photon_pt[1] > 10 && passLooseId[1] == 1) photon2_pt->Fill(photon_pt[1], pswgt_dijet_170);
-				if(photon_pt[0] > 10 && passLooseId[0] == 1) photon1_eta->Fill(photon_eta[0], pswgt_dijet_170);
-				if(photon_pt[1] > 10 && passLooseId[1] == 1) photon2_eta->Fill(photon_eta[1], pswgt_dijet_170);
-				if(photon_pt[0] > 10 && passLooseId[0] == 1) photon1_phi->Fill(photon_phi[0], pswgt_dijet_170);
-				if(photon_pt[1] > 10 && passLooseId[1] == 1) photon2_phi->Fill(photon_phi[1], pswgt_dijet_170);
-				
-			}
+				if (CHEF_jet[0] > 0.25) CHFvsCHF->Fill(CHEF_jet[1], CHEF_jet[0], pswgt_dijet_170);
+// 				if(CHEF_jet[0] > CHEF_jet[1]){
+// 					jetA_pt->Fill(jet_pt[0], pswgt_dijet_170);
+// 					jetB_pt->Fill(jet_pt[1], pswgt_dijet_170);
+// 					jetA_eta->Fill(jet_eta[0], pswgt_dijet_170);
+// 					jetB_eta->Fill(jet_eta[1], pswgt_dijet_170);
+// 					if (CHEF_jet[0] > 0.5) chf->Fill(CHEF_jet[1], pswgt_dijet_170);
+// 				}
+// 				else if(CHEF_jet[0] < CHEF_jet[1]){
+// 					jetA_pt->Fill(jet_pt[1], pswgt_dijet_170);
+// 					jetB_pt->Fill(jet_pt[0], pswgt_dijet_170);
+// 					jetA_eta->Fill(jet_eta[1], pswgt_dijet_170);
+// 					jetB_eta->Fill(jet_eta[0], pswgt_dijet_170);
+// 					if (CHEF_jet[1] > 0.5) chf->Fill(CHEF_jet[0], pswgt_dijet_170);
+// 				}
+// 				if(random1 <= 0.5 && CHEF_jet[0] > 0.5) ChFOtherJet->Fill(CHEF_jet[1], pswgt_dijet_170);
+// 				else if (random1 > 0.5 && CHEF_jet[1] > 0.5) ChFOtherJet->Fill(CHEF_jet[0], pswgt_dijet_170);
+        if (passLooseId[0] == 1){
+          dR_1->Fill(dR1, pswgt_dijet_170);
+          dR_2->Fill(dR2, pswgt_dijet_170);
+          dRvsChF1->Fill(CHEF_jet[0], dR1, pswgt_dijet_170);
+          dRvsChF2->Fill(CHEF_jet[1], dR2, pswgt_dijet_170);
+          dRvsdR->Fill(dR2, dR1, pswgt_dijet_170);
+        }else{
+          dR_1->Fill(-1, pswgt_dijet_170);
+          dR_2->Fill(-1, pswgt_dijet_170);
+          dRvsChF1->Fill(CHEF_jet[0], -1, pswgt_dijet_170);
+          dRvsChF2->Fill(CHEF_jet[1], -1, pswgt_dijet_170);
+          dRvsdR->Fill(-1, -1, pswgt_dijet_170);
+        }
+      }
+      if(photon_pt[0] > 10 && passLooseId[0] == 1) photon1_pt->Fill(photon_pt[0], pswgt_dijet_170);
+      if(photon_pt[1] > 10 && passLooseId[1] == 1) photon2_pt->Fill(photon_pt[1], pswgt_dijet_170);
+      if(photon_pt[0] > 10 && passLooseId[0] == 1) photon1_eta->Fill(photon_eta[0], pswgt_dijet_170);
+      if(photon_pt[1] > 10 && passLooseId[1] == 1) photon2_eta->Fill(photon_eta[1], pswgt_dijet_170);
+      if(photon_pt[0] > 10 && passLooseId[0] == 1) photon1_phi->Fill(photon_phi[0], pswgt_dijet_170);
+      if(photon_pt[1] > 10 && passLooseId[1] == 1) photon2_phi->Fill(photon_phi[1], pswgt_dijet_170);
 		}
 	}
 	std::cout<<"selected: "<<selection<<std::endl;

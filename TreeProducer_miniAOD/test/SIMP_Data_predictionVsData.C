@@ -54,17 +54,17 @@ void SIMP_Data_predictionVsData(){
 	int dijet_170;
 	double pswgt_dijet_170;
 	
-	double chf_cuts[21] = {0.0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0};
+	double chf_cuts[201] = {0.0, 0.005, 0.01, 0.015, 0.02, 0.025, 0.03, 0.035, 0.04, 0.045, 0.05, 0.055, 0.06, 0.065, 0.07, 0.075, 0.08, 0.085, 0.09, 0.095, 0.1, 0.105, 0.11, 0.115, 0.12, 0.125, 0.13, 0.135, 0.14, 0.145, 0.15, 0.155, 0.16, 0.165, 0.17, 0.175, 0.18, 0.185, 0.19, 0.195, 0.2, 0.205, 0.21, 0.215, 0.22, 0.225, 0.23, 0.235, 0.24, 0.245, 0.25, 0.255, 0.26, 0.265, 0.27, 0.275, 0.28, 0.285, 0.29, 0.295, 0.3, 0.305, 0.31, 0.315, 0.32, 0.325, 0.33, 0.335, 0.34, 0.345, 0.35, 0.355, 0.36, 0.365, 0.37, 0.375, 0.38, 0.385, 0.39, 0.395, 0.4, 0.405, 0.41, 0.415, 0.42, 0.425, 0.43, 0.435, 0.44, 0.445, 0.45, 0.455, 0.46, 0.465, 0.47, 0.475, 0.48, 0.485, 0.49, 0.495, 0.5, 0.505, 0.51, 0.515, 0.52, 0.525, 0.53, 0.535, 0.54, 0.545, 0.55, 0.555, 0.56, 0.565, 0.57, 0.575, 0.58, 0.585, 0.59, 0.595, 0.6, 0.605, 0.61, 0.615, 0.62, 0.625, 0.63, 0.635, 0.64, 0.645, 0.65, 0.655, 0.66, 0.665, 0.67, 0.675, 0.68, 0.685, 0.69, 0.695, 0.7, 0.705, 0.71, 0.715, 0.72, 0.725, 0.73, 0.735, 0.74, 0.745, 0.75, 0.755, 0.76, 0.765, 0.77, 0.775, 0.78, 0.785, 0.79, 0.795, 0.8, 0.805, 0.81, 0.815, 0.82, 0.825, 0.83, 0.835, 0.84, 0.845, 0.85, 0.855, 0.86, 0.865, 0.87, 0.875, 0.88, 0.885, 0.89, 0.895, 0.9, 0.905, 0.91, 0.915, 0.92, 0.925, 0.93, 0.935, 0.94, 0.945, 0.95, 0.955, 0.96, 0.965, 0.97, 0.975, 0.98, 0.985, 0.99, 0.995, 1.0};
 	double pt_bins[10] = {250, 275, 300, 350, 400, 450, 550, 700, 900, 10000};
 	double eta_bins[5] = {0, 0.5, 1.0, 1.5, 2.5};
   
-  TH1F * prediction = new TH1F("prediction", "prediction", 20, chf_cuts);
-  TH1F * data = new TH1F("data", "data", 20, chf_cuts);
+  TH1D * prediction = new TH1D("prediction", "prediction", 200, chf_cuts);
+  TH1D * data = new TH1D("data", "data", 200, chf_cuts);
   
 	std::cout<<"Getting the efficiency histos...";
 	TFile* efficiencies = new TFile("eff2D_Data_Rereco_exclusiveChF.root", "READ");
-	TH2D* eff_histos[20];
-	for(int j = 0; j < 20; j++){
+	TH2D* eff_histos[200];
+	for(int j = 0; j < 200; j++){
 		std::ostringstream strs;
 		double dbl = chf_cuts[j];
 		double dbl2 = chf_cuts[j+1];
@@ -75,7 +75,7 @@ void SIMP_Data_predictionVsData(){
 	}
 	std::cout<<"done"<<std::endl;
 	
-  TFile *output = new TFile("predictionVsData_test.root", "RECREATE");
+  TFile *output = new TFile("predictionVsData_notblinded.root", "RECREATE");
   
 	chain->SetBranchAddress("jet_pt", &jet_pt);
 	chain->SetBranchAddress("jet_eta", &jet_eta);
@@ -126,21 +126,21 @@ void SIMP_Data_predictionVsData(){
 		
 		output->cd();
 		
-		if (dijet_170 == 1 && jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2 && npixhits[0] > 0 && (passLooseId[0] == 0 || (passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1))){
+		if (dijet_170 == 1 && jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2 && /*npixhits[0] > 0 &&*/ (passLooseId[0] == 0 || (passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1))){
       
-        if (CHEF_jet[0]>0.25) data->Fill(CHEF_jet[0], pswgt_dijet_170);
-        else data->Fill(CHEF_jet[0], 0);
-        if (CHEF_jet[1]>0.25) data->Fill(CHEF_jet[1], pswgt_dijet_170);
-        else data->Fill(CHEF_jet[1], 0);
+        /*if (CHEF_jet[0]>0.25)*/ data->Fill(CHEF_jet[0], pswgt_dijet_170);
+//         else data->Fill(CHEF_jet[0], 0);
+        /*if (CHEF_jet[1]>0.25) */data->Fill(CHEF_jet[1], pswgt_dijet_170);
+//         else data->Fill(CHEF_jet[1], 0);
         
-			for(int j = 0; j < 20; j++){        
+			for(int j = 0; j < 200; j++){        
 				double eff1 = eff_histos[j]->GetBinContent(eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[0])), eff_histos[j]->GetYaxis()->FindBin(jet_pt[0]));
 				double eff2 = eff_histos[j]->GetBinContent(eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[1])), eff_histos[j]->GetYaxis()->FindBin(jet_pt[1]));
 				double erreff1 = eff_histos[j]->GetBinError(eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[0])), eff_histos[j]->GetYaxis()->FindBin(jet_pt[0]));
 				double erreff2 = eff_histos[j]->GetBinError(eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[1])), eff_histos[j]->GetYaxis()->FindBin(jet_pt[1]));
         
-        prediction->Fill(chf_cuts[j]+0.025, pswgt_dijet_170*eff1);
-        prediction->Fill(chf_cuts[j]+0.025, pswgt_dijet_170*eff2);
+        prediction->Fill(chf_cuts[j]+0.0025, pswgt_dijet_170*eff1);
+        prediction->Fill(chf_cuts[j]+0.0025, pswgt_dijet_170*eff2);
 			}
 		}
 	}

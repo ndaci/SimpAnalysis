@@ -36,7 +36,10 @@ void SIMP_Data_closure(){
 // 	list_JetHT_2016E(chain);
 // 	list_JetHT_2016F(chain);
 // 	list_JetHT_2016G(chain);
-	list_JetHT_rereco_2016B(chain);
+// 	list_JetHT_2016H2(chain);
+// 	list_JetHT_2016H3(chain);
+
+ 	list_JetHT_rereco_2016B(chain);
 	list_JetHT_rereco_2016C(chain);
 	list_JetHT_rereco_2016D(chain);
 	list_JetHT_rereco_2016E(chain);
@@ -54,29 +57,34 @@ void SIMP_Data_closure(){
 	int dijet_170;
 	double pswgt_dijet_170;
 	
-	double chf_cuts[11] = {0.5, 0.4, 0.3, 0.2, 0.15, 0.1, 0.05, 0.04, 0.03, 0.02, 0.01};
+	double chf_cuts[12] = {0.5, 0.4, 0.3, 0.2, 0.15, 0.1, 0.07, 0.05, 0.04, 0.03, 0.02, 0.01};
 	double pt_bins[10] = {250, 275, 300, 350, 400, 450, 550, 700, 900, 10000};
 	double eta_bins[5] = {0, 0.5, 1.0, 1.5, 2.5};
 	
-	double passed_eff[11] = {0,0,0,0,0,0,0,0,0,0,0};
-	double passed_eff1[11] = {0,0,0,0,0,0,0,0,0,0,0};
-	double passed_eff2[11] = {0,0,0,0,0,0,0,0,0,0,0};
-	double passed_effboth[11] = {0,0,0,0,0,0,0,0,0,0,0};
-	double passed_MCtruth[11] = {0,0,0,0,0,0,0,0,0,0,0};
-	double err_MCtruth[11] = {0,0,0,0,0,0,0,0,0,0,0};
-	double err_eff1[11] = {0,0,0,0,0,0,0,0,0,0,0};
-	double err_eff2[11] = {0,0,0,0,0,0,0,0,0,0,0};
-	double err_eff[11] = {0,0,0,0,0,0,0,0,0,0,0};
-	double err_effboth[11] = {0,0,0,0,0,0,0,0,0,0,0};
-	double zero[11] = {0,0,0,0,0,0,0,0,0,0,0};
+	double passed_eff[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+	double passed_eff1[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+	double passed_eff2[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+	double passed_effboth[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+	double passed_MCtruth[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+	double err_MCtruth[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+	double err_eff1[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+	double err_eff2[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+	double err_eff[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+	double err_effboth[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+	double zero[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
 	
-	double ratio[11] = {0,0,0,0,0,0,0,0,0,0,0};
-	double err_ratio[11] = {0,0,0,0,0,0,0,0,0,0,0};
+	double ratio_1leg[23] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	double ratio_2leg[23] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	double err_ratio_1leg[23] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	double err_ratio_2leg[23] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	
+// 	double ratio[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+// 	double err_ratio[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
   
 	std::cout<<"Getting the efficiency histos...";
-	TFile* efficiencies = new TFile("eff2D_photonVeto_Data_Rereco_runH.root", "READ");
-	TH2D* eff_histos[11];
-	for(int j = 0; j < 11; j++){
+	TFile* efficiencies = new TFile("eff2D_Data_Rereco_full2016.root", "READ");
+	TH2D* eff_histos[12];
+	for(int j = 0; j < 12; j++){
 		std::ostringstream strs;
 		double dbl = chf_cuts[j];
 		strs << dbl;
@@ -86,7 +94,7 @@ void SIMP_Data_closure(){
 	}
 	std::cout<<"done"<<std::endl;
 	
-  TFile *output = new TFile("closure_test_photonVeto_Data_Rereco_noMCTruth_ratio_runH_test.root", "RECREATE");
+  TFile *output = new TFile("closure_test_Data_Rereco_withData.root", "RECREATE");
   
 	chain->SetBranchAddress("jet_pt", &jet_pt);
 	chain->SetBranchAddress("jet_eta", &jet_eta);
@@ -107,7 +115,7 @@ void SIMP_Data_closure(){
 // 		chain->SetBranchAddress("track_ptError", &track_ptError);
 	
 	Int_t Nentries = chain->GetEntries(); 
-// 		Int_t Nentries = 1000000;
+// 		Int_t Nentries = 5000000;
 	
 	for(Int_t entry = 0; entry < Nentries; ++entry){
 		if(entry%1000000==0) std::cout<<"processed "<<entry/1000000<<"M events"<<std::endl;
@@ -137,11 +145,11 @@ void SIMP_Data_closure(){
 		
 		output->cd();
 		
-		if (dijet_170 == 1 && jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2 && npixhits[0] > 0 && (passLooseId[0] == 0 || (passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1))){
-			for(int j = 0; j < 11; j++){
+		if (dijet_170 == 1 && jet_pt[0] > 250 && jet_pt[1] > 250 && fabs(jet_eta[0]) < 2.0 && fabs(jet_eta[1]) < 2.0 && deltajet_phi > 2 /*&& npixhits[0] > 0*/ && (passLooseId[0] == 0 || (passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1))){
+			for(int j = 0; j < 12; j++){
 				if (CHEF_jet[0]<chf_cuts[j] && CHEF_jet[1]<chf_cuts[j]){
-					passed_MCtruth[j]+= pswgt_dijet_170;
-					err_MCtruth[j] += pow(pswgt_dijet_170, 2);
+          if (chf_cuts[j] > 0.25) passed_MCtruth[j]+= pswgt_dijet_170;
+          if (chf_cuts[j] > 0.25) err_MCtruth[j] += pow(pswgt_dijet_170, 2);
 				}
 				double eff1 = eff_histos[j]->GetBinContent(eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[0])), eff_histos[j]->GetYaxis()->FindBin(jet_pt[0]));
 				double eff2 = eff_histos[j]->GetBinContent(eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[1])), eff_histos[j]->GetYaxis()->FindBin(jet_pt[1]));
@@ -165,31 +173,36 @@ void SIMP_Data_closure(){
 			}
 		}
 	}
-	for(int j = 0; j < 11; j++){
+	for(int j = 0; j < 12; j++){
 		err_MCtruth[j] = TMath::Sqrt(err_MCtruth[j]);
 		err_effboth[j] = TMath::Sqrt(err_effboth[j]);
 		err_eff1[j] = TMath::Sqrt(err_eff1[j]);
 		err_eff2[j] = TMath::Sqrt(err_eff2[j]);
 		err_eff[j] = (err_eff1[j]+err_eff2[j])/2.0 ;
 		passed_eff[j] = (passed_eff1[j]+passed_eff2[j])/2;
-		ratio[j] = passed_eff[j]/passed_effboth[j];
-		err_ratio[j] = ratio[j]*TMath::Sqrt((err_eff[j]*err_eff[j]/passed_eff[j]/passed_eff[j])+(err_effboth[j]*err_effboth[j]/passed_effboth[j]/passed_effboth[j]));
-		std::cout<<chf_cuts[j]<<" "<<passed_eff[j]<<" "<<passed_effboth[j]<<std::endl;
+		ratio_1leg[j] = passed_MCtruth[j]/passed_eff[j];
+		ratio_2leg[j] = passed_MCtruth[j]/passed_effboth[j];
+		if (ratio_1leg[j] != 0) err_ratio_1leg[j] = ratio_1leg[j]*TMath::Sqrt((err_eff[j]*err_eff[j]/passed_eff[j]/passed_eff[j])+(err_MCtruth[j]*err_MCtruth[j]/passed_MCtruth[j]/passed_MCtruth[j]));
+		if (ratio_2leg[j] != 0) err_ratio_2leg[j] = ratio_2leg[j]*TMath::Sqrt((err_effboth[j]*err_effboth[j]/passed_effboth[j]/passed_effboth[j])+(err_MCtruth[j]*err_MCtruth[j]/passed_MCtruth[j]/passed_MCtruth[j]));
+// 		ratio[j] = passed_eff[j]/passed_effboth[j];
+// 		err_ratio[j] = ratio[j]*TMath::Sqrt((err_eff[j]*err_eff[j]/passed_eff[j]/passed_eff[j])+(err_effboth[j]*err_effboth[j]/passed_effboth[j]/passed_effboth[j]));
+// 		std::cout<<chf_cuts[j]<<" "<<passed_eff[j]<<" "<<passed_effboth[j]<<std::endl;
 	}
+	
 	TCanvas *c1 = new TCanvas("Closure test", "Closure test");
   TPad *pad1 = new TPad("pad1","pad1",0,0.3,1,1);
   pad1->SetBottomMargin(0);
   pad1->SetLogy(1);
   pad1->Draw();
   pad1->cd();
-// 	TGraphErrors *MC = new TGraphErrors(11, chf_cuts, passed_MCtruth, zero, err_MCtruth);
-// 	MC->SetTitle("Closure test");
-// 	MC->GetXaxis()->SetTitle("CHF cut");
-// 	MC->GetYaxis()->SetTitle("# events");
-// 	MC->SetMarkerStyle(20);
-// 	MC->Draw("AP");
+	TGraphErrors *MC = new TGraphErrors(12, chf_cuts, passed_MCtruth, zero, err_MCtruth);
+	MC->SetTitle("Closure test");
+	MC->GetXaxis()->SetTitle("CHF cut");
+	MC->GetYaxis()->SetTitle("# events");
+	MC->SetMarkerStyle(20);
+	MC->Draw("AP");
 	
-	TGraphErrors *oneleg = new TGraphErrors(11, chf_cuts, passed_eff, zero, err_eff);
+	TGraphErrors *oneleg = new TGraphErrors(12, chf_cuts, passed_eff, zero, err_eff);
 	oneleg->SetTitle("Closure test");
 	oneleg->GetXaxis()->SetTitle("CHF cut");
 	oneleg->GetYaxis()->SetTitle("# events");
@@ -197,16 +210,16 @@ void SIMP_Data_closure(){
 	oneleg->SetMarkerColor(2);
 // 	oneleg->Draw("P");
 	oneleg->Draw("AP");
-// 	TGraphErrors *oneleg1 = new TGraphErrors(11, chf_cuts, passed_eff1, zero, zero);
+// 	TGraphErrors *oneleg1 = new TGraphErrors(12, chf_cuts, passed_eff1, zero, zero);
 // 	oneleg1->SetMarkerStyle(20);
 // 	oneleg1->SetMarkerColor(2);
 // 	oneleg1->Draw("P");
-// 	TGraphErrors *oneleg2 = new TGraphErrors(11, chf_cuts, passed_eff2, zero, zero);
+// 	TGraphErrors *oneleg2 = new TGraphErrors(12, chf_cuts, passed_eff2, zero, zero);
 // 	oneleg2->SetMarkerStyle(20);
 // 	oneleg2->SetMarkerColor(3);
 // 	oneleg2->Draw("P");
 	
-	TGraphErrors *twoleg = new TGraphErrors(11, chf_cuts, passed_effboth, zero, err_effboth);
+	TGraphErrors *twoleg = new TGraphErrors(12, chf_cuts, passed_effboth, zero, err_effboth);
 	twoleg->SetMarkerStyle(20);
 	twoleg->SetMarkerColor(3);
 	twoleg->Draw("P");
@@ -218,13 +231,32 @@ void SIMP_Data_closure(){
   pad2->Draw();
   pad2->cd();
 	
-	TGraphErrors *ratio_plot = new TGraphErrors(11, chf_cuts, ratio, zero, err_ratio);
-	ratio_plot->SetMarkerStyle(20);
-	ratio_plot->SetMarkerColor(2);
-	ratio_plot->Draw("AP");
-  ratio_plot->SetTitle("");
-  ratio_plot->GetYaxis()->SetRangeUser(0.8, 1.2);
-  ratio_plot->GetYaxis()->SetTitle("#frac{1-leg}{2-leg}");
+	TGraphErrors *ratio_oneleg = new TGraphErrors(12, chf_cuts, ratio_1leg, zero, err_ratio_1leg);
+	ratio_oneleg->SetMarkerStyle(20);
+	ratio_oneleg->SetMarkerColor(2);
+	ratio_oneleg->Draw("AP");
+  ratio_oneleg->SetTitle("");
+  ratio_oneleg->GetYaxis()->SetRangeUser(0.8, 1.2);
+  ratio_oneleg->GetYaxis()->SetTitle("#frac{data}{1/2-leg}");
+	ratio_oneleg->GetYaxis()->SetTitleSize(0.11);
+	ratio_oneleg->GetYaxis()->SetLabelSize(0.1);
+	ratio_oneleg->GetYaxis()->SetTitleOffset(0.4);
+  ratio_oneleg->GetXaxis()->SetTitle("ChF cut");
+	ratio_oneleg->GetXaxis()->SetTitleSize(0.12);
+	ratio_oneleg->GetXaxis()->SetLabelSize(0.1);
+  
+	TGraphErrors *ratio_twoleg = new TGraphErrors(12, chf_cuts, ratio_2leg, zero, err_ratio_2leg);
+	ratio_twoleg->SetMarkerStyle(20);
+	ratio_twoleg->SetMarkerColor(3);
+	ratio_twoleg->Draw("P");
+	
+// 	TGraphErrors *ratio_plot = new TGraphErrors(12, chf_cuts, ratio, zero, err_ratio);
+// 	ratio_plot->SetMarkerStyle(20);
+// 	ratio_plot->SetMarkerColor(2);
+// 	ratio_plot->Draw("AP");
+//   ratio_plot->SetTitle("");
+//   ratio_plot->GetYaxis()->SetRangeUser(0.8, 1.2);
+//   ratio_plot->GetYaxis()->SetTitle("#frac{1-leg}{2-leg}");
   
   TLine *line = new TLine(0,1,0.55,1);
   line->SetLineColor(kViolet+5);
