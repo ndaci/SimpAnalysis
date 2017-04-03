@@ -23,46 +23,58 @@ void SIMP_QCD_eff2D(){
   
   TChain* chain0 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_300To500(chain0);
+//   chain0->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT300To500_PUMoriond17.root");
   TChain* chain1 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_500To700(chain1);
+//   chain1->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT500To700_PUMoriond17.root");
   TChain* chain2 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_700To1000(chain2);
+//   chain2->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT700To1000_PUMoriond17.root");
   TChain* chain3 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_1000To1500(chain3);
+//   chain3->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT1000To1500_PUMoriond17.root");
   TChain* chain4 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_1500To2000(chain4);
+//   chain4->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT1500To2000_PUMoriond17.root");
   TChain* chain5 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_2000ToInf(chain5);
+//   chain5->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT2000ToInf_PUMoriond17.root");
 	TChain* chains[6] = {chain0, chain1, chain2, chain3, chain4, chain5};
   
   TChain* SPVchain0 = new TChain("treeSPV/SimpAnalysis");
 	list_QCD_300To500(SPVchain0);
+//   SPVchain0->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT300To500_PUMoriond17.root");
   TChain* SPVchain1 = new TChain("treeSPV/SimpAnalysis");
 	list_QCD_500To700(SPVchain1);
+//   SPVchain1->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT500To700_PUMoriond17.root");
   TChain* SPVchain2 = new TChain("treeSPV/SimpAnalysis");
 	list_QCD_700To1000(SPVchain2);
+//   SPVchain2->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT700To1000_PUMoriond17.root");
   TChain* SPVchain3 = new TChain("treeSPV/SimpAnalysis");
 	list_QCD_1000To1500(SPVchain3);
+//   SPVchain3->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT1000To1500_PUMoriond17.root");
   TChain* SPVchain4 = new TChain("treeSPV/SimpAnalysis");
 	list_QCD_1500To2000(SPVchain4);
+//   SPVchain4->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT1500To2000_PUMoriond17.root");
   TChain* SPVchain5 = new TChain("treeSPV/SimpAnalysis");
 	list_QCD_2000ToInf(SPVchain5);
+//   SPVchain5->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT2000ToInf_PUMoriond17.root");
 	TChain* SPVchains[6] = {SPVchain0, SPVchain1, SPVchain2, SPVchain3, SPVchain4, SPVchain5};
 	std::cout<<"TChains ready"<<std::endl;
   
   double CHEF_SPVjet[8], CHEF_corrjet[8];
 	
-	double chf_cuts[11] = {0.5, 0.4, 0.3, 0.2, 0.15, 0.1, 0.05, 0.04, 0.03, 0.02, 0.01};
+	double chf_cuts[12] = {0.5, 0.4, 0.3, 0.2, 0.15, 0.07, 0.1, 0.05, 0.04, 0.03, 0.02, 0.01};
 	double pt_bins[10] = {250, 275, 300, 350, 400, 450, 550, 700, 900, 10000};
 	double eta_bins[5] = {0, 0.5, 1.0, 1.5, 2.0};
   
-  TFile *output = new TFile("eff2D_QCD_nopixcut_PUMoriond17_AOD.root", "RECREATE");
+  TFile *output = new TFile("eff2D_QCD_PUMoriond17_AOD.root", "RECREATE");
 	TH2D* total = new TH2D("total", "total", 4, eta_bins, 9, pt_bins);
 	total->GetYaxis()->SetTitle("p_{T}");
 	total->GetXaxis()->SetTitle("#eta");
 	total->Sumw2();
-	TH2D* passed[11] = {0,0,0,0,0,0,0,0,0,0,0};
-	TH2D* eff[11]    = {0,0,0,0,0,0,0,0,0,0,0};
+	TH2D* passed[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+	TH2D* eff[12]    = {0,0,0,0,0,0,0,0,0,0,0,0};
 	
 // 	double QCD_xsec[6] = {343500, 32050, 6791, 1214, 118.7, 24.91}; //Spring16
 	double QCD_xsec[6] = {346400, 32010, 6842, 1203, 120.1, 25.40}; //PUMoriond17
@@ -70,7 +82,7 @@ void SIMP_QCD_eff2D(){
 	double lumi = 20;
 	
 	std::cout<<"CHF cuts: ";
-	for(int j = 0; j < 11; j++){
+	for(int j = 0; j < 12; j++){
 		std::ostringstream strs;
 		double dbl = chf_cuts[j];
 		strs << dbl;
@@ -96,12 +108,12 @@ void SIMP_QCD_eff2D(){
     SANtuple SPVjets;
     SPVjets.Init(SPVchain);
 		
-		Int_t Nentries = corrjets.fChain->GetEntries(); 
-// 		Int_t Nentries = 1000; 
-		double weight = QCD_xsec[l]*lumi/Nentries;
-		std::cout<<"QCD bin "<<l<<": Processing "<<Nentries<<" entries with weight "<<weight<<std::endl;
+		Int_t entries = corrjets.fChain->GetEntries(); 
+		Int_t Nentries[6] = {10000000, 2000000, 200000, 40000, 4000, 2000}; 
+		double weight = QCD_xsec[l]*lumi/Nentries[l];
+		std::cout<<"QCD bin "<<l<<": Processing "<<entries<<" entries with weight "<<weight<<std::endl;
 		
-		for(Int_t entry = 0; entry < Nentries; ++entry){
+		for(Int_t entry = 0; entry < entries; ++entry){
 			if(entry%1000000==0) std::cout<<"processed "<<entry/1000000<<"M events"<<std::endl;
 			SPVjets.GetEntry(entry);
       corrjets.GetEntry(entry);
@@ -131,25 +143,66 @@ void SIMP_QCD_eff2D(){
 				CHEF_corrjet[i] = corrjets.jet_efrac_ch_Had[i]+corrjets.jet_efrac_ch_EM[i]+corrjets.jet_efrac_ch_Mu[i];
 			} 
 			
+			double deltaphi_jet1 = corrjets.jet_phi[0] - SPVjets.jet_phi[0];
+      if(deltaphi_jet1 > TMath::Pi()) deltaphi_jet1 -= 2*TMath::Pi();
+      if(deltaphi_jet1 < -TMath::Pi()) deltaphi_jet1 += 2*TMath::Pi();
+      double deltaphi_jet2 = corrjets.jet_phi[1] - SPVjets.jet_phi[0];
+      if(deltaphi_jet2 > TMath::Pi()) deltaphi_jet2 -= 2*TMath::Pi();
+      if(deltaphi_jet2 < -TMath::Pi()) deltaphi_jet2 += 2*TMath::Pi();
+      
+      double deltaeta_jet1 = corrjets.jet_eta[0] - SPVjets.jet_eta[0];
+      double deltaeta_jet2 = corrjets.jet_eta[1] - SPVjets.jet_eta[0];
+      
+      double dRjet1 = TMath::Sqrt(deltaphi_jet1*deltaphi_jet1 + deltaeta_jet1*deltaeta_jet1);
+      double dRjet2 = TMath::Sqrt(deltaphi_jet2*deltaphi_jet2 + deltaeta_jet2*deltaeta_jet2);
+			
 			output->cd();
 			
 			if (corrjets.jet_pt[0] > 250.0 && corrjets.jet_pt[1] > 250.0 && fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0 && deltajet_phi > 2.0 /*&& npixhits[0] > 0*/ && ( corrjets.photon_passLooseId[0] == 0 || (corrjets.photon_passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1))){
-        if(CHEF_corrjet[0] > 0.5){
-          total->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
-          for(int j = 0; j < 11; j++){
-            if (/*CHEF_SPVjet[1]<chf_cuts[j] &&*/ CHEF_corrjet[1]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
+        if (dRjet1 < 0.4){
+          if(CHEF_corrjet[0] > 0.5 || CHEF_SPVjet[0]>0.5){
+            total->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
+            for(int j = 0; j < 12; j++){
+              if (CHEF_SPVjet[1]<chf_cuts[j] && CHEF_corrjet[1]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
+            }
           }
-        }
-        if(CHEF_corrjet[1] > 0.5){
-          total->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
-          for(int j = 0; j < 11; j++){
-            if (/*CHEF_SPVjet[0]<chf_cuts[j] && */CHEF_corrjet[0]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
+          if(CHEF_corrjet[1] > 0.5){
+            total->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
+            for(int j = 0; j < 12; j++){
+              if (CHEF_SPVjet[0]<chf_cuts[j] && CHEF_corrjet[0]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
+            }
           }
+        }else if (dRjet2 < 0.4){
+          if(CHEF_corrjet[0] > 0.5){
+            total->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
+            for(int j = 0; j < 12; j++){
+              if (CHEF_SPVjet[1]<chf_cuts[j] && CHEF_corrjet[1]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
+            }
+          }
+          if(CHEF_corrjet[1] > 0.5){
+            total->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
+            for(int j = 0; j < 12; j++){
+              if (CHEF_SPVjet[0]<chf_cuts[j] && CHEF_corrjet[0]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
+            }
+          }          
+        }else{
+          if(CHEF_corrjet[0] > 0.5){
+            total->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
+            for(int j = 0; j < 12; j++){
+              if (CHEF_SPVjet[1]<chf_cuts[j] && CHEF_corrjet[1]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
+            }
+          }
+          if(CHEF_corrjet[1] > 0.5){
+            total->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
+            for(int j = 0; j < 12; j++){
+              if (CHEF_SPVjet[0]<chf_cuts[j] && CHEF_corrjet[0]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
+            }
+          }        
         }
 			}    
 		}
 	}
-	for(int j = 0; j < 11; j++){
+	for(int j = 0; j < 12; j++){
 		eff[j]->Divide(passed[j], total, 1, 1, "b");
 	}
   output->Write();

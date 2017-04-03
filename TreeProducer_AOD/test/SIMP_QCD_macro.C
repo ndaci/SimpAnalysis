@@ -24,38 +24,66 @@ void SIMP_QCD_macro(){
   
   TChain* chain0 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_300To500(chain0);
+//   chain0->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT300To500_PUMoriond17.root");
+//   chain0->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT300To500_PUMoriond17_ext_0.root");
+//   chain0->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT300To500_PUMoriond17_ext_1.root");
   TChain* chain1 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_500To700(chain1);
+//   chain1->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT500To700_PUMoriond17.root");
+//   chain1->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT500To700_PUMoriond17_ext_0.root");
+//   chain1->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT500To700_PUMoriond17_ext_1.root");
   TChain* chain2 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_700To1000(chain2);
+//   chain2->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT700To1000_PUMoriond17_ext.root");
+//   chain2->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT700To1000_PUMoriond17.root");
   TChain* chain3 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_1000To1500(chain3);
+//   chain3->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT1000To1500_PUMoriond17_ext.root");
+//   chain3->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT1000To1500_PUMoriond17.root");
   TChain* chain4 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_1500To2000(chain4);
+//   chain4->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT1500To2000_PUMoriond17_ext.root");
+//   chain4->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT1500To2000_PUMoriond17.root");
   TChain* chain5 = new TChain("treeCorr/SimpAnalysis");
 	list_QCD_2000ToInf(chain5);
+//   chain5->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT2000ToInf_PUMoriond17.root");
+//   chain5->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT2000ToInf_PUMoriond17_ext.root");
 //   chain5->Add("ROOTFiles/SIMPs_QCD_HT2000ToInf_PUMoriond17.root");
 //   chain5->Add("QCD_PUMoriond17_AOD_test.root");
 	TChain* chains[6] = {chain0, chain1, chain2, chain3, chain4, chain5};
   
   TChain* SPVchain0 = new TChain("treeSPV/SimpAnalysis");
 	list_QCD_300To500(SPVchain0);
+//   SPVchain0->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT300To500_PUMoriond17.root");
+//   SPVchain0->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT300To500_PUMoriond17_ext_0.root");
+//   SPVchain0->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT300To500_PUMoriond17_ext_1.root");
   TChain* SPVchain1 = new TChain("treeSPV/SimpAnalysis");
 	list_QCD_500To700(SPVchain1);
+//   SPVchain1->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT500To700_PUMoriond17.root");
+//   SPVchain1->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT500To700_PUMoriond17_ext_0.root");
+//   SPVchain1->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT500To700_PUMoriond17_ext_1.root");
   TChain* SPVchain2 = new TChain("treeSPV/SimpAnalysis");
 	list_QCD_700To1000(SPVchain2);
+//   SPVchain2->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT700To1000_PUMoriond17_ext.root");
+//   SPVchain2->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT700To1000_PUMoriond17.root");
   TChain* SPVchain3 = new TChain("treeSPV/SimpAnalysis");
 	list_QCD_1000To1500(SPVchain3);
+//   SPVchain3->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT1000To1500_PUMoriond17_ext.root");
+//   SPVchain3->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT1000To1500_PUMoriond17.root");
   TChain* SPVchain4 = new TChain("treeSPV/SimpAnalysis");
 	list_QCD_1500To2000(SPVchain4);
+//   SPVchain4->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT1500To2000_PUMoriond17_ext.root");
+//   SPVchain4->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT1500To2000_PUMoriond17.root");
   TChain* SPVchain5 = new TChain("treeSPV/SimpAnalysis");
 	list_QCD_2000ToInf(SPVchain5);
+//   SPVchain5->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT2000ToInf_PUMoriond17.root");
+//   SPVchain5->Add("/pnfs/iihe/cms/store/user/gflouris/SIMPS/QCD_Skimmed/SIMPs_QCD_HT2000ToInf_PUMoriond17_ext.root");
 //   SPVchain5->Add("ROOTFiles/SIMPs_QCD_HT2000ToInf_PUMoriond17.root");
 //   SPVchain5->Add("QCD_PUMoriond17_AOD_test.root");
 	TChain* SPVchains[6] = {SPVchain0, SPVchain1, SPVchain2, SPVchain3, SPVchain4, SPVchain5};
 	std::cout<<"TChains ready"<<std::endl;
   
-  TFile *output = new TFile("plots_QCD_lumi33p095_PUMoriond17_AOD.root", "RECREATE");
+  TFile *output = new TFile("plots_QCD_lumi33p095_PUMoriond17_AOD_noEtaCutForEtaOnly.root", "RECREATE");
   
   double CHEF_SPVjet[8], CHEF_corrjet[8];
   int counter;
@@ -64,6 +92,7 @@ void SIMP_QCD_macro(){
 	TH1F *nvtx = new TH1F("nvtx", "Number of vertices", 51, -0.5, 50.5);
 	TH1F *HT = new TH1F("HT", "HT (4 jets)", 100, 0, 2000);
 	TH1F *HT_nowgt = new TH1F("HT_noweight", "HT (4 jets) without correct weights", 100, 0, 2000);
+  TH1F *METOverHT = new TH1F("METOverHT", "MET / HT(4 jets)", 100, 0, 1);	
 	TH1F *jet1_pt = new TH1F("jet1_pt", "Leading jet pt", 100, 0, 2000);
 	TH1F *jet1_pt_SPV = new TH1F("jet1_pt_SPV", "Leading jet pt SPV collection", 100, 0, 2000);
 	TH1F *jet2_pt = new TH1F("jet2_pt", "Subleading jet pt", 100, 0, 2000);
@@ -139,7 +168,8 @@ void SIMP_QCD_macro(){
 // 	double QCD_events[5] = {16830696, 19199088, 15621634, 4980387, 3846616};
 // 	double lumi = 0.062*1000; // in 1000 fb^-1 = pb^-1
   double lumi = 33.095*1000; //RunB-H
-  double Nentries[6] = {54552852, 0, 0, 0, 11839357, 6039005};
+//   double Nentries[6] = {54552852, 62949818, 44806861, 15186097, 11839357, 6039005};
+  double Nentries[6] = {54552852, 62949818, 44806861, 15186097, 11839357, 6039005};
   
 	for (int j = 0; j < 6; j++){
 		TChain* chain = chains[j];		
@@ -161,6 +191,7 @@ void SIMP_QCD_macro(){
 			if(entry%1000000==0) std::cout<<"processed "<<entry/1000000<<"M events"<<std::endl;
       SPVjets.GetEntry(entry);
       corrjets.GetEntry(entry);
+//       std::cout<<entry<<std::endl;
 			
 // 			Double_t random1 = r.Uniform();
 			
@@ -189,132 +220,141 @@ void SIMP_QCD_macro(){
 			
 			output->cd();
 			
-			if (corrjets.jet_pt[0] > 250 && corrjets.jet_pt[1] > 250 && fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0 && deltajet_phi > 2 && corrjets.track_nPixHits[0] > 0 && (corrjets.photon_passLooseId[0] == 0 || (corrjets.photon_passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1))){
-				njets->Fill(corrjets.nJet, weight);
-				nvtx->Fill(corrjets.vtx_N, weight);
-				HT->Fill(corrjets.jet_pt[0]+corrjets.jet_pt[1]+corrjets.jet_pt[2]+corrjets.jet_pt[3], weight);
-				HT_nowgt->Fill(corrjets.jet_pt[0]+corrjets.jet_pt[1]+corrjets.jet_pt[2]+corrjets.jet_pt[3]);
-				
-				jet1_pt->Fill(corrjets.jet_pt[0], weight);
-        jet1_pt_SPV->Fill(SPVjets.jet_pt[0], weight);
-				jet2_pt->Fill(corrjets.jet_pt[1], weight);
-// 				if (jet_pt[2] > 20) jet3_pt->Fill(jet_pt[2], weight);
-// 				if (jet_pt[3] > 20) jet4_pt->Fill(jet_pt[3], weight);
-				
+//       std::cout<<"pt1: "<< corrjets.jet_pt[0]<<" pt2: "<<corrjets.jet_pt[1]<<" eta1: "<<corrjets.jet_eta[0]<<" eta2: "<<corrjets.jet_eta[1]<<" deltaphi: "<<deltajet_phi<<std::endl;
+      
+			if (corrjets.jet_pt[0] > 250 && corrjets.jet_pt[1] > 250 /*&& fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0*/ && deltajet_phi > 2 /*&& corrjets.track_nPixHits[0] > 0*/ && (corrjets.photon_passLooseId[0] == 0 || (corrjets.photon_passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1))){				
 				jet1_eta->Fill(corrjets.jet_eta[0], weight);
 				jet1_eta_SPV->Fill(SPVjets.jet_eta[0], weight);
 				jet2_eta->Fill(corrjets.jet_eta[1], weight);
-				jet1_phi->Fill(corrjets.jet_phi[0], weight);
-				jet2_phi->Fill(corrjets.jet_phi[1], weight);
-				deltaphi->Fill(deltajet_phi, weight);
-				
-				jet1_chf->Fill(CHEF_corrjet[0], weight);
-				jet2_chf->Fill(CHEF_corrjet[1], weight);
-				if (CHEF_corrjet[1] > 0.5) jet1_chf_jet2_0p5->Fill(CHEF_corrjet[0], weight);
-				jet1_chf_SPV->Fill(CHEF_SPVjet[0], weight);
-				jet2_chf_SPV->Fill(CHEF_SPVjet[1], weight);
-				ChfOverSPVChF->Fill(CHEF_corrjet[0]/CHEF_SPVjet[0], weight);
-				ChfOverSPVChF->Fill(CHEF_corrjet[1]/CHEF_SPVjet[1], weight);
         
-        double deltaphi_jet1 = corrjets.jet_phi[0] - SPVjets.jet_phi[0];
-        if(deltaphi_jet1 > TMath::Pi()) deltaphi_jet1 -= 2*TMath::Pi();
-        if(deltaphi_jet1 < -TMath::Pi()) deltaphi_jet1 += 2*TMath::Pi();
-        double deltaphi_jet2 = corrjets.jet_phi[1] - SPVjets.jet_phi[0];
-        if(deltaphi_jet2 > TMath::Pi()) deltaphi_jet2 -= 2*TMath::Pi();
-        if(deltaphi_jet2 < -TMath::Pi()) deltaphi_jet2 += 2*TMath::Pi();
-        
-        double deltaeta_jet1 = corrjets.jet_eta[0] - SPVjets.jet_eta[0];
-        double deltaeta_jet2 = corrjets.jet_eta[1] - SPVjets.jet_eta[0];
-        
-        double dRjet1 = TMath::Sqrt(deltaphi_jet1*deltaphi_jet1 + deltaeta_jet1*deltaeta_jet1);
-        double dRjet2 = TMath::Sqrt(deltaphi_jet2*deltaphi_jet2 + deltaeta_jet2*deltaeta_jet2);         
-        if (dRjet1 < 0.4){
-          if (CHEF_corrjet[1]<0.05) ChfVsSPVChf->Fill(CHEF_corrjet[0], CHEF_SPVjet[0], weight);
-          if (CHEF_corrjet[0]<0.05)ChfVsSPVChf->Fill(CHEF_corrjet[1], CHEF_SPVjet[1], weight);
-        }else if(dRjet2 < 0.4){
-          if (CHEF_corrjet[1]<0.05) ChfVsSPVChf->Fill(CHEF_corrjet[0], CHEF_SPVjet[1], weight);
-          if (CHEF_corrjet[0]<0.05) ChfVsSPVChf->Fill(CHEF_corrjet[1], CHEF_SPVjet[0], weight);          
-        }else counter++;
-// 				if (jet_pt[2] > 20) jet3_chf->Fill(CHEF_jet[2], weight);
-// 				if (jet_pt[3] > 20) jet4_chf->Fill(CHEF_jet[3], weight);
-// 				CHF->Fill(CHEF_jet[0], weight);
-// 				CHF->Fill(CHEF_jet[1], weight);
-				CHFvsCHF->Fill(CHEF_corrjet[1], CHEF_corrjet[0], weight);				
-				CHFvsPT->Fill(corrjets.jet_pt[0], CHEF_corrjet[0], weight);
-				CHFvsPT->Fill(corrjets.jet_pt[1], CHEF_corrjet[1], weight);
-				
-				genjet1_chf->Fill(corrjets.genjet_efrac_ch[0], weight);
-				genjet2_chf->Fill(corrjets.genjet_efrac_ch[1], weight);
-				CHFvsGenCHF1->Fill(corrjets.genjet_efrac_ch[0], CHEF_corrjet[0], weight);
-				CHFvsGenCHF2->Fill(corrjets.genjet_efrac_ch[1], CHEF_corrjet[1], weight);
-				relChF1->Fill((CHEF_corrjet[0]-corrjets.genjet_efrac_ch[0])/corrjets.genjet_efrac_ch[0], weight);
-				relChF2->Fill((CHEF_corrjet[1]-corrjets.genjet_efrac_ch[1])/corrjets.genjet_efrac_ch[1], weight);
-				
-				eta1vsnpixhits->Fill(corrjets.track_nPixHits[0], corrjets.jet_eta[0], weight);
-				eta2vsnpixhits->Fill(corrjets.track_nPixHits[0], corrjets.jet_eta[1], weight);
-				
-				NVTXvsCHF->Fill(CHEF_corrjet[0], corrjets.vtx_N, weight);
-				NVTXvsCHF->Fill(CHEF_corrjet[1], corrjets.vtx_N, weight);
-				NVTXvsCHF1->Fill(CHEF_corrjet[0], corrjets.vtx_N, weight);
-				NVTXvsCHF2->Fill(CHEF_corrjet[1], corrjets.vtx_N, weight);
-				
-				Chi2vsCHF->Fill(CHEF_corrjet[0], corrjets.track_normalizedChi2[0], weight);
-				Chi2vsCHF->Fill(CHEF_corrjet[1], corrjets.track_normalizedChi2[0], weight);
-				Chi2vsCHF1->Fill(CHEF_corrjet[0], corrjets.track_normalizedChi2[0], weight);
-				Chi2vsCHF2->Fill(CHEF_corrjet[1], corrjets.track_normalizedChi2[0], weight);
-				
-				ndofvsCHF->Fill(CHEF_corrjet[0], corrjets.track_ndof[0], weight);
-				ndofvsCHF->Fill(CHEF_corrjet[1], corrjets.track_ndof[0], weight);
-				ndofvsCHF1->Fill(CHEF_corrjet[0], corrjets.track_ndof[0], weight);
-				ndofvsCHF2->Fill(CHEF_corrjet[1], corrjets.track_ndof[0], weight);
-				
-// 				Pt1vsCHF1->Fill(CHEF_jet[0], jet_pt[0], weight);
-// 				Pt2vsCHF2->Fill(CHEF_jet[1], jet_pt[1], weight);
-// 				eta1vsCHF1->Fill(CHEF_jet[0], jet_eta[0], weight);
-// 				eta2vsCHF2->Fill(CHEF_jet[1], jet_eta[1], weight);				
-// 				Pt2vsCHF1->Fill(CHEF_jet[0], jet_pt[1], weight);
-// 				Pt1vsCHF2->Fill(CHEF_jet[1], jet_pt[0], weight);
-// 				eta2vsCHF1->Fill(CHEF_jet[0], jet_eta[1], weight);
-// 				eta1vsCHF2->Fill(CHEF_jet[1], jet_eta[0], weight);
-				
-				track1_nhits->Fill(corrjets.track_nhits[0], weight);
-				track1_npixhits->Fill(corrjets.track_nPixHits[0], weight);
-				track1_pt->Fill(corrjets.track_pt[0], weight);
-				track1_ptError->Fill(corrjets.track_ptError[0], weight);
-				track1_dzError->Fill(corrjets.track_dzError[0], weight);
-				track1_dz->Fill(corrjets.track_dz[0], weight);
-				track1_dzRelError->Fill(corrjets.track_dzError[0]/corrjets.track_dz[0], weight);
-				track1_reldzErrorvsdz->Fill(corrjets.track_dz[0], corrjets.track_dzError[0]/corrjets.track_dz[0], weight);
-// 				track1_fromPV->Fill(track_fromPV[0], weight);
-				
-// 				if (ndof[0] == 0) std::cout<<vtx_x[0]<<"\t"<<vtx_y[0]<<"\t"<<vtx_z[0]<<"\t"<<vtx_d0[0]<<std::endl;
-				
-				Chi2vsNdof->Fill(corrjets.track_ndof[0], corrjets.track_normalizedChi2[0], weight);
-				
-// 				if(CHEF_jet[0] > CHEF_jet[1]){
-// 					jetA_pt->Fill(jet_pt[0], weight);
-// 					jetB_pt->Fill(jet_pt[1], weight);
-// 					jetA_eta->Fill(jet_eta[0], weight);
-// 					jetB_eta->Fill(jet_eta[1], weight);
-// 				}
-// 				else if(CHEF_jet[0] < CHEF_jet[1]){
-// 					jetA_pt->Fill(jet_pt[1], weight);
-// 					jetB_pt->Fill(jet_pt[0], weight);
-// 					jetA_eta->Fill(jet_eta[1], weight);
-// 					jetB_eta->Fill(jet_eta[0], weight);
-// 				}
-// 				if (jet_pt[1] < 300 && fabs(jet_eta[1]) < 1.0 && CHEF_jet[0] > 0.5) chf0p5->Fill(CHEF_jet[1], weight);
-// 				if (jet_pt[0] < 300 && fabs(jet_eta[0]) < 1.0 && CHEF_jet[1] > 0.5) chf0p5->Fill(CHEF_jet[0], weight);
-// 				if (jet_pt[1] < 300 && fabs(jet_eta[1]) < 1.0 && CHEF_jet[0] < 0.2) chf0p2->Fill(CHEF_jet[1], weight);
-// 				if (jet_pt[0] < 300 && fabs(jet_eta[0]) < 1.0 && CHEF_jet[1] < 0.2) chf0p2->Fill(CHEF_jet[0], weight);
-// 				
-// 				if (CHEF_jet[1] > 0.5) CHFvsPT_0p5->Fill(jet_pt[0], CHEF_jet[0], weight);
-// 				if (CHEF_jet[0] > 0.5) CHFvsPT_0p5->Fill(jet_pt[1], CHEF_jet[1], weight);
-// 				if (CHEF_jet[1] < 0.2) CHFvsPT_0p2->Fill(jet_pt[0], CHEF_jet[0], weight);
-// 				if (CHEF_jet[0] < 0.2) CHFvsPT_0p2->Fill(jet_pt[1], CHEF_jet[1], weight);
-				
-// 				if(random1 <= 0.5 && CHEF_jet[0] > 0.5) ChFOtherJet->Fill(CHEF_jet[1], weight);
-// 				else if (random1 > 0.5 && CHEF_jet[1] > 0.5) ChFOtherJet->Fill(CHEF_jet[0], weight);
+        if (fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0){
+          njets->Fill(corrjets.nJet, weight);
+          nvtx->Fill(corrjets.vtx_N, weight);
+          HT->Fill(corrjets.jet_pt[0]+corrjets.jet_pt[1]+corrjets.jet_pt[2]+corrjets.jet_pt[3], weight);
+          HT_nowgt->Fill(corrjets.jet_pt[0]+corrjets.jet_pt[1]+corrjets.jet_pt[2]+corrjets.jet_pt[3]);
+          METOverHT->Fill(corrjets.MET/(corrjets.jet_pt[0]+corrjets.jet_pt[1]+corrjets.jet_pt[2]+corrjets.jet_pt[3]), weight);
+          
+          jet1_pt->Fill(corrjets.jet_pt[0], weight);
+          jet1_pt_SPV->Fill(SPVjets.jet_pt[0], weight);
+          jet2_pt->Fill(corrjets.jet_pt[1], weight);
+  // 				if (jet_pt[2] > 20) jet3_pt->Fill(jet_pt[2], weight);
+  // 				if (jet_pt[3] > 20) jet4_pt->Fill(jet_pt[3], weight);
+          jet1_phi->Fill(corrjets.jet_phi[0], weight);
+          jet2_phi->Fill(corrjets.jet_phi[1], weight);
+          deltaphi->Fill(deltajet_phi, weight);
+          
+          jet1_chf->Fill(CHEF_corrjet[0], weight);
+          jet2_chf->Fill(CHEF_corrjet[1], weight);
+          if (CHEF_corrjet[1] > 0.5) jet1_chf_jet2_0p5->Fill(CHEF_corrjet[0], weight);
+          jet1_chf_SPV->Fill(CHEF_SPVjet[0], weight);
+          jet2_chf_SPV->Fill(CHEF_SPVjet[1], weight);
+          ChfOverSPVChF->Fill(CHEF_corrjet[0]/CHEF_SPVjet[0], weight);
+          ChfOverSPVChF->Fill(CHEF_corrjet[1]/CHEF_SPVjet[1], weight);
+          
+          double deltaphi_jet1 = corrjets.jet_phi[0] - SPVjets.jet_phi[0];
+          if(deltaphi_jet1 > TMath::Pi()) deltaphi_jet1 -= 2*TMath::Pi();
+          if(deltaphi_jet1 < -TMath::Pi()) deltaphi_jet1 += 2*TMath::Pi();
+          double deltaphi_jet2 = corrjets.jet_phi[1] - SPVjets.jet_phi[0];
+          if(deltaphi_jet2 > TMath::Pi()) deltaphi_jet2 -= 2*TMath::Pi();
+          if(deltaphi_jet2 < -TMath::Pi()) deltaphi_jet2 += 2*TMath::Pi();
+          
+          double deltaeta_jet1 = corrjets.jet_eta[0] - SPVjets.jet_eta[0];
+          double deltaeta_jet2 = corrjets.jet_eta[1] - SPVjets.jet_eta[0];
+          
+          double dRjet1 = TMath::Sqrt(deltaphi_jet1*deltaphi_jet1 + deltaeta_jet1*deltaeta_jet1);
+          double dRjet2 = TMath::Sqrt(deltaphi_jet2*deltaphi_jet2 + deltaeta_jet2*deltaeta_jet2);         
+          if (dRjet1 < 0.4){
+  //           ChfVsSPVChf->Fill(CHEF_corrjet[0], CHEF_SPVjet[0], weight);
+            if (CHEF_corrjet[0]>CHEF_corrjet[1]) ChfVsSPVChf->Fill(CHEF_corrjet[0], CHEF_SPVjet[0], weight);
+            if (CHEF_corrjet[1]>CHEF_corrjet[0]) ChfVsSPVChf->Fill(CHEF_corrjet[1], CHEF_SPVjet[1], weight);
+  //           std::cout<<"corrjet1: "<<CHEF_corrjet[0]<<" SPVjet1: "<<CHEF_SPVjet[0]<<" corrjet2: "<<CHEF_corrjet[1]<<" SPVjet2: "<<CHEF_SPVjet[1]<<std::endl;
+          }else if(dRjet2 < 0.4){
+  //           ChfVsSPVChf->Fill(CHEF_corrjet[0], CHEF_SPVjet[1], weight);
+            if (CHEF_corrjet[0]>CHEF_corrjet[1]) ChfVsSPVChf->Fill(CHEF_corrjet[0], CHEF_SPVjet[1], weight);
+            if (CHEF_corrjet[1]>CHEF_corrjet[0]) ChfVsSPVChf->Fill(CHEF_corrjet[1], CHEF_SPVjet[0], weight);   
+  //           std::cout<<"corrjet1: "<<CHEF_corrjet[0]<<" SPVjet1: "<<CHEF_SPVjet[0]<<" corrjet2: "<<CHEF_corrjet[1]<<" SPVjet2: "<<CHEF_SPVjet[1]<<std::endl;       
+          }else counter++;
+  // 				if (jet_pt[2] > 20) jet3_chf->Fill(CHEF_jet[2], weight);
+  // 				if (jet_pt[3] > 20) jet4_chf->Fill(CHEF_jet[3], weight);
+  // 				CHF->Fill(CHEF_jet[0], weight);
+  // 				CHF->Fill(CHEF_jet[1], weight);
+          CHFvsCHF->Fill(CHEF_corrjet[1], CHEF_corrjet[0], weight);				
+          CHFvsPT->Fill(corrjets.jet_pt[0], CHEF_corrjet[0], weight);
+          CHFvsPT->Fill(corrjets.jet_pt[1], CHEF_corrjet[1], weight);
+          
+          genjet1_chf->Fill(corrjets.genjet_efrac_ch[0], weight);
+          genjet2_chf->Fill(corrjets.genjet_efrac_ch[1], weight);
+          CHFvsGenCHF1->Fill(corrjets.genjet_efrac_ch[0], CHEF_corrjet[0], weight);
+          CHFvsGenCHF2->Fill(corrjets.genjet_efrac_ch[1], CHEF_corrjet[1], weight);
+          relChF1->Fill((CHEF_corrjet[0]-corrjets.genjet_efrac_ch[0])/corrjets.genjet_efrac_ch[0], weight);
+          relChF2->Fill((CHEF_corrjet[1]-corrjets.genjet_efrac_ch[1])/corrjets.genjet_efrac_ch[1], weight);
+          
+          eta1vsnpixhits->Fill(corrjets.track_nPixHits[0], corrjets.jet_eta[0], weight);
+          eta2vsnpixhits->Fill(corrjets.track_nPixHits[0], corrjets.jet_eta[1], weight);
+          
+          NVTXvsCHF->Fill(CHEF_corrjet[0], corrjets.vtx_N, weight);
+          NVTXvsCHF->Fill(CHEF_corrjet[1], corrjets.vtx_N, weight);
+          NVTXvsCHF1->Fill(CHEF_corrjet[0], corrjets.vtx_N, weight);
+          NVTXvsCHF2->Fill(CHEF_corrjet[1], corrjets.vtx_N, weight);
+          
+          Chi2vsCHF->Fill(CHEF_corrjet[0], corrjets.track_normalizedChi2[0], weight);
+          Chi2vsCHF->Fill(CHEF_corrjet[1], corrjets.track_normalizedChi2[0], weight);
+          Chi2vsCHF1->Fill(CHEF_corrjet[0], corrjets.track_normalizedChi2[0], weight);
+          Chi2vsCHF2->Fill(CHEF_corrjet[1], corrjets.track_normalizedChi2[0], weight);
+          
+          ndofvsCHF->Fill(CHEF_corrjet[0], corrjets.track_ndof[0], weight);
+          ndofvsCHF->Fill(CHEF_corrjet[1], corrjets.track_ndof[0], weight);
+          ndofvsCHF1->Fill(CHEF_corrjet[0], corrjets.track_ndof[0], weight);
+          ndofvsCHF2->Fill(CHEF_corrjet[1], corrjets.track_ndof[0], weight);
+          
+  // 				Pt1vsCHF1->Fill(CHEF_jet[0], jet_pt[0], weight);
+  // 				Pt2vsCHF2->Fill(CHEF_jet[1], jet_pt[1], weight);
+  // 				eta1vsCHF1->Fill(CHEF_jet[0], jet_eta[0], weight);
+  // 				eta2vsCHF2->Fill(CHEF_jet[1], jet_eta[1], weight);				
+  // 				Pt2vsCHF1->Fill(CHEF_jet[0], jet_pt[1], weight);
+  // 				Pt1vsCHF2->Fill(CHEF_jet[1], jet_pt[0], weight);
+  // 				eta2vsCHF1->Fill(CHEF_jet[0], jet_eta[1], weight);
+  // 				eta1vsCHF2->Fill(CHEF_jet[1], jet_eta[0], weight);
+          
+          track1_nhits->Fill(corrjets.track_nhits[0], weight);
+          track1_npixhits->Fill(corrjets.track_nPixHits[0], weight);
+          track1_pt->Fill(corrjets.track_pt[0], weight);
+          track1_ptError->Fill(corrjets.track_ptError[0], weight);
+          track1_dzError->Fill(corrjets.track_dzError[0], weight);
+          track1_dz->Fill(corrjets.track_dz[0], weight);
+          track1_dzRelError->Fill(corrjets.track_dzError[0]/corrjets.track_dz[0], weight);
+          track1_reldzErrorvsdz->Fill(corrjets.track_dz[0], corrjets.track_dzError[0]/corrjets.track_dz[0], weight);
+  // 				track1_fromPV->Fill(track_fromPV[0], weight);
+          
+  // 				if (ndof[0] == 0) std::cout<<vtx_x[0]<<"\t"<<vtx_y[0]<<"\t"<<vtx_z[0]<<"\t"<<vtx_d0[0]<<std::endl;
+          
+          Chi2vsNdof->Fill(corrjets.track_ndof[0], corrjets.track_normalizedChi2[0], weight);
+          
+  // 				if(CHEF_jet[0] > CHEF_jet[1]){
+  // 					jetA_pt->Fill(jet_pt[0], weight);
+  // 					jetB_pt->Fill(jet_pt[1], weight);
+  // 					jetA_eta->Fill(jet_eta[0], weight);
+  // 					jetB_eta->Fill(jet_eta[1], weight);
+  // 				}
+  // 				else if(CHEF_jet[0] < CHEF_jet[1]){
+  // 					jetA_pt->Fill(jet_pt[1], weight);
+  // 					jetB_pt->Fill(jet_pt[0], weight);
+  // 					jetA_eta->Fill(jet_eta[1], weight);
+  // 					jetB_eta->Fill(jet_eta[0], weight);
+  // 				}
+  // 				if (jet_pt[1] < 300 && fabs(jet_eta[1]) < 1.0 && CHEF_jet[0] > 0.5) chf0p5->Fill(CHEF_jet[1], weight);
+  // 				if (jet_pt[0] < 300 && fabs(jet_eta[0]) < 1.0 && CHEF_jet[1] > 0.5) chf0p5->Fill(CHEF_jet[0], weight);
+  // 				if (jet_pt[1] < 300 && fabs(jet_eta[1]) < 1.0 && CHEF_jet[0] < 0.2) chf0p2->Fill(CHEF_jet[1], weight);
+  // 				if (jet_pt[0] < 300 && fabs(jet_eta[0]) < 1.0 && CHEF_jet[1] < 0.2) chf0p2->Fill(CHEF_jet[0], weight);
+  // 				
+  // 				if (CHEF_jet[1] > 0.5) CHFvsPT_0p5->Fill(jet_pt[0], CHEF_jet[0], weight);
+  // 				if (CHEF_jet[0] > 0.5) CHFvsPT_0p5->Fill(jet_pt[1], CHEF_jet[1], weight);
+  // 				if (CHEF_jet[1] < 0.2) CHFvsPT_0p2->Fill(jet_pt[0], CHEF_jet[0], weight);
+  // 				if (CHEF_jet[0] < 0.2) CHFvsPT_0p2->Fill(jet_pt[1], CHEF_jet[1], weight);
+          
+  // 				if(random1 <= 0.5 && CHEF_jet[0] > 0.5) ChFOtherJet->Fill(CHEF_jet[1], weight);
+  // 				else if (random1 > 0.5 && CHEF_jet[1] > 0.5) ChFOtherJet->Fill(CHEF_jet[0], weight);
+        }
 			}    
 		}
 	}
