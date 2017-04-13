@@ -65,7 +65,7 @@ void SIMP_macro(int j){
 		double dbl = mass[j];
 		strs << dbl;
 		std::string m = strs.str();
-    outputfiles[j] = new TFile(("plots_SIMPs_M"+m+"_lumi33p095_withetacut.root").c_str(), "RECREATE");
+    outputfiles[j] = new TFile(("plots_SIMPs_M"+m+"_lumi33p095_withNvertexCut.root").c_str(), "RECREATE");
 //   }
   
 // 	for (int j = 0; j < 7; j++){
@@ -73,6 +73,7 @@ void SIMP_macro(int j){
     TFile *output = outputfiles[j];
     TH1F *njets = new TH1F("njets", "Number of jets", 11, -0.5, 10.5);
     TH1F *nvtx = new TH1F("nvtx", "Number of vertices", 51, -0.5, 50.5);
+    TH1F *vtx_ntracks = new TH1F("vtx_ntracks", "# tracks PV", 101, -0.5, 100.5);
     TH1F *HT = new TH1F("HT", "HT (4 jets)", 100, 0, 2000);
     TH1F *HT_nowgt = new TH1F("HT_noweight", "HT (4 jets) without correct weights", 100, 0, 2000);
     TH1F *METOverHT = new TH1F("METOverHT", "MET / HT(4 jets)", 100, 0, 1);	
@@ -164,16 +165,25 @@ void SIMP_macro(int j){
 			if(deltajet_phi > TMath::Pi()) deltajet_phi -= 2*TMath::Pi();
 			if(deltajet_phi < -TMath::Pi()) deltajet_phi += 2*TMath::Pi();
 			deltajet_phi = fabs(deltajet_phi);
+      
+      double photonpt = 0;
+      photon_nr = 0;
+      for (int i = 0; i < 4; ++i){
+        if(corrjets.photon_pt[i]>photonpt){
+          photon_nr = i;
+          photonpt = corrjets.photon_pt[i];
+        }
+      }
 			
-			double deltaphi_jet1photon = corrjets.jet_phi[0] - corrjets.photon_phi[0];
+			double deltaphi_jet1photon = corrjets.jet_phi[0] - corrjets.photon_phi[photon_nr];
 			if(deltaphi_jet1photon > TMath::Pi()) deltaphi_jet1photon -= 2*TMath::Pi();
 			if(deltaphi_jet1photon < -TMath::Pi()) deltaphi_jet1photon += 2*TMath::Pi();
-			double deltaphi_jet2photon = corrjets.jet_phi[1] - corrjets.photon_phi[0];
+			double deltaphi_jet2photon = corrjets.jet_phi[1] - corrjets.photon_phi[photon_nr];
 			if(deltaphi_jet2photon > TMath::Pi()) deltaphi_jet2photon -= 2*TMath::Pi();
 			if(deltaphi_jet2photon < -TMath::Pi()) deltaphi_jet2photon += 2*TMath::Pi();
 			
-			double deltaeta_jet1photon = corrjets.jet_eta[0] - corrjets.photon_eta[0];
-			double deltaeta_jet2photon = corrjets.jet_eta[1] - corrjets.photon_eta[0];
+			double deltaeta_jet1photon = corrjets.jet_eta[0] - corrjets.photon_eta[photon_nr];
+			double deltaeta_jet2photon = corrjets.jet_eta[1] - corrjets.photon_eta[photon_nr];
 			
 			double dR1 = TMath::Sqrt(deltaphi_jet1photon*deltaphi_jet1photon + deltaeta_jet1photon*deltaeta_jet1photon);
 			double dR2 = TMath::Sqrt(deltaphi_jet2photon*deltaphi_jet2photon + deltaeta_jet2photon*deltaeta_jet2photon);
@@ -185,9 +195,10 @@ void SIMP_macro(int j){
 			
 			output->cd();
 			
-			if (corrjets.jet_pt[0] > 250 && corrjets.jet_pt[1] > 250 && fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0 && deltajet_phi > 2 /*&& nPixHits[0] > 0*/ && (corrjets.photon_passLooseId[0] == 0 || (corrjets.photon_passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1))){
+			if (corrjets.jet_pt[0] > 250 && corrjets.jet_pt[1] > 250 && fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0 && deltajet_phi > 2 /*&& nPixHits[0] > 0*/ && (corrjets.photon_passLooseId[photon_nr] == 0 || (corrjets.photon_passLooseId[photon_nr] == 1 && dR1 > 0.1 && dR2 > 0.1)) && corrjets.vtx_N >= 2){
 				njets->Fill(corrjets.nJet, weight);
 				nvtx->Fill(corrjets.vtx_N, weight);
+				vtx_ntracks->Fill(corrjets.vtx_nTracks[0], weight);
 				HT->Fill(corrjets.jet_pt[0]+corrjets.jet_pt[1]+corrjets.jet_pt[2]+corrjets.jet_pt[3], weight);
 				METOverHT->Fill(corrjets.MET/(corrjets.jet_pt[0]+corrjets.jet_pt[1]+corrjets.jet_pt[2]+corrjets.jet_pt[3]), weight);
 				HT_nowgt->Fill(corrjets.jet_pt[0]+corrjets.jet_pt[1]+corrjets.jet_pt[2]+corrjets.jet_pt[3]);

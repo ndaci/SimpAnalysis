@@ -92,7 +92,7 @@ void SIMP_QCD_closure(){
 	double err_ratio_2leg[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
   
 	std::cout<<"Getting the efficiency histos...";
-	TFile* efficiencies = new TFile("eff2D_QCD_PUMoriond17_AOD.root", "READ");
+	TFile* efficiencies = new TFile("eff2D_QCD_PUMoriond17_AOD_NvertexCut_Njets2.root", "READ");
 	TH2D* eff_histos[12];
 	for(int j = 0; j < 12; j++){
 		std::ostringstream strs;
@@ -104,7 +104,7 @@ void SIMP_QCD_closure(){
 	}
 	std::cout<<"done"<<std::endl;
 	
-  TFile *output = new TFile("closure_test_MCtruthSPVcut_PUMoriond17_AOD_photontest_new.root", "RECREATE");
+  TFile *output = new TFile("closure_test_MCtruthSPVcut_PUMoriond17_AOD_pt350.root", "RECREATE");
 	
 // 	double QCD_xsec[6] = {343500, 32050, 6791, 1214, 118.7, 24.91};//Spring16
 	double QCD_xsec[6] = {346400, 32010, 6842, 1203, 120.1, 25.40}; //PUMoriond17
@@ -121,6 +121,7 @@ void SIMP_QCD_closure(){
     SANtuple SPVjets;
     SPVjets.Init(SPVchain);
 		
+//     Int_t entries = 10000;
 		Int_t entries = corrjets.fChain->GetEntries(); 
 		double weight = QCD_xsec[l]*lumi/entries;
 		std::cout<<"QCD bin "<<l<<": Processing "<<entries<<" entries with weight "<<weight<<std::endl;
@@ -130,6 +131,11 @@ void SIMP_QCD_closure(){
 //       std::cout<<"processed "<<entry<<" events"<<std::endl;
       SPVjets.GetEntry(entry);
       corrjets.GetEntry(entry);
+      
+      double njets = 0;
+      for (int k = 0; k < 8; ++k){
+        if (corrjets.jet_pt[k] > 30) njets++;
+      }
 			
 			double deltajet_phi =  corrjets.jet_phi[0] -  corrjets.jet_phi[1];
 			if(deltajet_phi > TMath::Pi()) deltajet_phi -= 2*TMath::Pi();
@@ -178,7 +184,7 @@ void SIMP_QCD_closure(){
 			
 			output->cd();
       
-			if (corrjets.jet_pt[0] > 250 && corrjets.jet_pt[1] > 250 && fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0 && deltajet_phi > 2 /*&& corrjets.track_nPixHits[0] > 0*/ && (corrjets.photon_passLooseId[photon_nr] == 0 || (corrjets.photon_passLooseId[photon_nr] == 1 && dR1 > 0.1 && dR2 > 0.1))){
+			if (corrjets.jet_pt[0] > 350 && corrjets.jet_pt[1] > 350 && fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0 && deltajet_phi > 2 /*&& corrjets.track_nPixHits[0] > 0*/ && (corrjets.photon_passLooseId[photon_nr] == 0 || (corrjets.photon_passLooseId[photon_nr] == 1 && dR1 > 0.1 && dR2 > 0.1)) && corrjets.vtx_N >= 2 && njets == 2){
         
 //         if (dRjet1 < 0.4 && CHEF_SPVjet[0] > 5*CHEF_corrjet[0] && CHEF_SPVjet[1] > 5*CHEF_corrjet[1]){
 //           std::cout<<corrjets.nEvent<<" "<<corrjets.nLumi<<" "<<CHEF_corrjet[0]<<" "<<CHEF_SPVjet[0]<<" "<<CHEF_corrjet[1]<<" "<<CHEF_SPVjet[1]<<" "<<weight<<std::endl;
@@ -237,13 +243,13 @@ void SIMP_QCD_closure(){
   }
   
 	TCanvas *c1 = new TCanvas("Closure test", "Closure test",1400,1000);
-  TPad *pad1 = new TPad("pad1","pad1",0,0.3,1,1);
+  TPad *pad1 = new TPad("pad1","pad1",0,0.4,1,1);
   pad1->SetBottomMargin(0);
   pad1->SetLogy(1);
   pad1->Draw();
   pad1->cd();
 	TGraphErrors *MC = new TGraphErrors(12, chf_cuts, passed_MCtruth, zero, err_MCtruth);
-	MC->SetTitle("Closure test");
+	MC->SetTitle("");
 	MC->GetXaxis()->SetTitle("CHF cut");
 	MC->GetYaxis()->SetTitle("# events");
 	MC->SetMarkerStyle(20);
@@ -268,20 +274,22 @@ void SIMP_QCD_closure(){
 	twoleg->Draw("P");
 	
 	c1->cd();
-	TPad *pad2 = new TPad("pad2","pad2",0,0,1,0.3);
+	TPad *pad2 = new TPad("pad2","pad2",0,0.24,1,0.4);
   pad2->SetTopMargin(0);
-  pad2->SetBottomMargin(0.35);
-  pad2->SetLogy();
+  pad2->SetBottomMargin(0);
   pad2->Draw();
   pad2->cd();
 	
 	TGraphErrors *ratio_oneleg = new TGraphErrors(12, chf_cuts, ratio_1leg, zero, err_ratio_1leg);
 	ratio_oneleg->SetMarkerStyle(20);
 	ratio_oneleg->SetMarkerColor(2);
-	ratio_oneleg->Draw("AP");
   ratio_oneleg->SetTitle("");
   ratio_oneleg->GetYaxis()->SetRangeUser(0.8, 1.2);
   ratio_oneleg->GetYaxis()->SetTitle("#frac{MCtruth}{1/2-leg}");
+  ratio_oneleg->GetYaxis()->SetTitleSize(0.06);
+  ratio_oneleg->GetYaxis()->SetTitleOffset(0.4);
+  ratio_oneleg->GetYaxis()->SetLabelSize(0.06);
+	ratio_oneleg->Draw("AP");
 	
 	TGraphErrors *ratio_twoleg = new TGraphErrors(12, chf_cuts, ratio_2leg, zero, err_ratio_2leg);
 	ratio_twoleg->SetMarkerStyle(20);
@@ -291,6 +299,21 @@ void SIMP_QCD_closure(){
   TLine *line = new TLine(0,1,0.55,1);
   line->SetLineColor(kViolet+5);
   line->SetLineWidth(2);
+	line->Draw();
+  
+	c1->cd();
+	TPad *pad3 = new TPad("pad3","pad3",0,0,1,0.24);
+  pad3->SetTopMargin(0);
+  pad3->SetBottomMargin(0.35);
+  pad3->SetLogy(1);
+  pad3->Draw();
+  pad3->cd();
+  
+  ratio_oneleg->GetXaxis()->SetTitle("ChF cut");
+  ratio_oneleg->GetXaxis()->SetTitleSize(0.06);
+  ratio_oneleg->GetXaxis()->SetLabelSize(0.06);
+	ratio_oneleg->Draw("AP");
+	ratio_twoleg->Draw("P");
 	line->Draw();
 	
   c1->cd();

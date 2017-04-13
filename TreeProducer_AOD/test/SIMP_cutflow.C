@@ -105,16 +105,25 @@ void SIMP_cutflow(){
 			if(deltajet_phi > TMath::Pi()) deltajet_phi -= 2*TMath::Pi();
 			if(deltajet_phi < -TMath::Pi()) deltajet_phi += 2*TMath::Pi();
 			deltajet_phi = fabs(deltajet_phi);
+      
+      double photonpt = 0;
+      photon_nr = 0;
+      for (int i = 0; i < 4; ++i){
+        if(corrjets.photon_pt[i]>photonpt){
+          photon_nr = i;
+          photonpt = corrjets.photon_pt[i];
+        }
+      }
 			
-			double deltaphi_jet1photon = corrjets.jet_phi[0] - corrjets.photon_phi[0];
+			double deltaphi_jet1photon = corrjets.jet_phi[0] - corrjets.photon_phi[photon_nr];
 			if(deltaphi_jet1photon > TMath::Pi()) deltaphi_jet1photon -= 2*TMath::Pi();
 			if(deltaphi_jet1photon < -TMath::Pi()) deltaphi_jet1photon += 2*TMath::Pi();
-			double deltaphi_jet2photon = corrjets.jet_phi[1] - corrjets.photon_phi[0];
+			double deltaphi_jet2photon = corrjets.jet_phi[1] - corrjets.photon_phi[photon_nr];
 			if(deltaphi_jet2photon > TMath::Pi()) deltaphi_jet2photon -= 2*TMath::Pi();
 			if(deltaphi_jet2photon < -TMath::Pi()) deltaphi_jet2photon += 2*TMath::Pi();
 			
-			double deltaeta_jet1photon = corrjets.jet_eta[0] - corrjets.photon_eta[0];
-			double deltaeta_jet2photon = corrjets.jet_eta[1] - corrjets.photon_eta[0];
+			double deltaeta_jet1photon = corrjets.jet_eta[0] - corrjets.photon_eta[photon_nr];
+			double deltaeta_jet2photon = corrjets.jet_eta[1] - corrjets.photon_eta[photon_nr];
 			
 			double dR1 = TMath::Sqrt(deltaphi_jet1photon*deltaphi_jet1photon + deltaeta_jet1photon*deltaeta_jet1photon);
 			double dR2 = TMath::Sqrt(deltaphi_jet2photon*deltaphi_jet2photon + deltaeta_jet2photon*deltaeta_jet2photon);
@@ -135,7 +144,7 @@ void SIMP_cutflow(){
 					if(deltajet_phi > 2){
 						passed_deltaphi[l] += weight;
 						deltaphi_eff[l]->Fill(2, weight);
-            if(corrjets.photon_passLooseId[0] == 0 || (corrjets.photon_passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1)){
+            if(corrjets.photon_passLooseId[photon_nr] == 0 || (corrjets.photon_passLooseId[photon_nr] == 1 && dR1 > 0.1 && dR2 > 0.1)){
               passed_photonveto[l] += weight;
               photonVeto_eff[l]->Fill(0.1, weight);
               for(int j = 0; j < 12; j++){

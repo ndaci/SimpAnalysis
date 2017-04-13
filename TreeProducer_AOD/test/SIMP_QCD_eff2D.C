@@ -63,12 +63,14 @@ void SIMP_QCD_eff2D(){
 	std::cout<<"TChains ready"<<std::endl;
   
   double CHEF_SPVjet[8], CHEF_corrjet[8];
+  int photon_nr;
 	
 	double chf_cuts[12] = {0.5, 0.4, 0.3, 0.2, 0.15, 0.07, 0.1, 0.05, 0.04, 0.03, 0.02, 0.01};
+  double njet_cuts[4] = {2, 3, 4, 5};
 	double pt_bins[10] = {250, 275, 300, 350, 400, 450, 550, 700, 900, 10000};
 	double eta_bins[5] = {0, 0.5, 1.0, 1.5, 2.0};
   
-  TFile *output = new TFile("eff2D_QCD_PUMoriond17_AOD.root", "RECREATE");
+  TFile *output = new TFile("eff2D_QCD_PUMoriond17_AOD_NvertexCut_Njets2.root", "RECREATE");
 	TH2D* total = new TH2D("total", "total", 4, eta_bins, 9, pt_bins);
 	total->GetYaxis()->SetTitle("p_{T}");
 	total->GetXaxis()->SetTitle("#eta");
@@ -82,22 +84,29 @@ void SIMP_QCD_eff2D(){
 	double lumi = 20;
 	
 	std::cout<<"CHF cuts: ";
-	for(int j = 0; j < 12; j++){
-		std::ostringstream strs;
-		double dbl = chf_cuts[j];
-		strs << dbl;
-		std::string cut = strs.str();
-		std::cout<<" "<<cut<<" ";
-		std::string title_passed = "passed_"+cut;
-		std::string title_eff = "eff_"+cut;
-		passed[j] = new TH2D(title_passed.c_str(), title_passed.c_str(), 4, eta_bins, 9, pt_bins);
-		passed[j]->GetYaxis()->SetTitle("p_{T}");
-		passed[j]->GetXaxis()->SetTitle("#eta");
-		passed[j]->Sumw2();
-		eff[j] = new TH2D(title_eff.c_str(), title_eff.c_str(), 4, eta_bins, 9, pt_bins);
-		eff[j]->GetYaxis()->SetTitle("p_{T}");
-		eff[j]->GetXaxis()->SetTitle("#eta");
-	}
+//   for (int i = 0; i < 4; i++){
+    for(int j = 0; j < 12; j++){
+      std::ostringstream strs;
+      double dbl = chf_cuts[j];
+      strs << dbl;
+      std::string cut = strs.str();
+//       std::ostringstream strs2;
+//       double dbl2 = njet_cuts[i];
+//       strs2 << dbl2;
+//       std::string cut2 = strs2.str();
+//       std::string title_passed = "passed_njets_"+cut2+"_"+cut;
+//       std::string title_eff = "eff_njets_"+cut2+"_"+cut;
+      std::string title_passed = "passed_"+cut;
+      std::string title_eff = "eff_"+cut;
+      passed[j] = new TH2D(title_passed.c_str(), title_passed.c_str(), 4, eta_bins, 9, pt_bins);
+      passed[j]->GetYaxis()->SetTitle("p_{T}");
+      passed[j]->GetXaxis()->SetTitle("#eta");
+      passed[j]->Sumw2();
+      eff[j] = new TH2D(title_eff.c_str(), title_eff.c_str(), 4, eta_bins, 9, pt_bins);
+      eff[j]->GetYaxis()->SetTitle("p_{T}");
+      eff[j]->GetXaxis()->SetTitle("#eta");
+    }
+//   }
 	std::cout<<std::endl;
 		
 	for (int l = 0; l < 6; l++){
@@ -109,14 +118,19 @@ void SIMP_QCD_eff2D(){
     SPVjets.Init(SPVchain);
 		
 		Int_t entries = corrjets.fChain->GetEntries(); 
-		Int_t Nentries[6] = {10000000, 2000000, 200000, 40000, 4000, 2000}; 
-		double weight = QCD_xsec[l]*lumi/Nentries[l];
+// 		Int_t Nentries[6] = {10000000, 2000000, 200000, 40000, 4000, 2000}; 
+		double weight = QCD_xsec[l]*lumi/entries;
 		std::cout<<"QCD bin "<<l<<": Processing "<<entries<<" entries with weight "<<weight<<std::endl;
 		
 		for(Int_t entry = 0; entry < entries; ++entry){
 			if(entry%1000000==0) std::cout<<"processed "<<entry/1000000<<"M events"<<std::endl;
 			SPVjets.GetEntry(entry);
       corrjets.GetEntry(entry);
+      
+      double njets = 0;
+      for (int k = 0; k < 8; ++k){
+        if (corrjets.jet_pt[k] > 30) njets++;
+      }
 			
 // 			Double_t random1 = r.Uniform();
 			
@@ -124,16 +138,25 @@ void SIMP_QCD_eff2D(){
 			if(deltajet_phi > TMath::Pi()) deltajet_phi -= 2*TMath::Pi();
 			if(deltajet_phi < -TMath::Pi()) deltajet_phi += 2*TMath::Pi();
 			deltajet_phi = fabs(deltajet_phi);
+      
+      double photonpt = 0;
+      photon_nr = 0;
+      for (int i = 0; i < 4; ++i){
+        if(corrjets.photon_pt[i]>photonpt){
+          photon_nr = i;
+          photonpt = corrjets.photon_pt[i];
+        }
+      }
 			
-			double deltaphi_jet1photon = corrjets.jet_phi[0] - corrjets.photon_phi[0];
+			double deltaphi_jet1photon = corrjets.jet_phi[photon_nr] - corrjets.photon_phi[0];
 			if(deltaphi_jet1photon > TMath::Pi()) deltaphi_jet1photon -= 2*TMath::Pi();
 			if(deltaphi_jet1photon < -TMath::Pi()) deltaphi_jet1photon += 2*TMath::Pi();
-			double deltaphi_jet2photon = corrjets.jet_phi[1] - corrjets.photon_phi[0];
+			double deltaphi_jet2photon = corrjets.jet_phi[1] - corrjets.photon_phi[photon_nr];
 			if(deltaphi_jet2photon > TMath::Pi()) deltaphi_jet2photon -= 2*TMath::Pi();
 			if(deltaphi_jet2photon < -TMath::Pi()) deltaphi_jet2photon += 2*TMath::Pi();
 			
-			double deltaeta_jet1photon = corrjets.jet_eta[0] - corrjets.photon_eta[0];
-			double deltaeta_jet2photon = corrjets.jet_eta[1] - corrjets.photon_eta[0];
+			double deltaeta_jet1photon = corrjets.jet_eta[0] - corrjets.photon_eta[photon_nr];
+			double deltaeta_jet2photon = corrjets.jet_eta[1] - corrjets.photon_eta[photon_nr];
 			
 			double dR1 = TMath::Sqrt(deltaphi_jet1photon*deltaphi_jet1photon + deltaeta_jet1photon*deltaeta_jet1photon);
 			double dR2 = TMath::Sqrt(deltaphi_jet2photon*deltaphi_jet2photon + deltaeta_jet2photon*deltaeta_jet2photon);
@@ -158,47 +181,59 @@ void SIMP_QCD_eff2D(){
 			
 			output->cd();
 			
-			if (corrjets.jet_pt[0] > 250.0 && corrjets.jet_pt[1] > 250.0 && fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0 && deltajet_phi > 2.0 /*&& npixhits[0] > 0*/ && ( corrjets.photon_passLooseId[0] == 0 || (corrjets.photon_passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1))){
-        if (dRjet1 < 0.4){
-          if(CHEF_corrjet[0] > 0.5 || CHEF_SPVjet[0]>0.5){
-            total->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
-            for(int j = 0; j < 12; j++){
-              if (CHEF_SPVjet[1]<chf_cuts[j] && CHEF_corrjet[1]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
-            }
+			if (corrjets.jet_pt[0] > 250.0 && corrjets.jet_pt[1] > 250.0 && fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0 && deltajet_phi > 2.0 /*&& npixhits[0] > 0*/ && ( corrjets.photon_passLooseId[photon_nr] == 0 || (corrjets.photon_passLooseId[photon_nr] == 1 && dR1 > 0.1 && dR2 > 0.1)) && corrjets.vtx_N >= 2 && njets == 2){
+        if(CHEF_corrjet[0] > 0.5){
+          total->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
+          for(int j = 0; j < 12; j++){
+            if (CHEF_corrjet[1]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
           }
-          if(CHEF_corrjet[1] > 0.5){
-            total->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
-            for(int j = 0; j < 12; j++){
-              if (CHEF_SPVjet[0]<chf_cuts[j] && CHEF_corrjet[0]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
-            }
-          }
-        }else if (dRjet2 < 0.4){
-          if(CHEF_corrjet[0] > 0.5){
-            total->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
-            for(int j = 0; j < 12; j++){
-              if (CHEF_SPVjet[1]<chf_cuts[j] && CHEF_corrjet[1]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
-            }
-          }
-          if(CHEF_corrjet[1] > 0.5){
-            total->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
-            for(int j = 0; j < 12; j++){
-              if (CHEF_SPVjet[0]<chf_cuts[j] && CHEF_corrjet[0]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
-            }
-          }          
-        }else{
-          if(CHEF_corrjet[0] > 0.5){
-            total->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
-            for(int j = 0; j < 12; j++){
-              if (CHEF_SPVjet[1]<chf_cuts[j] && CHEF_corrjet[1]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
-            }
-          }
-          if(CHEF_corrjet[1] > 0.5){
-            total->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
-            for(int j = 0; j < 12; j++){
-              if (CHEF_SPVjet[0]<chf_cuts[j] && CHEF_corrjet[0]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
-            }
-          }        
         }
+        if(CHEF_corrjet[1] > 0.5){
+          total->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
+          for(int j = 0; j < 12; j++){
+            if (CHEF_corrjet[0]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
+          }
+        }          
+//         if (dRjet1 < 0.4){
+//           if(CHEF_corrjet[0] > 0.5 || CHEF_SPVjet[0]>0.5){
+//             total->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
+//             for(int j = 0; j < 12; j++){
+//               if (CHEF_SPVjet[1]<chf_cuts[j] && CHEF_corrjet[1]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
+//             }
+//           }
+//           if(CHEF_corrjet[1] > 0.5){
+//             total->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
+//             for(int j = 0; j < 12; j++){
+//               if (CHEF_SPVjet[0]<chf_cuts[j] && CHEF_corrjet[0]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
+//             }
+//           }
+//         }else if (dRjet2 < 0.4){
+//           if(CHEF_corrjet[0] > 0.5){
+//             total->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
+//             for(int j = 0; j < 12; j++){
+//               if (CHEF_SPVjet[1]<chf_cuts[j] && CHEF_corrjet[1]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
+//             }
+//           }
+//           if(CHEF_corrjet[1] > 0.5){
+//             total->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
+//             for(int j = 0; j < 12; j++){
+//               if (CHEF_SPVjet[0]<chf_cuts[j] && CHEF_corrjet[0]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
+//             }
+//           }          
+//         }else{
+//           if(CHEF_corrjet[0] > 0.5){
+//             total->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
+//             for(int j = 0; j < 12; j++){
+//               if (CHEF_SPVjet[1]<chf_cuts[j] && CHEF_corrjet[1]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], weight);
+//             }
+//           }
+//           if(CHEF_corrjet[1] > 0.5){
+//             total->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
+//             for(int j = 0; j < 12; j++){
+//               if (CHEF_SPVjet[0]<chf_cuts[j] && CHEF_corrjet[0]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], weight);
+//             }
+//           }        
+//         }
 			}    
 		}
 	}

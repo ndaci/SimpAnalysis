@@ -47,9 +47,12 @@ void SIMP_Data_closure(){
 	list_JetHT_2016H3(SPVchain);
   
   double CHEF_SPVjet[8], CHEF_corrjet[8];
+  int photon_nr;
 	
 	double chf_cuts[23] = {0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.07, 0.05, 0.04, 0.03, 0.02, 0.01};
+  double njet_cuts[4] = {2, 3, 4, 5};
 // 	double chf_cuts[11] = {0.5, 0.4, 0.3, 0.2, 0.15, 0.1, 0.05, 0.04, 0.03, 0.02, 0.01};
+// 	double eta_bins[17] = {-2.0, -1.75, -1.5, -1.25, -1.0, -0.75, -0.5, -0.25, 0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0};
 
 //   pt::ptree root;
 //   pt::read_json("Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt", root);
@@ -72,20 +75,28 @@ void SIMP_Data_closure(){
 	double err_ratio_2leg[23] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
   
 	std::cout<<"Getting the efficiency histos...";
-	TFile* efficiencies = new TFile("eff2D_Data_Rereco_AOD_withNvertexCut.root", "READ");
+	TFile* efficiencies = new TFile("eff2D_Data_Rereco_AOD_withNvertexCut_Njets2_finerEtaBinning.root", "READ");
+// 	TFile* efficiencies = new TFile("eff3D_Data_ChFMin0p5_AOD.root", "READ");
 // 	TFile* efficiencies = new TFile("../../TreeProducer_miniAOD/test/eff2D_Data_Rereco_full2016.root", "READ");
-	TH2D* eff_histos[23];
-	for(int j = 0; j < 23; j++){
-		std::ostringstream strs;
-		double dbl = chf_cuts[j];
-		strs << dbl;
-		std::string cut = strs.str();
-		std::string title_eff = "eff_"+cut;
-		eff_histos[j] = (TH2D*) efficiencies->Get(title_eff.c_str());
-	}
+	TH2D* eff_histos[4][23];
+  for (int i = 0; i < 4; i++){
+    for(int j = 0; j < 23; j++){
+      std::ostringstream strs;
+      double dbl = chf_cuts[j];
+      strs << dbl;
+      std::ostringstream strs2;
+      double dbl2 = njet_cuts[i];
+      strs2 << dbl2;
+      std::string cut = strs.str();
+      std::string cut2 = strs2.str();
+//       std::string title_eff = "eff_njets_"+cut2+"_"+cut;
+      std::string title_eff = "eff_"+cut;
+      eff_histos[i][j] = (TH2D*) efficiencies->Get(title_eff.c_str());
+    }
+  }
 	std::cout<<"done"<<std::endl;
 	
-  TFile *output = new TFile("closure_test_Data_NvertexCut.root", "RECREATE");
+  TFile *output = new TFile("closure_test_Data_nvertexcut_njets2_eff2DFinerEtaBinning.root", "RECREATE");
 	  
   SANtuple corrjets;
   corrjets.Init(chain);
@@ -103,20 +114,34 @@ void SIMP_Data_closure(){
 //     bool isInJSON = Check_Run_Lumi(corrjets.nRun, corrjets.nLumi, root);
 //     if (!isInJSON) continue;
     
+    double njets = 0;
+    for (int k = 0; k < 8; ++k){
+      if (corrjets.jet_pt[k] > 30) njets++;
+    }
+    
     double deltajet_phi =  corrjets.jet_phi[0] -  corrjets.jet_phi[1];
     if(deltajet_phi > TMath::Pi()) deltajet_phi -= 2*TMath::Pi();
     if(deltajet_phi < -TMath::Pi()) deltajet_phi += 2*TMath::Pi();
     deltajet_phi = fabs(deltajet_phi);
+      
+    double photonpt = 0;
+    photon_nr = 0;
+    for (int i = 0; i < 4; ++i){
+      if(corrjets.photon_pt[i]>photonpt){
+        photon_nr = i;
+        photonpt = corrjets.photon_pt[i];
+      }
+    }
     
-    double deltaphi_jet1photon =  corrjets.jet_phi[0] -  corrjets.photon_phi[0];
+    double deltaphi_jet1photon =  corrjets.jet_phi[0] -  corrjets.photon_phi[photon_nr];
     if(deltaphi_jet1photon > TMath::Pi()) deltaphi_jet1photon -= 2*TMath::Pi();
     if(deltaphi_jet1photon < -TMath::Pi()) deltaphi_jet1photon += 2*TMath::Pi();
-    double deltaphi_jet2photon =  corrjets.jet_phi[1] -  corrjets.photon_phi[0];
+    double deltaphi_jet2photon =  corrjets.jet_phi[1] -  corrjets.photon_phi[photon_nr];
     if(deltaphi_jet2photon > TMath::Pi()) deltaphi_jet2photon -= 2*TMath::Pi();
     if(deltaphi_jet2photon < -TMath::Pi()) deltaphi_jet2photon += 2*TMath::Pi();
     
-    double deltaeta_jet1photon =  corrjets.jet_eta[0] -  corrjets.photon_eta[0];
-    double deltaeta_jet2photon =  corrjets.jet_eta[1] -  corrjets.photon_eta[0];
+    double deltaeta_jet1photon =  corrjets.jet_eta[0] -  corrjets.photon_eta[photon_nr];
+    double deltaeta_jet2photon =  corrjets.jet_eta[1] -  corrjets.photon_eta[photon_nr];
     
     double dR1 = TMath::Sqrt(deltaphi_jet1photon*deltaphi_jet1photon + deltaeta_jet1photon*deltaeta_jet1photon);
     double dR2 = TMath::Sqrt(deltaphi_jet2photon*deltaphi_jet2photon + deltaeta_jet2photon*deltaeta_jet2photon);
@@ -128,16 +153,22 @@ void SIMP_Data_closure(){
     
     output->cd();
     
-    if (corrjets.HLT_DiCentralPFJet170 == 1 && corrjets.jet_pt[0] > 250 && corrjets.jet_pt[1] > 250 && fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0 && deltajet_phi > 2 && (corrjets.photon_passLooseId[0] == 0 || (corrjets.photon_passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1)) && corrjets.vtx_N >= 3){
+    if (corrjets.HLT_DiCentralPFJet170 == 1 && corrjets.jet_pt[0] > 250 && corrjets.jet_pt[1] > 250 && fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0 && deltajet_phi > 2 && (corrjets.photon_passLooseId[photon_nr] == 0 || (corrjets.photon_passLooseId[photon_nr] == 1 && dR1 > 0.1 && dR2 > 0.1)) && corrjets.vtx_N >= 2 /*&& fabs(corrjets.jet_eta[0])>1.5 && fabs(corrjets.jet_eta[1])>1.5 && fabs(corrjets.jet_eta[0])<2.0 && fabs(corrjets.jet_eta[1])<2.0*/ && njets == 2){
       for(int j = 0; j < 23; j++){
         if (CHEF_SPVjet[0]<chf_cuts[j] && CHEF_SPVjet[1]<chf_cuts[j] && CHEF_corrjet[0]<chf_cuts[j] && CHEF_corrjet[1]<chf_cuts[j]){
           if (chf_cuts[j] > 0.25) passed_MCtruth[j]+= corrjets.pswgt_dijet_170;
           if (chf_cuts[j] > 0.25) err_MCtruth[j] += pow(corrjets.pswgt_dijet_170, 2);
         }
-        double eff1 = eff_histos[j]->GetBinContent(eff_histos[j]->GetXaxis()->FindBin(fabs(corrjets.jet_eta[0])), eff_histos[j]->GetYaxis()->FindBin(corrjets.jet_pt[0]));
-        double eff2 = eff_histos[j]->GetBinContent(eff_histos[j]->GetXaxis()->FindBin(fabs(corrjets.jet_eta[1])), eff_histos[j]->GetYaxis()->FindBin(corrjets.jet_pt[1]));
-        double erreff1 = eff_histos[j]->GetBinError(eff_histos[j]->GetXaxis()->FindBin(fabs(corrjets.jet_eta[0])), eff_histos[j]->GetYaxis()->FindBin(corrjets.jet_pt[0]));
-        double erreff2 = eff_histos[j]->GetBinError(eff_histos[j]->GetXaxis()->FindBin(fabs(corrjets.jet_eta[1])), eff_histos[j]->GetYaxis()->FindBin(corrjets.jet_pt[1]));
+        int i = 0;
+//         if (corrjets.nJet == 2) i = 0;
+//         else if (corrjets.nJet == 3) i = 1;
+//         else if (corrjets.nJet == 4) i = 2;
+//         else if (corrjets.nJet >= 5) i = 3;
+//         else std::cout<<"wrong nb of jets!!"<<std::endl;
+        double eff1 = eff_histos[i][j]->GetBinContent(eff_histos[i][j]->GetXaxis()->FindBin(fabs(corrjets.jet_eta[0])), eff_histos[i][j]->GetYaxis()->FindBin(corrjets.jet_pt[0]));
+        double eff2 = eff_histos[i][j]->GetBinContent(eff_histos[i][j]->GetXaxis()->FindBin(fabs(corrjets.jet_eta[1])), eff_histos[i][j]->GetYaxis()->FindBin(corrjets.jet_pt[1]));
+        double erreff1 = eff_histos[i][j]->GetBinError(eff_histos[i][j]->GetXaxis()->FindBin(fabs(corrjets.jet_eta[0])), eff_histos[i][j]->GetYaxis()->FindBin(corrjets.jet_pt[0]));
+        double erreff2 = eff_histos[i][j]->GetBinError(eff_histos[i][j]->GetXaxis()->FindBin(fabs(corrjets.jet_eta[1])), eff_histos[i][j]->GetYaxis()->FindBin(corrjets.jet_pt[1]));
 // 					std::cout<<chf_cuts[j]<<std::endl;
 // 					std::cout<<jet_eta[0]<<"  "<<jet_pt[0]<<" bin "<<eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[0]))<<", "<<eff_histos[j]->GetYaxis()->FindBin(jet_pt[0])<<std::endl;
 // 					std::cout<<jet_eta[1]<<"  "<<jet_pt[1]<<" bin "<<eff_histos[j]->GetXaxis()->FindBin(fabs(jet_eta[1]))<<", "<<eff_histos[j]->GetYaxis()->FindBin(jet_pt[1])<<std::endl;
@@ -226,7 +257,7 @@ void SIMP_Data_closure(){
 	ratio_twoleg->SetMarkerColor(3);
 	ratio_twoleg->Draw("P");
   
-  TLine *line = new TLine(0,1,0.55,1);
+  TLine *line = new TLine(0,1,1,1);
   line->SetLineColor(kViolet+5);
   line->SetLineWidth(2);
 	line->Draw();

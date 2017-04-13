@@ -45,16 +45,17 @@ void SIMP_Data_eff2D(){
 	list_JetHT_2016H3(SPVchain);
   
   double CHEF_SPVjet[8], CHEF_corrjet[8];
+  int photon_nr;
 	
 	double chf_cuts[23] = {0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.07, 0.05, 0.04, 0.03, 0.02, 0.01};
 	double pt_bins[10] = {250, 275, 300, 350, 400, 450, 550, 700, 900, 10000};
-	double eta_bins[5] = {0, 0.5, 1.0, 1.5, 2.0};
+	double eta_bins[17] = {-2.0, -1.75, -1.5, -1.25, -1.0, -0.75, -0.5, -0.25, 0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0};
   
 //   pt::ptree root;
 //   pt::read_json("Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt", root);
   
-  TFile *output = new TFile("eff2D_Data_Rereco_AOD_withNvertexCut.root", "RECREATE");
-	TH2D* total = new TH2D("total", "total", 4, eta_bins, 9, pt_bins);
+  TFile *output = new TFile("eff2D_Data_Rereco_AOD_withNvertexCut_Njets2_finerEtaBinning.root", "RECREATE");
+	TH2D* total = new TH2D("total", "total", 16, eta_bins, 9, pt_bins);
 	total->GetYaxis()->SetTitle("p_{T}");
 	total->GetXaxis()->SetTitle("#eta");
 	total->Sumw2();
@@ -70,11 +71,11 @@ void SIMP_Data_eff2D(){
 		std::cout<<" "<<cut<<" ";
 		std::string title_passed = "passed_"+cut;
 		std::string title_eff = "eff_"+cut;
-		passed[j] = new TH2D(title_passed.c_str(), title_passed.c_str(), 4, eta_bins, 9, pt_bins);
+		passed[j] = new TH2D(title_passed.c_str(), title_passed.c_str(), 16, eta_bins, 9, pt_bins);
 		passed[j]->GetYaxis()->SetTitle("p_{T}");
 		passed[j]->GetXaxis()->SetTitle("#eta");
 		passed[j]->Sumw2();
-		eff[j] = new TH2D(title_eff.c_str(), title_eff.c_str(), 4, eta_bins, 9, pt_bins);
+		eff[j] = new TH2D(title_eff.c_str(), title_eff.c_str(), 16, eta_bins, 9, pt_bins);
 		eff[j]->GetYaxis()->SetTitle("p_{T}");
 		eff[j]->GetXaxis()->SetTitle("#eta");
 	}
@@ -97,20 +98,34 @@ void SIMP_Data_eff2D(){
 //     bool isInJSON = Check_Run_Lumi(corrjets.nRun, corrjets.nLumi, root);
 //     if (!isInJSON) continue;
     
+    double njets = 0;
+    for (int k = 0; k < 8; ++k){
+      if (corrjets.jet_pt[k] > 30) njets++;
+    }
+    
     double deltajet_phi = corrjets.jet_phi[0] - corrjets.jet_phi[1];
     if(deltajet_phi > TMath::Pi()) deltajet_phi -= 2*TMath::Pi();
     if(deltajet_phi < -TMath::Pi()) deltajet_phi += 2*TMath::Pi();
     deltajet_phi = fabs(deltajet_phi);
+      
+    double photonpt = 0;
+    photon_nr = 0;
+    for (int i = 0; i < 4; ++i){
+      if(corrjets.photon_pt[i]>photonpt){
+        photon_nr = i;
+        photonpt = corrjets.photon_pt[i];
+      }
+    }
     
-    double deltaphi_jet1photon = corrjets.jet_phi[0] - corrjets.photon_phi[0];
+    double deltaphi_jet1photon = corrjets.jet_phi[0] - corrjets.photon_phi[photon_nr];
     if(deltaphi_jet1photon > TMath::Pi()) deltaphi_jet1photon -= 2*TMath::Pi();
     if(deltaphi_jet1photon < -TMath::Pi()) deltaphi_jet1photon += 2*TMath::Pi();
-    double deltaphi_jet2photon = corrjets.jet_phi[1] - corrjets.photon_phi[0];
+    double deltaphi_jet2photon = corrjets.jet_phi[1] - corrjets.photon_phi[photon_nr];
     if(deltaphi_jet2photon > TMath::Pi()) deltaphi_jet2photon -= 2*TMath::Pi();
     if(deltaphi_jet2photon < -TMath::Pi()) deltaphi_jet2photon += 2*TMath::Pi();
     
-    double deltaeta_jet1photon = corrjets.jet_eta[0] - corrjets.photon_eta[0];
-    double deltaeta_jet2photon = corrjets.jet_eta[1] - corrjets.photon_eta[0];
+    double deltaeta_jet1photon = corrjets.jet_eta[0] - corrjets.photon_eta[photon_nr];
+    double deltaeta_jet2photon = corrjets.jet_eta[1] - corrjets.photon_eta[photon_nr];
     
     double dR1 = TMath::Sqrt(deltaphi_jet1photon*deltaphi_jet1photon + deltaeta_jet1photon*deltaeta_jet1photon);
     double dR2 = TMath::Sqrt(deltaphi_jet2photon*deltaphi_jet2photon + deltaeta_jet2photon*deltaeta_jet2photon);
@@ -121,18 +136,18 @@ void SIMP_Data_eff2D(){
     
     output->cd();
     
-    if (corrjets.HLT_DiCentralPFJet170 == 1 && corrjets.jet_pt[0] > 250.0 && corrjets.jet_pt[1] > 250.0 && fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0 && deltajet_phi > 2.0 && ( corrjets.photon_passLooseId[0] == 0 || (corrjets.photon_passLooseId[0] == 1 && dR1 > 0.1 && dR2 > 0.1)) && corrjets.vtx_N >= 3){
+    if (corrjets.HLT_DiCentralPFJet170 == 1 && corrjets.jet_pt[0] > 250.0 && corrjets.jet_pt[1] > 250.0 && fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0 && deltajet_phi > 2.0 && ( corrjets.photon_passLooseId[photon_nr] == 0 || (corrjets.photon_passLooseId[photon_nr] == 1 && dR1 > 0.1 && dR2 > 0.1)) && corrjets.vtx_N >= 2 && njets == 2){
       if(CHEF_corrjet[0] > 0.5){
 //         std::cout<<corrjets.pswgt_dijet_170<<std::endl;
-        total->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], corrjets.pswgt_dijet_170);
+        total->Fill(corrjets.jet_eta[1], corrjets.jet_pt[1], corrjets.pswgt_dijet_170);
         for(int j = 0; j < 23; j++){
-          if (CHEF_corrjet[1]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[1]), corrjets.jet_pt[1], corrjets.pswgt_dijet_170);
+          if (CHEF_corrjet[1]<chf_cuts[j]) passed[j]->Fill(corrjets.jet_eta[1], corrjets.jet_pt[1], corrjets.pswgt_dijet_170);
         }
       }
       if(CHEF_corrjet[1] > 0.5){
-        total->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], corrjets.pswgt_dijet_170);
+        total->Fill(corrjets.jet_eta[0], corrjets.jet_pt[0], corrjets.pswgt_dijet_170);
         for(int j = 0; j < 23; j++){
-          if (CHEF_corrjet[0]<chf_cuts[j]) passed[j]->Fill(fabs(corrjets.jet_eta[0]), corrjets.jet_pt[0], corrjets.pswgt_dijet_170);
+          if (CHEF_corrjet[0]<chf_cuts[j]) passed[j]->Fill(corrjets.jet_eta[0], corrjets.jet_pt[0], corrjets.pswgt_dijet_170);
         }
       }
     }    
