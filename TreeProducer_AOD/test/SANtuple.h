@@ -26,6 +26,8 @@ public :
    Int_t           nEvent;
    Int_t           nRun;
    Int_t           nLumi;
+   Int_t           nBx;
+   Int_t           nOrbit;
    Int_t           vtx_N;
    Int_t           vtx_N_stored;
    Double_t        vtx_normalizedChi2[3];   //[vtx_N_stored]
@@ -71,6 +73,7 @@ public :
    Double_t        jet_efrac_ch_Had[8];   //[nJet_stored]
    Double_t        jet_efrac_ch_EM[8];   //[nJet_stored]
    Double_t        jet_efrac_ch_Mu[8];   //[nJet_stored]
+   Double_t        jet_efrac_photon[8];   //[nJet_stored]
    Int_t           nGenJet_stored;
    Int_t           nGenJet;
    Double_t        genjetArea[4];   //[nGenJet_stored]
@@ -91,6 +94,8 @@ public :
     Int_t           photon_passLooseId[4];   //[nPhoton_stored]
     Int_t           photon_passMediumId[4];   //[nPhoton_stored]
     Int_t           photon_passTightId[4];   //[nPhoton_stored]
+    Double_t        convtracks_pt[4];   //[nPhoton_stored]
+    Int_t           hasConvTracks[4];
     Double_t        MET;
     Double_t        MET_phi;
     Int_t           HLT_DiCentralPFJet170_CFMax0p1;
@@ -99,20 +104,24 @@ public :
     Int_t           HLT_DiCentralPFJet430;
     Int_t           HLT_DiCentralPFJet170;
     Int_t           HLT_SingleCentralPFJet170_CFMax0p1;
+    Int_t           HLT_PFJet450;
     Double_t        pswgt_dijet_170;
     Double_t        pswgt_singlejet_170_0p1;
-    Int_t           Flag_HBHENoiseFilter;
-    Int_t           Flag_HBHENoiseIsoFilter;
-    Int_t           Flag_EcalDeadCellTriggerPrimitiveFilter;
-    Int_t           Flag_goodVertices;
-    Int_t           Flag_eeBadScFilter;
-    Int_t           Flag_globalTightHalo2016Filter;
+    bool            Flag_HBHENoiseFilter;
+    bool            Flag_HBHENoiseIsoFilter;
+    bool            Flag_EcalDeadCellTriggerPrimitiveFilter;
+    bool            Flag_goodVertices;
+    bool            Flag_eeBadScFilter;
+    bool            Flag_globalTightHalo2016Filter;
 
    // List of branches
    //TBranch        *b_pfrho;   //!
+   TBranch        *b_hasConvTracks;   //!
    TBranch        *b_nEvent;   //!
    TBranch        *b_nRun;   //!
    TBranch        *b_nLumi;   //!
+   TBranch        *b_nBx;   //!
+   TBranch        *b_nOrbit;   //!
    TBranch        *b_vtx_N;   //!
    TBranch        *b_vtx_N_stored;   //!
    TBranch        *b_vtx_normalizedChi2;   //!
@@ -158,6 +167,7 @@ public :
     TBranch        *b_jet_efrac_ch_Had;   //!
     TBranch        *b_jet_efrac_ch_EM;   //!
     TBranch        *b_jet_efrac_ch_Mu;   //!
+    TBranch        *b_jet_efrac_photon;   //!
     TBranch        *b_nGenJet_stored;   //!
     TBranch        *b_nGenJet;   //!
     TBranch        *b_genjetArea;   //!
@@ -178,6 +188,7 @@ public :
     TBranch        *passLooseId;   //!
     TBranch        *passMediumId;   //!
     TBranch        *passTightId;   //!
+    TBranch        *convtrackspt;   //!
     TBranch        *b_MET;   //!
     TBranch        *b_MET_phi;   //!
     TBranch        *b_HLT_DiCentralPFJet170_CFMax0p1;   //!
@@ -186,6 +197,7 @@ public :
     TBranch        *b_HLT_DiCentralPFJet430;   //!
     TBranch        *b_HLT_DiCentralPFJet170;   //!
     TBranch        *b_HLT_SingleCentralPFJet170_CFMax0p1;   //!
+    TBranch        *b_HLT_PFJet450;
     TBranch        *b_pswgt_dijet_170;   //!
     TBranch        *b_pswgt_singlejet_170_0p1;   //!
     TBranch        *b_Flag_HBHENoiseFilter;   //!
@@ -266,9 +278,12 @@ void SANtuple::Init(TTree *tree)
    //fCurrent = -1;
    //fChain->SetMakeClass(1);
 
+//    fChain->SetBranchAddress("photon_hasConvTracks", &hasConvTracks, &b_hasConvTracks);
    fChain->SetBranchAddress("nEvent", &nEvent, &b_nEvent);
    fChain->SetBranchAddress("nRun", &nRun, &b_nRun);
    fChain->SetBranchAddress("nLumi", &nLumi, &b_nLumi);
+// //    fChain->SetBranchAddress("nBx", &nBx, &b_nBx);
+//    fChain->SetBranchAddress("nOrbit", &nOrbit, &b_nOrbit);
    fChain->SetBranchAddress("vtx_N", &vtx_N, &b_vtx_N);
    fChain->SetBranchAddress("vtx_N_stored", &vtx_N_stored, &b_vtx_N_stored);
    fChain->SetBranchAddress("vtx_normalizedChi2", vtx_normalizedChi2, &b_vtx_normalizedChi2);
@@ -314,6 +329,7 @@ void SANtuple::Init(TTree *tree)
    fChain->SetBranchAddress("jet_efrac_ch_Had", jet_efrac_ch_Had, &b_jet_efrac_ch_Had);
    fChain->SetBranchAddress("jet_efrac_ch_EM", jet_efrac_ch_EM, &b_jet_efrac_ch_EM);
    fChain->SetBranchAddress("jet_efrac_ch_Mu", jet_efrac_ch_Mu, &b_jet_efrac_ch_Mu);
+   fChain->SetBranchAddress("jet_efrac_photon", jet_efrac_photon, &b_jet_efrac_photon);
    fChain->SetBranchAddress("nGenJet_stored", &nGenJet_stored, &b_nGenJet_stored);
    fChain->SetBranchAddress("nGenJet", &nGenJet, &b_nGenJet);
    fChain->SetBranchAddress("genjetArea", genjetArea, &b_genjetArea);
@@ -326,7 +342,7 @@ void SANtuple::Init(TTree *tree)
    fChain->SetBranchAddress("genjet_e", genjet_e, &b_genjet_e);
    fChain->SetBranchAddress("genjet_m", genjet_m, &b_genjet_m);
    fChain->SetBranchAddress("genjet_efrac_ch", genjet_efrac_ch, &b_genjet_efrac_ch);
-   //fChain->SetBranchAddress("parton_pt", &parton_pt, &b_parton_pt);
+//    fChain->SetBranchAddress("parton_pt", &parton_pt, &b_parton_pt);
    fChain->SetBranchAddress("nPhoton_stored", &nPhoton_stored, &b_nPhoton_stored);
    fChain->SetBranchAddress("photon_eta", photon_eta, &b_photon_eta);
    fChain->SetBranchAddress("photon_phi", photon_phi, &b_photon_phi);
@@ -334,6 +350,7 @@ void SANtuple::Init(TTree *tree)
    fChain->SetBranchAddress("photon_passLooseId", photon_passLooseId, &passLooseId);
    fChain->SetBranchAddress("photon_passMediumId", photon_passMediumId, &passMediumId);
 	 fChain->SetBranchAddress("photon_passTightId", photon_passTightId, &passTightId);
+	 fChain->SetBranchAddress("convtracks_pt", convtracks_pt, &convtrackspt);
    fChain->SetBranchAddress("MET", &MET, &b_MET);
    fChain->SetBranchAddress("MET_phi", &MET_phi, &b_MET_phi);
    fChain->SetBranchAddress("HLT_DiCentralPFJet170_CFMax0p1", &HLT_DiCentralPFJet170_CFMax0p1, &b_HLT_DiCentralPFJet170_CFMax0p1);
@@ -342,6 +359,7 @@ void SANtuple::Init(TTree *tree)
    fChain->SetBranchAddress("HLT_DiCentralPFJet430", &HLT_DiCentralPFJet430, &b_HLT_DiCentralPFJet430);
    fChain->SetBranchAddress("HLT_DiCentralPFJet170", &HLT_DiCentralPFJet170, &b_HLT_DiCentralPFJet170);
    fChain->SetBranchAddress("HLT_SingleCentralPFJet170_CFMax0p1", &HLT_SingleCentralPFJet170_CFMax0p1, &b_HLT_SingleCentralPFJet170_CFMax0p1);
+   fChain->SetBranchAddress("HLT_PFJet450", &HLT_PFJet450, &b_HLT_PFJet450);
    fChain->SetBranchAddress("pswgt_dijet_170", &pswgt_dijet_170, &b_pswgt_dijet_170);
    fChain->SetBranchAddress("pswgt_singlejet_170_0p1", &pswgt_singlejet_170_0p1, &b_pswgt_singlejet_170_0p1);
    fChain->SetBranchAddress("Flag_HBHENoiseFilter", &Flag_HBHENoiseFilter, &b_Flag_HBHENoiseFilter);
