@@ -18,39 +18,85 @@ void SIMP_macro(int j){
 	int mass[7] = {1, 10, 100, 200, 400, 700, 1000};
   TFile* outputfiles[7];
   
+//   TChain * chain0 = new TChain("treeCorr/SimpAnalysis");
+//   chain0->Add("SIMPs_PUMoriond17_AOD_M1_1_filters.root");
+//   chain0->Add("SIMPs_PUMoriond17_AOD_M1_2_filters.root");
+//   TChain * chain1 = new TChain("treeCorr/SimpAnalysis");
+//   chain1->Add("SIMPs_PUMoriond17_AOD_M10_1_filters.root");
+//   chain1->Add("SIMPs_PUMoriond17_AOD_M10_2_filters.root");
+//   chain1->Add("SIMPs_PUMoriond17_AOD_M10_3_filters.root");
+//   TChain * chain2 = new TChain("treeCorr/SimpAnalysis");
+//   chain2->Add("SIMPs_PUMoriond17_AOD_M100_filters.root");
+//   TChain * chain3 = new TChain("treeCorr/SimpAnalysis");
+//   chain3->Add("SIMPs_PUMoriond17_AOD_M200_filters.root");
+//   TChain * chain4 = new TChain("treeCorr/SimpAnalysis");
+//   chain4->Add("SIMPs_PUMoriond17_AOD_M400_filters.root");
+//   TChain * chain5 = new TChain("treeCorr/SimpAnalysis");
+//   chain5->Add("SIMPs_PUMoriond17_AOD_M700_filters.root");
+//   TChain * chain6 = new TChain("treeCorr/SimpAnalysis");
+//   chain6->Add("SIMPs_PUMoriond17_AOD_M1000_filters.root");
+//   
+//   TChain * SPVchain0 = new TChain("treeSPV/SimpAnalysis");
+//   SPVchain0->Add("SIMPs_PUMoriond17_AOD_M1_1_filters.root");
+//   SPVchain0->Add("SIMPs_PUMoriond17_AOD_M1_2_filters.root");
+//   TChain * SPVchain1 = new TChain("treeSPV/SimpAnalysis");
+//   SPVchain1->Add("SIMPs_PUMoriond17_AOD_M10_1_filters.root");
+//   SPVchain1->Add("SIMPs_PUMoriond17_AOD_M10_2_filters.root");
+//   SPVchain1->Add("SIMPs_PUMoriond17_AOD_M10_3_filters.root");
+//   TChain * SPVchain2 = new TChain("treeSPV/SimpAnalysis");
+//   SPVchain2->Add("SIMPs_PUMoriond17_AOD_M100_filters.root");
+//   TChain * SPVchain3 = new TChain("treeSPV/SimpAnalysis");
+//   SPVchain3->Add("SIMPs_PUMoriond17_AOD_M200_filters.root");
+//   TChain * SPVchain4 = new TChain("treeSPV/SimpAnalysis");
+//   SPVchain4->Add("SIMPs_PUMoriond17_AOD_M400_filters.root");
+//   TChain * SPVchain5 = new TChain("treeSPV/SimpAnalysis");
+//   SPVchain5->Add("SIMPs_PUMoriond17_AOD_M700_filters.root");
+//   TChain * SPVchain6 = new TChain("treeSPV/SimpAnalysis");
+//   SPVchain6->Add("SIMPs_PUMoriond17_AOD_M1000_filters.root");
+  
   TChain * chain0 = new TChain("treeCorr/SimpAnalysis");
-  chain0->Add("SIMPs_PUMoriond17_AOD_M1.root");
+  chain0->Add("SIMPs_Neutrons_M1_AOD_1.root");
+  chain0->Add("SIMPs_Neutrons_M1_AOD_2.root");
+  chain0->Add("SIMPs_Neutrons_M1_AOD_3.root");
   TChain * chain1 = new TChain("treeCorr/SimpAnalysis");
-  chain1->Add("SIMPs_PUMoriond17_AOD_M10_1.root");
-  chain1->Add("SIMPs_PUMoriond17_AOD_M10_2.root");
-  chain1->Add("SIMPs_PUMoriond17_AOD_M10_3.root");
+  chain1->Add("SIMPs_Neutrons_M10_AOD_1.root");
+  chain1->Add("SIMPs_Neutrons_M10_AOD_2.root");
+  chain1->Add("SIMPs_Neutrons_M10_AOD_3.root");
+  chain1->Add("SIMPs_Neutrons_M10_AOD_4.root");
   TChain * chain2 = new TChain("treeCorr/SimpAnalysis");
-  chain2->Add("SIMPs_PUMoriond17_AOD_M100.root");
+  chain2->Add("SIMPs_Neutrons_M100_AOD_1.root");
+  chain2->Add("SIMPs_Neutrons_M100_AOD_2.root");
+  chain2->Add("SIMPs_Neutrons_M100_AOD_3.root");
   TChain * chain3 = new TChain("treeCorr/SimpAnalysis");
-  chain3->Add("SIMPs_PUMoriond17_AOD_M200.root");
+  chain3->Add("SIMPs_Neutrons_M200_AOD.root");
   TChain * chain4 = new TChain("treeCorr/SimpAnalysis");
-  chain4->Add("SIMPs_PUMoriond17_AOD_M400.root");
+  chain4->Add("SIMPs_Neutrons_M400_AOD.root");
   TChain * chain5 = new TChain("treeCorr/SimpAnalysis");
-  chain5->Add("SIMPs_PUMoriond17_AOD_M700.root");
+  chain5->Add("SIMPs_Neutrons_M700_AOD.root");
   TChain * chain6 = new TChain("treeCorr/SimpAnalysis");
-  chain6->Add("SIMPs_PUMoriond17_AOD_M1000.root");
+  chain6->Add("SIMPs_Neutrons_M1000_AOD.root");
   
   TChain * SPVchain0 = new TChain("treeSPV/SimpAnalysis");
-  SPVchain0->Add("SIMPs_PUMoriond17_AOD_M1.root");
+  SPVchain0->Add("SIMPs_Neutrons_M1_AOD_1.root");
+  SPVchain0->Add("SIMPs_Neutrons_M1_AOD_2.root");
+  SPVchain0->Add("SIMPs_Neutrons_M1_AOD_3.root");
   TChain * SPVchain1 = new TChain("treeSPV/SimpAnalysis");
-  SPVchain1->Add("SIMPs_PUMoriond17_AOD_M10_1.root");
-  SPVchain1->Add("SIMPs_PUMoriond17_AOD_M10_2.root");
-  SPVchain1->Add("SIMPs_PUMoriond17_AOD_M10_3.root");
+  SPVchain1->Add("SIMPs_Neutrons_M10_AOD_1.root");
+  SPVchain1->Add("SIMPs_Neutrons_M10_AOD_2.root");
+  SPVchain1->Add("SIMPs_Neutrons_M10_AOD_3.root");
+  SPVchain1->Add("SIMPs_Neutrons_M10_AOD_4.root");
   TChain * SPVchain2 = new TChain("treeSPV/SimpAnalysis");
-  SPVchain2->Add("SIMPs_PUMoriond17_AOD_M100.root");
+  SPVchain2->Add("SIMPs_Neutrons_M100_AOD_1.root");
+  SPVchain2->Add("SIMPs_Neutrons_M100_AOD_2.root");
+  SPVchain2->Add("SIMPs_Neutrons_M100_AOD_3.root");
   TChain * SPVchain3 = new TChain("treeSPV/SimpAnalysis");
-  SPVchain3->Add("SIMPs_PUMoriond17_AOD_M200.root");
+  SPVchain3->Add("SIMPs_Neutrons_M200_AOD.root");
   TChain * SPVchain4 = new TChain("treeSPV/SimpAnalysis");
-  SPVchain4->Add("SIMPs_PUMoriond17_AOD_M400.root");
+  SPVchain4->Add("SIMPs_Neutrons_M400_AOD.root");
   TChain * SPVchain5 = new TChain("treeSPV/SimpAnalysis");
-  SPVchain5->Add("SIMPs_PUMoriond17_AOD_M700.root");
+  SPVchain5->Add("SIMPs_Neutrons_M700_AOD_new.root");
   TChain * SPVchain6 = new TChain("treeSPV/SimpAnalysis");
-  SPVchain6->Add("SIMPs_PUMoriond17_AOD_M1000.root");
+  SPVchain6->Add("SIMPs_Neutrons_M1000_AOD.root");
 	
 	TChain* chains[7] = {chain0, chain1, chain2, chain3, chain4, chain5, chain6};
 	TChain* SPVchains[7] = {SPVchain0, SPVchain1, SPVchain2, SPVchain3, SPVchain4, SPVchain5, SPVchain6};
@@ -58,14 +104,15 @@ void SIMP_macro(int j){
   double CHEF_SPVjet[8], CHEF_corrjet[8];	
 	
 	double SIMP_xsec[7] = {4.461, 4.402, 2.553, 0.7903, 0.07434, 0.004846, 0.0005714}; //1/pb
-  double lumi = 33.095*1000; //RunB-H pb
+//   double lumi = 33.095*1000; //RunB-H pb
+  double lumi = 16.146*1000; //RunG-H pb
   
 // 	for (int j = 0; j < 7; j++){
 		std::ostringstream strs;
 		double dbl = mass[j];
 		strs << dbl;
 		std::string m = strs.str();
-    outputfiles[j] = new TFile(("plots_SIMPs_M"+m+"_lumi33p095_withNvertexCut.root").c_str(), "RECREATE");
+    outputfiles[j] = new TFile(("plots_SIMP_M"+m+"_neutrons_noDeltaphi.root").c_str(), "RECREATE");
 //   }
   
 // 	for (int j = 0; j < 7; j++){
@@ -74,8 +121,8 @@ void SIMP_macro(int j){
     TH1F *njets = new TH1F("njets", "Number of jets", 11, -0.5, 10.5);
     TH1F *nvtx = new TH1F("nvtx", "Number of vertices", 51, -0.5, 50.5);
     TH1F *vtx_ntracks = new TH1F("vtx_ntracks", "# tracks PV", 101, -0.5, 100.5);
-    TH1F *HT = new TH1F("HT", "HT (4 jets)", 100, 0, 2000);
-    TH1F *HT_nowgt = new TH1F("HT_noweight", "HT (4 jets) without correct weights", 100, 0, 2000);
+    TH1F *HT = new TH1F("HT", "HT (4 jets)", 150, 1000, 4000);
+    TH1F *HT_nowgt = new TH1F("HT_noweight", "HT (4 jets) without correct weights", 150, 1000, 4000);
     TH1F *METOverHT = new TH1F("METOverHT", "MET / HT(4 jets)", 100, 0, 1);	
     TH1F *jet1_pt = new TH1F("jet1_pt", "Leading jet pt", 100, 0, 2000);
     TH1F *jet2_pt = new TH1F("jet2_pt", "Subleading jet pt", 100, 0, 2000);
@@ -90,7 +137,11 @@ void SIMP_macro(int j){
     TH1F *jet1_phi = new TH1F("jet1_phi", "Leading jet phi", 100, -3.14, 3.14);
     TH1F *jet2_phi = new TH1F("jet2_phi", "Subleading jet phi", 100, -3.14, 3.14);
     TH1F *deltaphi = new TH1F("DeltaPhi", "DeltaPhi", 100, 0, 3.14);
+    TH1F *deltaphi_ChFMax0p5 = new TH1F("DeltaPhi_ChFMax0p5", "DeltaPhi (ChF < 0.5)", 100, 0, 3.14);
     TH1F *jet1_chf = new TH1F("jet1_chf", "Charged energy fraction (leading jet)", 100, 0, 1);
+    TH1F *jet1_nhf = new TH1F("jet1_nhf", "Neutral hadron energy fraction (leading jet)", 100, 0, 1);
+    TH1F *jet1_nemf = new TH1F("jet1_nemf", "Neutral em energy fraction (leading jet)", 100, 0, 1);
+    TH1F *jet1_cemf = new TH1F("jet1_cemf", "Charged em energy fraction (leading jet)", 100, 0, 1);
     TH1F *jet1_chf_jet2_0p5 = new TH1F("jet1_chf_jet2_0p5", "Leading jet charged energy fraction (jet2_chf > 0.5)", 100, 0, 1);
     TH1F *jet2_chf = new TH1F("jet2_chf", "Charged energy fraction (subleading jet)", 100, 0, 1);
     TH1F *chf0p5 = new TH1F("chf_Min0p5", "Charged energy fraction (other jet ChF > 0.5)", 100, 0, 1);
@@ -158,6 +209,11 @@ void SIMP_macro(int j){
 			if(entry%1000000==0) std::cout<<"processed "<<entry/1000000<<"M events"<<std::endl;
       SPVjets.GetEntry(entry);
       corrjets.GetEntry(entry);
+    
+      double njet = 0;
+      for (int k = 0; k < 8; ++k){
+        if (corrjets.jet_pt[k] > 30) njet++;
+      }
 			
 // 			Double_t random1 = r.Uniform();
 			
@@ -192,11 +248,16 @@ void SIMP_macro(int j){
 				CHEF_SPVjet[i] = SPVjets.jet_efrac_ch_Had[i]+SPVjets.jet_efrac_ch_EM[i]+SPVjets.jet_efrac_ch_Mu[i];
 				CHEF_corrjet[i] = corrjets.jet_efrac_ch_Had[i]+corrjets.jet_efrac_ch_EM[i]+corrjets.jet_efrac_ch_Mu[i];
 			} 
+      
+      bool pass_conv_1 = true;
+      bool pass_conv_2 = true;
+      if (corrjets.jet_efrac_photon[0] > 0.8 && corrjets.convtracks_pt[photon_nr]/corrjets.photon_pt[photon_nr] > 0.3 && dR1 < 0.2) pass_conv_1 = false;
+      if (corrjets.jet_efrac_photon[1] > 0.8 && corrjets.convtracks_pt[photon_nr]/corrjets.photon_pt[photon_nr] > 0.3 && dR2 < 0.2) pass_conv_2 = false;
 			
 			output->cd();
 			
-			if (corrjets.jet_pt[0] > 250 && corrjets.jet_pt[1] > 250 && fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0 && deltajet_phi > 2 /*&& nPixHits[0] > 0*/ && (corrjets.photon_passLooseId[photon_nr] == 0 || (corrjets.photon_passLooseId[photon_nr] == 1 && dR1 > 0.1 && dR2 > 0.1)) && corrjets.vtx_N >= 2){
-				njets->Fill(corrjets.nJet, weight);
+			if (corrjets.jet_pt[0] > 550 && corrjets.jet_pt[1] > 550 && fabs(corrjets.jet_eta[0]) < 2.0 && fabs(corrjets.jet_eta[1]) < 2.0 /*&& deltajet_phi > 2*/ && (corrjets.photon_passLooseId[photon_nr] == 0 || (corrjets.photon_passLooseId[photon_nr] == 1 && dR1 > 0.1 && dR2 > 0.1)) && (corrjets.jet_efrac_photon[0] < 0.9 && corrjets.jet_efrac_photon[1] < 0.9) && corrjets.vtx_N >= 2 && njet == 2 && pass_conv_1 && pass_conv_2 && corrjets.Flag_HBHENoiseFilter == 1 /*&& corrjets.Flag_HBHENoiseIsoFilter == 1*/ && corrjets.Flag_EcalDeadCellTriggerPrimitiveFilter == 1 && corrjets.Flag_goodVertices == 1 && corrjets.Flag_eeBadScFilter == 1 && corrjets.Flag_globalTightHalo2016Filter == 1){
+				njets->Fill(njet, weight);
 				nvtx->Fill(corrjets.vtx_N, weight);
 				vtx_ntracks->Fill(corrjets.vtx_nTracks[0], weight);
 				HT->Fill(corrjets.jet_pt[0]+corrjets.jet_pt[1]+corrjets.jet_pt[2]+corrjets.jet_pt[3], weight);
@@ -213,8 +274,12 @@ void SIMP_macro(int j){
 				jet1_phi->Fill(corrjets.jet_phi[0], weight);
 				jet2_phi->Fill(corrjets.jet_phi[1], weight);
 				deltaphi->Fill(deltajet_phi, weight);
+        if (CHEF_corrjet[0] < 0.5 && CHEF_corrjet[1] < 0.5 && CHEF_SPVjet[0] < 0.5 && CHEF_SPVjet[1] < 0.5) deltaphi_ChFMax0p5->Fill(deltajet_phi, weight);
 				
 				jet1_chf->Fill(CHEF_corrjet[0], weight);
+				jet1_nhf->Fill(corrjets.jet_efrac_ne_Had[0], weight);
+				jet1_nemf->Fill(corrjets.jet_efrac_ne_EM[0], weight);
+				jet1_cemf->Fill(corrjets.jet_efrac_ch_EM[0], weight);
 				if (CHEF_corrjet[1] > 0.5) jet1_chf_jet2_0p5->Fill(CHEF_corrjet[0], weight);
 				jet2_chf->Fill(CHEF_corrjet[1], weight);
 // 				if (jet_pt[2] > 20) jet3_chf->Fill(CHEF_jet[2], weight);
